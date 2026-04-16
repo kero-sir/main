@@ -216,7 +216,14 @@
         /* Expense Summary */
         .expense-summary { background: var(--primary-light); padding: 15px; border-radius: 8px; margin-top: 15px; }
         
-        /* Scrollbar personalizada */
+        /* Signature Area */
+        .signature-area { border-top: 1px solid #ddd; margin-top: 20px; padding-top: 20px; }
+        .signature-line { display: flex; justify-content: space-between; margin-top: 20px; flex-wrap: wrap; gap: 15px; }
+        .signature-item { text-align: center; flex: 1; min-width: 150px; }
+        .signature-item input { border: none; border-bottom: 1px solid #ccc; width: 100%; text-align: center; padding: 8px; background: transparent; }
+        .signature-item input:focus { outline: none; border-bottom-color: var(--primary); }
+        
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: var(--gray-200); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
@@ -413,7 +420,7 @@
         </div>
     </div>
 
-    <!-- MODAL AVALIAÇÃO COM ANEXOS -->
+    <!-- MODAL AVALIAÇÃO COM ANEXOS E NOVAS OPÇÕES -->
     <div class="modal" id="modalAvaliacao">
         <div class="modal-content">
             <div class="modal-header"><h2><i class="fas fa-clipboard-check"></i> Avaliação da Manutenção</h2><span class="close-modal" onclick="window.app.fecharModal('modalAvaliacao')">&times;</span></div>
@@ -423,19 +430,90 @@
                     
                     <div class="form-group"><label>Diagnóstico *</label><textarea id="diagnostico" class="form-control" rows="3" placeholder="Descreva o diagnóstico realizado..." required></textarea></div>
                     
-                    <div class="form-group"><label>Consegue resolver sem comprar materiais?</label>
-                        <select id="precisaComprar" class="form-control">
-                            <option value="nao">Sim, resolvo com recursos internos (sem gastos)</option>
-                            <option value="sim">Não, preciso comprar materiais/serviços</option>
+                    <div class="form-group"><label>Situação da Resolução *</label>
+                        <select id="opcaoResolucao" class="form-control" required>
+                            <option value="">Selecione uma opção</option>
+                            <option value="com_material">✅ Sim, consigo resolver (já tenho todo material)</option>
+                            <option value="recursos_internos">🔄 Sim, consigo resolver com recursos internos/consumo</option>
+                            <option value="nao_consigo">❌ Não consigo resolver (precisa comprar)</option>
                         </select>
                     </div>
                     
-                    <div id="camposCompra" style="display:none;">
-                        <div class="form-group"><label>Itens a Comprar / Serviços</label>
-                            <div id="listaItens"></div>
-                            <button type="button" class="btn-small btn-view" onclick="window.app.adicionarItemCompra()"><i class="fas fa-plus"></i> Adicionar Item</button>
+                    <!-- Opção: Recursos Internos -->
+                    <div id="recursosInternosOpcao" style="display:none;">
+                        <div class="form-group"><label>Tipo de Recurso</label>
+                            <select id="tipoRecursoInterno" class="form-control">
+                                <option value="transferencia">📦 Transferência de Recurso (de outro local)</option>
+                                <option value="consumo">⚡ Consumo (material de stock interno)</option>
+                            </select>
                         </div>
-                        <div class="form-group"><label>Justificativa da Compra</label><textarea id="justificativaCompra" class="form-control" rows="2"></textarea></div>
+                        <div class="form-group"><label>Detalhes do Recurso/Consumo</label>
+                            <textarea id="detalhesRecurso" class="form-control" rows="2" placeholder="Descreva qual recurso será transferido ou qual material será consumido..."></textarea>
+                        </div>
+                        <div class="form-group"><label>Custo Estimado (se aplicável)</label>
+                            <input type="number" id="custoRecursoInterno" class="form-control" placeholder="0 KZ" value="0">
+                        </div>
+                    </div>
+                    
+                    <!-- Opção: Não Consigo Resolver - Formulário de Compra/Serviço -->
+                    <div id="naoConsigoResolverOpcao" style="display:none;">
+                        <div class="expense-summary">
+                            <h4 style="margin-bottom:15px;"><i class="fas fa-file-invoice"></i> Formulário de Requisição de Compra/Serviço</h4>
+                            
+                            <div class="form-group"><label>Fornecedor</label>
+                                <input type="text" id="fornecedor" class="form-control" placeholder="Nome do fornecedor">
+                            </div>
+                            
+                            <div class="form-group"><label>Modo de Recebimento</label>
+                                <select id="modoRecebimento" class="form-control">
+                                    <option value="Transferência">Transferência Bancária</option>
+                                    <option value="Numerário">Numerário</option>
+                                    <option value="Cheque">Cheque</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group"><label>Moeda</label>
+                                <select id="moeda" class="form-control">
+                                    <option value="AKZ">AKZ - Kwanza</option>
+                                    <option value="USD">USD - Dólar</option>
+                                    <option value="EUR">EUR - Euro</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group"><label>Data da Despesa</label>
+                                <input type="date" id="dataDespesa" class="form-control">
+                            </div>
+                            
+                            <div class="form-group"><label>Itens/Serviços</label>
+                                <div id="listaItensCompra"></div>
+                                <button type="button" class="btn-small btn-view" onclick="window.app.adicionarItemCompraForm()"><i class="fas fa-plus"></i> Adicionar Item/Serviço</button>
+                            </div>
+                            
+                            <div class="form-group"><label>Motivo da Despesa</label>
+                                <textarea id="motivoDespesa" class="form-control" rows="2" placeholder="Descreva o motivo da despesa..."></textarea>
+                            </div>
+                            
+                            <div class="signature-area">
+                                <h4><i class="fas fa-signature"></i> Assinaturas</h4>
+                                <div class="signature-line">
+                                    <div class="signature-item">
+                                        <label>Beneficiário/Dir. Área</label>
+                                        <input type="text" id="assinaturaBeneficiario" class="form-control" placeholder="Nome do Responsável">
+                                        <small>Data: <input type="date" id="dataBeneficiario" style="border:none;background:transparent;"></small>
+                                    </div>
+                                    <div class="signature-item">
+                                        <label>Validado por (Dir.CG)</label>
+                                        <input type="text" id="assinaturaCG" class="form-control" placeholder="Nome do Dir. CG">
+                                        <small>Data: <input type="date" id="dataCG" style="border:none;background:transparent;"></small>
+                                    </div>
+                                    <div class="signature-item">
+                                        <label>Aprovado por (Dir.Fin./Dir.Geral)</label>
+                                        <input type="text" id="assinaturaDiretor" class="form-control" placeholder="Nome do Diretor">
+                                        <small>Data: <input type="date" id="dataDiretor" style="border:none;background:transparent;"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -500,13 +578,10 @@
     </div>
 
     <script>
-        // Módulo Principal - IIFE para encapsulamento
+        // Módulo Principal
         (function() {
             'use strict';
             
-            // ============================================
-            // CONSTANTES E CONFIGURAÇÕES
-            // ============================================
             const todasDirecoes = [
                 "Direção Geral", "Sede", "Loja Morro Bento", "Loja Nova Vida", "Loja Saurimo",
                 "Loja Gika", "Loja Viana", "Loja Martíres", "Loja Combatentes", "Loja Benguela",
@@ -522,7 +597,6 @@
                 'admin': { nome: 'Administrador', perfil: 'Administrador' }
             };
             
-            // Estado da aplicação
             let state = {
                 usuarioAtual: null,
                 requisicoes: [],
@@ -533,25 +607,12 @@
                 ordenacao: 'newest',
                 configuracoes: { limiteCG: 500000, orcamentoAnual: 5000000 },
                 anexosAvaliacao: [],
-                contadorItens: 1,
+                contadorItensCompra: 1,
                 graficos: {}
             };
             
-            // DOM Elements cache
-            const elements = {};
-            
-            // ============================================
-            // FUNÇÕES UTILITÁRIAS
-            // ============================================
-            function showLoading() {
-                const overlay = document.getElementById('loadingOverlay');
-                if (overlay) overlay.classList.add('show');
-            }
-            
-            function hideLoading() {
-                const overlay = document.getElementById('loadingOverlay');
-                if (overlay) overlay.classList.remove('show');
-            }
+            function showLoading() { document.getElementById('loadingOverlay')?.classList.add('show'); }
+            function hideLoading() { document.getElementById('loadingOverlay')?.classList.remove('show'); }
             
             function mostrarNotificacao(msg, tipo) {
                 const div = document.createElement('div');
@@ -562,111 +623,45 @@
                 setTimeout(() => div.remove(), 4000);
             }
             
-            function formatarData(d) {
-                if (!d) return '';
-                try {
-                    return new Date(d).toLocaleDateString('pt-PT');
-                } catch(e) {
-                    return '';
-                }
-            }
-            
-            function formatarDataHora(d) {
-                if (!d) return '';
-                try {
-                    return new Date(d).toLocaleString('pt-PT');
-                } catch(e) {
-                    return '';
-                }
-            }
-            
-            function formatarMoeda(v) {
-                return (v || 0).toLocaleString('pt-AO') + ' KZ';
-            }
+            function formatarData(d) { if (!d) return ''; try { return new Date(d).toLocaleDateString('pt-PT'); } catch(e) { return ''; } }
+            function formatarDataHora(d) { if (!d) return ''; try { return new Date(d).toLocaleString('pt-PT'); } catch(e) { return ''; } }
+            function formatarMoeda(v) { return (v || 0).toLocaleString('pt-AO') + ' KZ'; }
             
             function getStatusText(s) {
-                const m = { 
-                    'pendente': 'Pendente', 
-                    'em_atendimento': 'Em Atendimento', 
-                    'aguardando_aprovacao_cg': 'Aguard. CG', 
-                    'aguardando_aprovacao_diretor': 'Aguard. Director', 
-                    'concluida_sem_gastos': 'Concluída s/ Gastos', 
-                    'concluida_com_gastos': 'Concluída c/ Gastos', 
-                    'reprovada': 'Reprovada' 
-                };
+                const m = { 'pendente': 'Pendente', 'em_atendimento': 'Em Atendimento', 'aguardando_aprovacao_cg': 'Aguard. CG', 'aguardando_aprovacao_diretor': 'Aguard. Director', 'concluida_sem_gastos': 'Concluída s/ Gastos', 'concluida_com_gastos': 'Concluída c/ Gastos', 'reprovada': 'Reprovada' };
                 return m[s] || s;
             }
             
-            function getTipoManutencaoText(t) {
-                const m = { 'corretiva': 'Corretiva', 'preventiva': 'Preventiva', 'preditiva': 'Preditiva', 'urgente': 'Urgente' };
-                return m[t] || t;
-            }
-            
+            function getTipoManutencaoText(t) { const m = { 'corretiva': 'Corretiva', 'preventiva': 'Preventiva', 'preditiva': 'Preditiva', 'urgente': 'Urgente' }; return m[t] || t; }
             function getTipoClass(t) { return `type-${t}`; }
             function getPrioridadeClass(p) { return `priority-${p}`; }
             function getStatusClass(s) { return `status-${s}`; }
             
-            function gerarCodigo() {
-                const ano = new Date().getFullYear();
-                const num = String(state.requisicoes.length + 1).padStart(4, '0');
-                return `MAN-${ano}-${num}`;
-            }
+            function gerarCodigo() { const ano = new Date().getFullYear(); const num = String(state.requisicoes.length + 1).padStart(4, '0'); return `MAN-${ano}-${num}`; }
             
-            // Persistência de dados
-            function salvarDados() {
-                try {
-                    localStorage.setItem('requisicoesManutencao', JSON.stringify(state.requisicoes));
-                    localStorage.setItem('configManutencao', JSON.stringify(state.configuracoes));
-                } catch(e) {
-                    mostrarNotificacao('Erro ao salvar dados: ' + e.message, 'error');
-                }
-            }
+            function salvarDados() { try { localStorage.setItem('requisicoesManutencao', JSON.stringify(state.requisicoes)); localStorage.setItem('configManutencao', JSON.stringify(state.configuracoes)); } catch(e) { mostrarNotificacao('Erro ao salvar dados', 'error'); } }
             
             function carregarDados() {
                 try {
                     const saved = localStorage.getItem('requisicoesManutencao');
-                    if (saved) {
-                        state.requisicoes = JSON.parse(saved);
-                    } else {
-                        carregarDadosExemplo();
-                    }
-                    
+                    if (saved) { state.requisicoes = JSON.parse(saved); }
+                    else { carregarDadosExemplo(); }
                     const configSaved = localStorage.getItem('configManutencao');
-                    if (configSaved) {
-                        state.configuracoes = JSON.parse(configSaved);
-                    }
-                } catch(e) {
-                    mostrarNotificacao('Erro ao carregar dados: ' + e.message, 'error');
-                    carregarDadosExemplo();
-                }
+                    if (configSaved) { state.configuracoes = JSON.parse(configSaved); }
+                } catch(e) { mostrarNotificacao('Erro ao carregar dados', 'error'); carregarDadosExemplo(); }
             }
             
             function carregarDadosExemplo() {
                 if (state.requisicoes.length === 0) {
                     state.requisicoes = [
-                        { 
-                            id: '1', codigo: 'MAN-2024-0001', tipoManutencao: 'corretiva', 
-                            equipamento: 'Ar Condicionado', local: 'Direção de Sistemas', 
-                            prioridade: 'alta', descricao: 'Não está gelando', 
-                            status: 'pendente', dataAbertura: new Date(Date.now() - 2*24*60*60*1000).toISOString(), 
-                            criadoPor: 'João Solicitante', criadoPorEmail: 'solicitante@accord.com' 
-                        },
-                        { 
-                            id: '2', codigo: 'MAN-2024-0002', tipoManutencao: 'urgente', 
-                            equipamento: 'Quadro Elétrico', local: 'Loja Talatona', 
-                            prioridade: 'alta', descricao: 'Disjuntores desarmando', 
-                            status: 'em_atendimento', dataAbertura: new Date(Date.now() - 5*24*60*60*1000).toISOString(), 
-                            criadoPor: 'Maria Gerente', criadoPorEmail: 'gerente@accord.com' 
-                        }
+                        { id: '1', codigo: 'MAN-2024-0001', tipoManutencao: 'corretiva', equipamento: 'Ar Condicionado', local: 'Direção de Sistemas', prioridade: 'alta', descricao: 'Não está gelando', status: 'pendente', dataAbertura: new Date(Date.now() - 2*24*60*60*1000).toISOString(), criadoPor: 'João Solicitante', criadoPorEmail: 'solicitante@accord.com' },
+                        { id: '2', codigo: 'MAN-2024-0002', tipoManutencao: 'urgente', equipamento: 'Quadro Elétrico', local: 'Loja Talatona', prioridade: 'alta', descricao: 'Disjuntores desarmando', status: 'em_atendimento', dataAbertura: new Date(Date.now() - 5*24*60*60*1000).toISOString(), criadoPor: 'Maria Gerente', criadoPorEmail: 'gerente@accord.com' }
                     ];
                     salvarDados();
                     mostrarNotificacao('Dados de exemplo carregados!', 'success');
                 }
             }
             
-            // ============================================
-            // CONTROLE DE ACESSO
-            // ============================================
             function isAdmin() { return state.usuarioAtual?.perfil === 'Administrador'; }
             function isManutencao() { return state.usuarioAtual?.perfil === 'Manutenção' || isAdmin(); }
             function isCG() { return state.usuarioAtual?.perfil === 'Controlo Gestão' || isAdmin(); }
@@ -679,9 +674,6 @@
                 return req.criadoPorEmail === 'solicitante@accord.com';
             }
             
-            // ============================================
-            // LOGIN
-            // ============================================
             function loginComo(tipo) {
                 if (perfisUsuarios[tipo]) {
                     state.usuarioAtual = { ...perfisUsuarios[tipo] };
@@ -694,37 +686,17 @@
                 }
             }
             
-            function logout() {
-                if (confirm('Tem certeza que deseja sair?')) {
-                    state.usuarioAtual = null;
-                    document.getElementById('mainSystem').style.display = 'none';
-                    document.getElementById('loginScreen').style.display = 'flex';
-                }
-            }
+            function logout() { if (confirm('Tem certeza que deseja sair?')) { state.usuarioAtual = null; document.getElementById('mainSystem').style.display = 'none'; document.getElementById('loginScreen').style.display = 'flex'; } }
             
-            // ============================================
-            // GERENCIAMENTO DE ANEXOS
-            // ============================================
             function handleAvaliacaoFiles(files) {
                 const maxSize = 10 * 1024 * 1024;
-                
                 for (let f of files) {
-                    if (f.size > maxSize) {
-                        mostrarNotificacao(`${f.name} excede 10MB`, 'error');
-                    } else {
+                    if (f.size > maxSize) { mostrarNotificacao(`${f.name} excede 10MB`, 'error'); }
+                    else {
                         const reader = new FileReader();
                         reader.onload = function(e) {
-                            state.anexosAvaliacao.push({
-                                id: Date.now() + Math.random(),
-                                name: f.name,
-                                size: f.size,
-                                type: f.type,
-                                data: e.target.result
-                            });
+                            state.anexosAvaliacao.push({ id: Date.now() + Math.random(), name: f.name, size: f.size, type: f.type, data: e.target.result });
                             atualizarListaAnexos();
-                        };
-                        reader.onerror = function() {
-                            mostrarNotificacao(`Erro ao ler arquivo ${f.name}`, 'error');
                         };
                         reader.readAsDataURL(f);
                     }
@@ -734,80 +706,61 @@
             function atualizarListaAnexos() {
                 const list = document.getElementById('avaliacaoFileList');
                 if (!list) return;
-                
-                if (state.anexosAvaliacao.length === 0) {
-                    list.innerHTML = '';
-                    return;
-                }
-                
-                list.innerHTML = state.anexosAvaliacao.map((a, i) => `
-                    <div class="file-item">
-                        <div class="file-info">
-                            <i class="fas ${a.type.includes('image') ? 'fa-image' : (a.type.includes('pdf') ? 'fa-file-pdf' : 'fa-file')}"></i>
-                            <div>
-                                <div>${escapeHtml(a.name)}</div>
-                                <div class="file-size">${(a.size / 1024).toFixed(2)} KB</div>
-                            </div>
-                        </div>
-                        <i class="fas fa-times file-remove" onclick="window.app.removerAnexo(${i})"></i>
-                    </div>
-                `).join('');
+                if (state.anexosAvaliacao.length === 0) { list.innerHTML = ''; return; }
+                list.innerHTML = state.anexosAvaliacao.map((a, i) => `<div class="file-item"><div class="file-info"><i class="fas ${a.type.includes('image') ? 'fa-image' : (a.type.includes('pdf') ? 'fa-file-pdf' : 'fa-file')}"></i><div><div>${escapeHtml(a.name)}</div><div class="file-size">${(a.size / 1024).toFixed(2)} KB</div></div></div><i class="fas fa-times file-remove" onclick="window.app.removerAnexo(${i})"></i></div>`).join('');
             }
             
-            function removerAnexo(index) {
-                if (confirm('Remover este anexo?')) {
-                    state.anexosAvaliacao.splice(index, 1);
-                    atualizarListaAnexos();
-                }
+            function removerAnexo(index) { if (confirm('Remover este anexo?')) { state.anexosAvaliacao.splice(index, 1); atualizarListaAnexos(); } }
+            function escapeHtml(str) { if (!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+            
+            function adicionarItemCompraForm() {
+                const lista = document.getElementById('listaItensCompra');
+                const index = state.contadorItensCompra;
+                const div = document.createElement('div');
+                div.className = 'item-compra';
+                div.style.display = 'flex';
+                div.style.gap = '10px';
+                div.style.marginBottom = '10px';
+                div.style.flexWrap = 'wrap';
+                div.innerHTML = `<input type="text" placeholder="Descrição do Item/Serviço" class="form-control" style="flex:2;" id="itemDescCompra${index}"><input type="number" placeholder="Qtd" class="form-control" style="flex:1;" id="itemQtdCompra${index}" value="1"><input type="number" placeholder="Valor Unitário" class="form-control" style="flex:1;" id="itemPrecoCompra${index}"><button type="button" class="btn-small btn-reject" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>`;
+                lista.appendChild(div);
+                state.contadorItensCompra++;
             }
             
-            function visualizarAnexo(reqId, anexoIndex) {
-                const req = state.requisicoes.find(r => r.id === reqId);
-                if (req && req.anexos && req.anexos[anexoIndex]) {
-                    const anexo = req.anexos[anexoIndex];
-                    if (anexo.type && anexo.type.includes('image')) {
-                        const win = window.open();
-                        win.document.write(`<html><body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#333;"><img src="${anexo.data}" style="max-width:90%;max-height:90%;"></body></html>`);
-                    } else {
-                        const link = document.createElement('a');
-                        link.href = anexo.data;
-                        link.download = anexo.name;
-                        link.click();
+            function getItensCompra() {
+                const itens = [];
+                for (let i = 1; i < state.contadorItensCompra; i++) {
+                    const desc = document.getElementById(`itemDescCompra${i}`)?.value;
+                    if (desc) {
+                        const qtd = parseFloat(document.getElementById(`itemQtdCompra${i}`)?.value) || 0;
+                        const preco = parseFloat(document.getElementById(`itemPrecoCompra${i}`)?.value) || 0;
+                        itens.push({ desc, qtd, preco, total: qtd * preco });
                     }
                 }
+                return itens;
             }
             
-            // Função para escapar HTML e prevenir XSS
-            function escapeHtml(str) {
-                if (!str) return '';
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
+            function calcularTotalCompra() {
+                let total = 0;
+                for (let i = 1; i < state.contadorItensCompra; i++) {
+                    const qtd = parseFloat(document.getElementById(`itemQtdCompra${i}`)?.value) || 0;
+                    const preco = parseFloat(document.getElementById(`itemPrecoCompra${i}`)?.value) || 0;
+                    total += qtd * preco;
+                }
+                return total;
             }
             
-            // ============================================
-            // REQUISIÇÕES
-            // ============================================
             function filtrarRequisicoes() {
                 let lista = [...state.requisicoes];
                 lista = lista.filter(r => podeVerRequisicao(r));
-                
-                if (state.filtrosAtivos.pesquisa) {
-                    const p = state.filtrosAtivos.pesquisa.toLowerCase();
-                    lista = lista.filter(r => r.codigo.toLowerCase().includes(p) || r.equipamento.toLowerCase().includes(p));
-                }
+                if (state.filtrosAtivos.pesquisa) { const p = state.filtrosAtivos.pesquisa.toLowerCase(); lista = lista.filter(r => r.codigo.toLowerCase().includes(p) || r.equipamento.toLowerCase().includes(p)); }
                 if (state.filtrosAtivos.status) lista = lista.filter(r => r.status === state.filtrosAtivos.status);
                 if (state.filtrosAtivos.tipo) lista = lista.filter(r => r.tipoManutencao === state.filtrosAtivos.tipo);
                 if (state.filtrosAtivos.prioridade) lista = lista.filter(r => r.prioridade === state.filtrosAtivos.prioridade);
                 if (state.filtrosAtivos.direcao) lista = lista.filter(r => r.local === state.filtrosAtivos.direcao);
-                
                 if (state.ordenacao === 'newest') lista.sort((a,b) => new Date(b.dataAbertura) - new Date(a.dataAbertura));
                 else if (state.ordenacao === 'oldest') lista.sort((a,b) => new Date(a.dataAbertura) - new Date(b.dataAbertura));
-                else if (state.ordenacao === 'priority') {
-                    const prioridades = { 'alta': 0, 'media': 1, 'baixa': 2 };
-                    lista.sort((a,b) => prioridades[a.prioridade] - prioridades[b.prioridade]);
-                }
-                
+                else if (state.ordenacao === 'priority') { const prioridades = { 'alta': 0, 'media': 1, 'baixa': 2 }; lista.sort((a,b) => prioridades[a.prioridade] - prioridades[b.prioridade]); }
                 state.requisicoesFiltradas = lista;
                 state.paginaAtual = 1;
                 carregarRequisicoes();
@@ -816,54 +769,21 @@
             function carregarRequisicoes() {
                 const tbody = document.getElementById('corpoTabela');
                 if (!tbody) return;
-                
                 tbody.innerHTML = '';
-                
-                if (state.requisicoesFiltradas.length === 0) {
-                    const row = tbody.insertRow();
-                    const cell = row.insertCell(0);
-                    cell.colSpan = 8;
-                    cell.textContent = 'Nenhuma requisição encontrada';
-                    cell.style.textAlign = 'center';
-                    return;
-                }
-                
+                if (state.requisicoesFiltradas.length === 0) { const row = tbody.insertRow(); const cell = row.insertCell(0); cell.colSpan = 8; cell.textContent = 'Nenhuma requisição encontrada'; cell.style.textAlign = 'center'; return; }
                 const inicio = (state.paginaAtual - 1) * state.itensPorPagina;
                 const itens = state.requisicoesFiltradas.slice(inicio, inicio + state.itensPorPagina);
-                
                 itens.forEach(r => {
                     const row = tbody.insertRow();
                     row.dataset.id = r.id;
                     row.addEventListener('click', () => visualizarRequisicao(r.id));
-                    
-                    const cells = [
-                        r.codigo,
-                        r.equipamento,
-                        r.local,
-                        `<span class="type-badge ${getTipoClass(r.tipoManutencao)}">${getTipoManutencaoText(r.tipoManutencao)}</span>`,
-                        `<span class="priority-badge ${getPrioridadeClass(r.prioridade)}">${r.prioridade}</span>`,
-                        `<span class="status-badge ${getStatusClass(r.status)}">${getStatusText(r.status)}</span>`,
-                        r.valorTotalCompra ? formatarMoeda(r.valorTotalCompra) : '-',
-                        ''
-                    ];
-                    
-                    cells.forEach((content, idx) => {
-                        const cell = row.insertCell(idx);
-                        if (idx === 7) {
-                            cell.innerHTML = `<div class="action-buttons">${getBotoesAcao(r)}</div>`;
-                        } else if (idx >= 3 && idx <= 5) {
-                            cell.innerHTML = content;
-                        } else {
-                            cell.textContent = content;
-                        }
-                    });
+                    const cells = [r.codigo, r.equipamento, r.local, `<span class="type-badge ${getTipoClass(r.tipoManutencao)}">${getTipoManutencaoText(r.tipoManutencao)}</span>`, `<span class="priority-badge ${getPrioridadeClass(r.prioridade)}">${r.prioridade}</span>`, `<span class="status-badge ${getStatusClass(r.status)}">${getStatusText(r.status)}</span>`, r.valorTotalCompra ? formatarMoeda(r.valorTotalCompra) : '-', ''];
+                    cells.forEach((content, idx) => { const cell = row.insertCell(idx); if (idx === 7) { cell.innerHTML = `<div class="action-buttons">${getBotoesAcao(r)}</div>`; } else if (idx >= 3 && idx <= 5) { cell.innerHTML = content; } else { cell.textContent = content; } });
                 });
-                
                 const total = Math.ceil(state.requisicoesFiltradas.length / state.itensPorPagina);
                 const paginaAnterior = document.getElementById('paginaAnterior');
                 const paginaProxima = document.getElementById('paginaProxima');
                 const infoPagina = document.getElementById('infoPagina');
-                
                 if (paginaAnterior) paginaAnterior.disabled = state.paginaAtual === 1;
                 if (paginaProxima) paginaProxima.disabled = state.paginaAtual === total;
                 if (infoPagina) infoPagina.textContent = `Página ${state.paginaAtual} de ${total || 1}`;
@@ -871,100 +791,39 @@
             
             function getBotoesAcao(req) {
                 let botoes = '';
-                
-                if (isManutencao() && req.status === 'pendente') {
-                    botoes += `<button class="btn-small btn-approve" onclick="event.stopPropagation();window.app.abrirModalAvaliacao('${req.id}')"><i class="fas fa-clipboard-check"></i> Avaliar</button>`;
-                }
-                if (isManutencao() && req.status === 'em_atendimento') {
-                    botoes += `<button class="btn-small btn-approve" onclick="event.stopPropagation();window.app.abrirModalConcluir('${req.id}')"><i class="fas fa-check-circle"></i> Concluir</button>`;
-                }
-                if (isCG() && req.status === 'aguardando_aprovacao_cg') {
-                    botoes += `<button class="btn-small btn-approve" onclick="event.stopPropagation();window.app.abrirModalAprovacao('${req.id}', 'cg')"><i class="fas fa-check"></i> Aprovar</button>
-                            <button class="btn-small btn-reject" onclick="event.stopPropagation();window.app.abrirModalAprovacao('${req.id}', 'cg')"><i class="fas fa-times"></i> Reprovar</button>`;
-                }
-                if (isDiretor() && req.status === 'aguardando_aprovacao_diretor') {
-                    botoes += `<button class="btn-small btn-approve" onclick="event.stopPropagation();window.app.abrirModalAprovacao('${req.id}', 'diretor')"><i class="fas fa-check"></i> Aprovar</button>
-                            <button class="btn-small btn-reject" onclick="event.stopPropagation();window.app.abrirModalAprovacao('${req.id}', 'diretor')"><i class="fas fa-times"></i> Reprovar</button>`;
-                }
-                
+                if (isManutencao() && req.status === 'pendente') { botoes += `<button class="btn-small btn-approve" onclick="event.stopPropagation();window.app.abrirModalAvaliacao('${req.id}')"><i class="fas fa-clipboard-check"></i> Avaliar</button>`; }
+                if (isManutencao() && req.status === 'em_atendimento') { botoes += `<button class="btn-small btn-approve" onclick="event.stopPropagation();window.app.abrirModalConcluir('${req.id}')"><i class="fas fa-check-circle"></i> Concluir</button>`; }
+                if (isCG() && req.status === 'aguardando_aprovacao_cg') { botoes += `<button class="btn-small btn-approve" onclick="event.stopPropagation();window.app.abrirModalAprovacao('${req.id}', 'cg')"><i class="fas fa-check"></i> Aprovar</button><button class="btn-small btn-reject" onclick="event.stopPropagation();window.app.abrirModalAprovacao('${req.id}', 'cg')"><i class="fas fa-times"></i> Reprovar</button>`; }
+                if (isDiretor() && req.status === 'aguardando_aprovacao_diretor') { botoes += `<button class="btn-small btn-approve" onclick="event.stopPropagation();window.app.abrirModalAprovacao('${req.id}', 'diretor')"><i class="fas fa-check"></i> Aprovar</button><button class="btn-small btn-reject" onclick="event.stopPropagation();window.app.abrirModalAprovacao('${req.id}', 'diretor')"><i class="fas fa-times"></i> Reprovar</button>`; }
                 return botoes;
             }
             
             function visualizarRequisicao(id) {
                 const req = state.requisicoes.find(r => r.id === id);
                 if (!req) return;
-                
                 const container = document.getElementById('conteudoModal');
-                if (!container) return;
-                
-                let html = `
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-                        <div><strong>Código:</strong> ${escapeHtml(req.codigo)}</div>
-                        <div><strong>Tipo:</strong> <span class="type-badge ${getTipoClass(req.tipoManutencao)}">${getTipoManutencaoText(req.tipoManutencao)}</span></div>
-                        <div><strong>Equipamento:</strong> ${escapeHtml(req.equipamento)}</div>
-                        <div><strong>Local:</strong> ${escapeHtml(req.local)}</div>
-                        <div><strong>Prioridade:</strong> <span class="priority-badge ${getPrioridadeClass(req.prioridade)}">${req.prioridade}</span></div>
-                        <div><strong>Status:</strong> <span class="status-badge ${getStatusClass(req.status)}">${getStatusText(req.status)}</span></div>
-                        <div><strong>Solicitante:</strong> ${escapeHtml(req.criadoPor)}</div>
-                        <div><strong>Data Abertura:</strong> ${formatarDataHora(req.dataAbertura)}</div>
-                    </div>
-                    <div><strong>Descrição:</strong><br>${escapeHtml(req.descricao)}</div>
-                `;
-                
+                let html = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;"><div><strong>Código:</strong> ${escapeHtml(req.codigo)}</div><div><strong>Tipo:</strong> <span class="type-badge ${getTipoClass(req.tipoManutencao)}">${getTipoManutencaoText(req.tipoManutencao)}</span></div><div><strong>Equipamento:</strong> ${escapeHtml(req.equipamento)}</div><div><strong>Local:</strong> ${escapeHtml(req.local)}</div><div><strong>Prioridade:</strong> <span class="priority-badge ${getPrioridadeClass(req.prioridade)}">${req.prioridade}</span></div><div><strong>Status:</strong> <span class="status-badge ${getStatusClass(req.status)}">${getStatusText(req.status)}</span></div><div><strong>Solicitante:</strong> ${escapeHtml(req.criadoPor)}</div><div><strong>Data Abertura:</strong> ${formatarDataHora(req.dataAbertura)}</div></div><div><strong>Descrição:</strong><br>${escapeHtml(req.descricao)}</div>`;
                 if (req.diagnostico) html += `<div style="margin-top:15px;"><strong>Diagnóstico:</strong><br>${escapeHtml(req.diagnostico)}</div>`;
-                if (req.itensCompra && req.itensCompra.length > 0) {
-                    html += `<div style="margin-top:15px;"><strong>Itens a Comprar:</strong><table style="width:100%;margin-top:5px;border-collapse:collapse;"><thead><tr style="background:#f5f5f5;"><th>Descrição</th><th>Qtd</th><th>Preço</th><th>Total</th></tr></thead><tbody>`;
-                    req.itensCompra.forEach(i => {
-                        html += `<tr><td>${escapeHtml(i.desc)}</td><td>${i.qtd}</td><td>${formatarMoeda(i.preco)}</td><td>${formatarMoeda(i.total)}</td></tr>`;
-                    });
-                    html += `<tr style="font-weight:bold;background:#fff3e0;"><td colspan="3">Total:</td><td>${formatarMoeda(req.valorTotalCompra)}</td></tr></tbody></table></div>`;
-                }
-                
-                if (req.anexos && req.anexos.length > 0) {
-                    html += `<div style="margin-top:15px;"><strong>Anexos:</strong><div class="anexos-list">`;
-                    req.anexos.forEach((a, idx) => {
-                        html += `<div class="anexo-item"><i class="fas ${a.type.includes('image') ? 'fa-image' : 'fa-file'}"></i> <a onclick="window.app.visualizarAnexo('${req.id}', ${idx})">${escapeHtml(a.name)}</a> <span class="file-size">(${(a.size/1024).toFixed(1)}KB)</span></div>`;
-                    });
-                    html += `</div></div>`;
-                }
-                
+                if (req.opcaoResolucao === 'com_material') html += `<div style="margin-top:15px;background:#e8f5e9;padding:10px;border-radius:5px;"><strong>✅ Resolução:</strong> Tínhamos o material disponível</div>`;
+                else if (req.opcaoResolucao === 'recursos_internos') html += `<div style="margin-top:15px;background:#e3f2fd;padding:10px;border-radius:5px;"><strong>🔄 Resolução com Recursos Internos:</strong><br>Tipo: ${req.tipoRecursoInterno === 'transferencia' ? 'Transferência de Recurso' : 'Consumo'}<br>Detalhes: ${escapeHtml(req.detalhesRecurso)}<br>Custo: ${formatarMoeda(req.custoRecursoInterno)}</div>`;
+                else if (req.opcaoResolucao === 'nao_consigo' && req.formularioCompra) html += `<div style="margin-top:15px;background:#fff3e0;padding:10px;border-radius:5px;"><strong>📋 Requisição de Compra/Serviço</strong><br>Fornecedor: ${escapeHtml(req.formularioCompra.fornecedor)}<br>Modo: ${req.formularioCompra.modoRecebimento}<br>Moeda: ${req.formularioCompra.moeda}<br>Motivo: ${escapeHtml(req.formularioCompra.motivoDespesa)}<br><strong>Itens:</strong><table style="width:100%;margin-top:5px;"><tr><th>Descrição</th><th>Qtd</th><th>Valor Unit.</th><th>Total</th></tr>${(req.formularioCompra.itens || []).map(i => `<tr><td>${escapeHtml(i.desc)}</td><td>${i.qtd}</td><td>${formatarMoeda(i.preco)}</td><td>${formatarMoeda(i.total)}</td></tr>`).join('')}</table><hr><strong>Assinaturas:</strong><br>Beneficiário: ${escapeHtml(req.formularioCompra.assinaturaBeneficiario)}<br>Validado CG: ${escapeHtml(req.formularioCompra.assinaturaCG)}<br>Aprovado Diretor: ${escapeHtml(req.formularioCompra.assinaturaDiretor)}</div>`;
+                if (req.anexos && req.anexos.length > 0) { html += `<div style="margin-top:15px;"><strong>Anexos:</strong><div class="anexos-list">${req.anexos.map((a, idx) => `<div class="anexo-item"><i class="fas ${a.type.includes('image') ? 'fa-image' : 'fa-file'}"></i> <a onclick="window.app.visualizarAnexo('${req.id}', ${idx})">${escapeHtml(a.name)}</a> <span class="file-size">(${(a.size/1024).toFixed(1)}KB)</span></div>`).join('')}</div></div>`; }
                 if (req.relatorioExecucao) html += `<div style="margin-top:15px;"><strong>Relatório Execução:</strong><br>${escapeHtml(req.relatorioExecucao)}</div>`;
                 if (req.gastosReais !== undefined) html += `<div style="margin-top:15px;"><strong>Gastos Reais:</strong> ${formatarMoeda(req.gastosReais)}</div>`;
-                
                 container.innerHTML = html;
                 abrirModal('modalVisualizar');
             }
             
-            async function salvarRequisicao(e) {
+            function salvarRequisicao(e) {
                 e.preventDefault();
-                
                 const tipoManutencao = document.getElementById('tipoManutencao').value;
                 const equipamento = document.getElementById('equipamento').value;
                 const local = document.getElementById('local').value;
                 const prioridade = document.getElementById('prioridade').value;
                 const descricao = document.getElementById('descricao').value;
                 const observacoes = document.getElementById('observacoes').value;
-                
-                if (!tipoManutencao || !equipamento || !local || !prioridade || !descricao) {
-                    mostrarNotificacao('Preencha todos os campos obrigatórios', 'error');
-                    return;
-                }
-                
-                const novaRequisicao = {
-                    id: Date.now().toString(), 
-                    codigo: gerarCodigo(),
-                    tipoManutencao, 
-                    equipamento, 
-                    local, 
-                    prioridade, 
-                    descricao, 
-                    observacoes,
-                    status: 'pendente', 
-                    dataAbertura: new Date().toISOString(),
-                    criadoPor: state.usuarioAtual.nome, 
-                    criadoPorEmail: 'solicitante@accord.com'
-                };
-                
+                if (!tipoManutencao || !equipamento || !local || !prioridade || !descricao) { mostrarNotificacao('Preencha todos os campos obrigatórios', 'error'); return; }
+                const novaRequisicao = { id: Date.now().toString(), codigo: gerarCodigo(), tipoManutencao, equipamento, local, prioridade, descricao, observacoes, status: 'pendente', dataAbertura: new Date().toISOString(), criadoPor: state.usuarioAtual.nome, criadoPorEmail: 'solicitante@accord.com' };
                 state.requisicoes.unshift(novaRequisicao);
                 salvarDados();
                 fecharModal('modalNovaRequisicao');
@@ -975,54 +834,31 @@
                 mostrarNotificacao(`Requisição ${novaRequisicao.codigo} criada!`, 'success');
             }
             
-            // ============================================
-            // AVALIAÇÃO COM ANEXOS
-            // ============================================
             function abrirModalAvaliacao(id) {
                 document.getElementById('avaliacaoRequisicaoId').value = id;
                 document.getElementById('diagnostico').value = '';
-                document.getElementById('precisaComprar').value = 'nao';
-                document.getElementById('camposCompra').style.display = 'none';
+                document.getElementById('opcaoResolucao').value = '';
+                document.getElementById('recursosInternosOpcao').style.display = 'none';
+                document.getElementById('naoConsigoResolverOpcao').style.display = 'none';
                 document.getElementById('prazoConclusao').value = '';
-                state.contadorItens = 1;
+                state.contadorItensCompra = 1;
+                document.getElementById('listaItensCompra').innerHTML = '';
+                adicionarItemCompraForm();
                 state.anexosAvaliacao = [];
                 document.getElementById('avaliacaoFileList').innerHTML = '';
-                document.getElementById('listaItens').innerHTML = '';
-                adicionarItemCompra();
+                const hoje = new Date().toISOString().slice(0,10);
+                document.getElementById('dataBeneficiario').value = hoje;
+                document.getElementById('dataCG').value = hoje;
+                document.getElementById('dataDiretor').value = hoje;
+                document.getElementById('dataDespesa').value = hoje;
                 abrirModal('modalAvaliacao');
             }
             
-            function toggleCamposCompra(valor) {
-                document.getElementById('camposCompra').style.display = valor === 'sim' ? 'block' : 'none';
-            }
-            
-            function calcularItemTotal(index) {
-                const qtd = parseFloat(document.getElementById(`itemQtd${index}`)?.value) || 0;
-                const preco = parseFloat(document.getElementById(`itemPreco${index}`)?.value) || 0;
-                const total = qtd * preco;
-                const totalInput = document.getElementById(`itemTotal${index}`);
-                if (totalInput) totalInput.value = formatarMoeda(total);
-                return total;
-            }
-            
-            function adicionarItemCompra() {
-                const lista = document.getElementById('listaItens');
-                const index = state.contadorItens;
-                const novoItem = document.createElement('div');
-                novoItem.className = 'item-compra';
-                novoItem.style.display = 'flex';
-                novoItem.style.gap = '10px';
-                novoItem.style.marginBottom = '10px';
-                novoItem.style.flexWrap = 'wrap';
-                novoItem.innerHTML = `
-                    <input type="text" placeholder="Descrição" class="form-control" style="flex:2;" id="itemDesc${index}">
-                    <input type="number" placeholder="Qtd" class="form-control" style="flex:1;" id="itemQtd${index}" value="1" onchange="window.app.calcularItemTotal(${index})">
-                    <input type="number" placeholder="Preço Unit." class="form-control" style="flex:1;" id="itemPreco${index}" onchange="window.app.calcularItemTotal(${index})">
-                    <input type="text" placeholder="Total" class="form-control" style="flex:1;" readonly id="itemTotal${index}">
-                    <button type="button" class="btn-small btn-reject" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>
-                `;
-                lista.appendChild(novoItem);
-                state.contadorItens++;
+            function toggleOpcaoResolucao(valor) {
+                document.getElementById('recursosInternosOpcao').style.display = 'none';
+                document.getElementById('naoConsigoResolverOpcao').style.display = 'none';
+                if (valor === 'recursos_internos') { document.getElementById('recursosInternosOpcao').style.display = 'block'; }
+                else if (valor === 'nao_consigo') { document.getElementById('naoConsigoResolverOpcao').style.display = 'block'; }
             }
             
             function processarAvaliacao(e) {
@@ -1030,45 +866,43 @@
                 const id = document.getElementById('avaliacaoRequisicaoId').value;
                 const req = state.requisicoes.find(r => r.id === id);
                 if (!req) return;
-                
                 req.diagnostico = document.getElementById('diagnostico').value;
                 req.prazoConclusao = document.getElementById('prazoConclusao').value;
-                
-                if (state.anexosAvaliacao.length > 0) {
-                    req.anexos = [...state.anexosAvaliacao];
+                req.opcaoResolucao = document.getElementById('opcaoResolucao').value;
+                if (state.anexosAvaliacao.length > 0) { req.anexos = [...state.anexosAvaliacao]; }
+                if (req.opcaoResolucao === 'com_material') {
+                    req.status = 'em_atendimento';
+                    mostrarNotificacao('Requisição em atendimento (material disponível).', 'success');
+                } 
+                else if (req.opcaoResolucao === 'recursos_internos') {
+                    req.tipoRecursoInterno = document.getElementById('tipoRecursoInterno').value;
+                    req.detalhesRecurso = document.getElementById('detalhesRecurso').value;
+                    req.custoRecursoInterno = parseFloat(document.getElementById('custoRecursoInterno').value) || 0;
+                    req.status = 'em_atendimento';
+                    mostrarNotificacao(`Requisição em atendimento com ${req.tipoRecursoInterno === 'transferencia' ? 'transferência de recurso' : 'consumo interno'}.`, 'success');
                 }
-                
-                const precisaComprar = document.getElementById('precisaComprar').value;
-                
-                if (precisaComprar === 'sim') {
-                    const itens = [];
-                    let totalCompra = 0;
-                    for (let i = 0; i < state.contadorItens; i++) {
-                        const desc = document.getElementById(`itemDesc${i}`)?.value;
-                        if (desc) {
-                            const qtd = parseFloat(document.getElementById(`itemQtd${i}`)?.value) || 0;
-                            const preco = parseFloat(document.getElementById(`itemPreco${i}`)?.value) || 0;
-                            const total = qtd * preco;
-                            itens.push({ desc, qtd, preco, total });
-                            totalCompra += total;
-                        }
-                    }
+                else if (req.opcaoResolucao === 'nao_consigo') {
+                    const itens = getItensCompra();
+                    const totalCompra = itens.reduce((sum, i) => sum + i.total, 0);
+                    req.formularioCompra = {
+                        fornecedor: document.getElementById('fornecedor').value,
+                        modoRecebimento: document.getElementById('modoRecebimento').value,
+                        moeda: document.getElementById('moeda').value,
+                        dataDespesa: document.getElementById('dataDespesa').value,
+                        itens: itens,
+                        motivoDespesa: document.getElementById('motivoDespesa').value,
+                        assinaturaBeneficiario: document.getElementById('assinaturaBeneficiario').value,
+                        dataBeneficiario: document.getElementById('dataBeneficiario').value,
+                        assinaturaCG: document.getElementById('assinaturaCG').value,
+                        dataCG: document.getElementById('dataCG').value,
+                        assinaturaDiretor: document.getElementById('assinaturaDiretor').value,
+                        dataDiretor: document.getElementById('dataDiretor').value
+                    };
                     req.itensCompra = itens;
                     req.valorTotalCompra = totalCompra;
-                    req.justificativaCompra = document.getElementById('justificativaCompra').value;
-                    
-                    if (totalCompra > state.configuracoes.limiteCG) {
-                        req.status = 'aguardando_aprovacao_diretor';
-                        mostrarNotificacao(`Valor ${formatarMoeda(totalCompra)} excede limite. Enviado ao Director.`, 'warning');
-                    } else {
-                        req.status = 'aguardando_aprovacao_cg';
-                        mostrarNotificacao(`Requisição enviada para aprovação do CG.`, 'success');
-                    }
-                } else {
-                    req.status = 'em_atendimento';
-                    mostrarNotificacao('Requisição aprovada internamente. Iniciando atendimento.', 'success');
+                    if (totalCompra > state.configuracoes.limiteCG) { req.status = 'aguardando_aprovacao_diretor'; mostrarNotificacao(`Valor ${formatarMoeda(totalCompra)} excede limite. Enviado ao Director.`, 'warning'); }
+                    else { req.status = 'aguardando_aprovacao_cg'; mostrarNotificacao('Requisição enviada para aprovação do CG.', 'success'); }
                 }
-                
                 salvarDados();
                 fecharModal('modalAvaliacao');
                 filtrarRequisicoes();
@@ -1077,549 +911,65 @@
                 atualizarGraficos();
             }
             
-            function abrirModalAprovacao(id, tipo) {
-                document.getElementById('aprovacaoRequisicaoId').value = id;
-                document.getElementById('decisaoAprovacao').value = '';
-                document.getElementById('comentarioAprovacao').value = '';
-                abrirModal('modalAprovacao');
-            }
+            function abrirModalAprovacao(id) { document.getElementById('aprovacaoRequisicaoId').value = id; document.getElementById('decisaoAprovacao').value = ''; document.getElementById('comentarioAprovacao').value = ''; abrirModal('modalAprovacao'); }
+            function processarAprovacao(e) { e.preventDefault(); const id = document.getElementById('aprovacaoRequisicaoId').value; const decisao = document.getElementById('decisaoAprovacao').value; const comentario = document.getElementById('comentarioAprovacao').value; const req = state.requisicoes.find(r => r.id === id); if (!req) return; if (decisao === 'aprovar') { req.status = 'em_atendimento'; mostrarNotificacao(`Requisição ${req.codigo} aprovada!`, 'success'); } else { req.status = 'reprovada'; req.motivoReprovacao = comentario; mostrarNotificacao(`Requisição ${req.codigo} reprovada.`, 'warning'); } salvarDados(); fecharModal('modalAprovacao'); filtrarRequisicoes(); carregarAprovacoes(); atualizarKPIs(); atualizarGraficos(); }
+            function abrirModalConcluir(id) { document.getElementById('concluirRequisicaoId').value = id; document.getElementById('relatorioExecucao').value = ''; document.getElementById('gastosReais').value = '0'; abrirModal('modalConcluir'); }
+            function processarConclusao(e) { e.preventDefault(); const id = document.getElementById('concluirRequisicaoId').value; const relatorio = document.getElementById('relatorioExecucao').value; const gastosReais = parseFloat(document.getElementById('gastosReais').value) || 0; const req = state.requisicoes.find(r => r.id === id); if (!req) return; req.relatorioExecucao = relatorio; req.gastosReais = gastosReais; req.dataConclusao = new Date().toISOString(); req.status = gastosReais > 0 ? 'concluida_com_gastos' : 'concluida_sem_gastos'; salvarDados(); fecharModal('modalConcluir'); filtrarRequisicoes(); atualizarKPIs(); atualizarGraficos(); carregarResumoGastos(); mostrarNotificacao(`Serviço concluído! ${gastosReais > 0 ? 'Gastos: ' + formatarMoeda(gastosReais) : 'Sem gastos'}`, 'success'); }
             
-            function processarAprovacao(e) {
-                e.preventDefault();
-                const id = document.getElementById('aprovacaoRequisicaoId').value;
-                const decisao = document.getElementById('decisaoAprovacao').value;
-                const comentario = document.getElementById('comentarioAprovacao').value;
-                const req = state.requisicoes.find(r => r.id === id);
-                
-                if (!req) return;
-                
-                if (decisao === 'aprovar') {
-                    req.status = 'em_atendimento';
-                    mostrarNotificacao(`Requisição ${req.codigo} aprovada!`, 'success');
-                } else {
-                    req.status = 'reprovada';
-                    req.motivoReprovacao = comentario;
-                    mostrarNotificacao(`Requisição ${req.codigo} reprovada.`, 'warning');
-                }
-                
-                salvarDados();
-                fecharModal('modalAprovacao');
-                filtrarRequisicoes();
-                carregarAprovacoes();
-                atualizarKPIs();
-                atualizarGraficos();
-            }
+            function carregarDashboard() { const cont = document.getElementById('atividadesRecentes'); if (!cont) return; const recentes = [...state.requisicoes].sort((a,b) => new Date(b.dataAbertura) - new Date(a.dataAbertura)).slice(0,5); cont.innerHTML = recentes.map(r => `<div class="activity-item"><i class="fas fa-clipboard-list" style="color: var(--primary);"></i><div><strong>${escapeHtml(r.codigo)}</strong> - ${escapeHtml(r.equipamento)}<br><small>${getStatusText(r.status)} - ${formatarData(r.dataAbertura)}</small></div></div>`).join(''); }
+            function atualizarKPIs() { const todas = state.requisicoes; document.getElementById('totalRequisicoes').textContent = todas.length; document.getElementById('totalPendentes').textContent = todas.filter(r => r.status === 'pendente').length; document.getElementById('totalEmAtendimento').textContent = todas.filter(r => r.status === 'em_atendimento').length; document.getElementById('totalAguardCG').textContent = todas.filter(r => r.status === 'aguardando_aprovacao_cg').length; document.getElementById('totalAguardDiretor').textContent = todas.filter(r => r.status === 'aguardando_aprovacao_diretor').length; const gastosMes = todas.filter(r => r.dataConclusao && new Date(r.dataConclusao).getMonth() === new Date().getMonth()).reduce((sum, r) => sum + (r.gastosReais || r.valorTotalCompra || 0), 0); document.getElementById('totalGastosMes').innerHTML = formatarMoeda(gastosMes); }
+            function carregarAprovacoes() { const tbody = document.getElementById('corpoAprovacoes'); if (!tbody) return; tbody.innerHTML = ''; let pendentes = []; if (isCG()) pendentes = state.requisicoes.filter(r => r.status === 'aguardando_aprovacao_cg'); else if (isDiretor()) pendentes = state.requisicoes.filter(r => r.status === 'aguardando_aprovacao_diretor'); else if (isAdmin()) pendentes = state.requisicoes.filter(r => ['aguardando_aprovacao_cg', 'aguardando_aprovacao_diretor'].includes(r.status)); if (pendentes.length === 0) { const row = tbody.insertRow(); const cell = row.insertCell(0); cell.colSpan = 8; cell.textContent = 'Nenhuma aprovação pendente'; cell.style.textAlign = 'center'; return; } pendentes.forEach(r => { const row = tbody.insertRow(); row.dataset.id = r.id; row.addEventListener('click', () => visualizarRequisicao(r.id)); const cells = [r.codigo, r.equipamento, r.local, `<span class="type-badge ${getTipoClass(r.tipoManutencao)}">${getTipoManutencaoText(r.tipoManutencao)}</span>`, `<span class="priority-badge ${getPrioridadeClass(r.prioridade)}">${r.prioridade}</span>`, formatarMoeda(r.valorTotalCompra), `<span class="status-badge ${getStatusClass(r.status)}">${getStatusText(r.status)}</span>`, '']; cells.forEach((content, idx) => { const cell = row.insertCell(idx); if (idx === 7) { cell.innerHTML = `<div class="action-buttons">${getBotoesAcao(r)}</div>`; } else if ((idx >= 3 && idx <= 4) || idx === 6) { cell.innerHTML = content; } else { cell.textContent = content; } }); }); }
+            function carregarResumoGastos() { const mes = document.getElementById('filtroMesGastos').value; if (!mes) return; const [ano, mesNum] = mes.split('-'); const concluidas = state.requisicoes.filter(r => (r.status === 'concluida_com_gastos' || r.status === 'concluida_sem_gastos') && r.dataConclusao && new Date(r.dataConclusao).getFullYear() == ano && new Date(r.dataConclusao).getMonth() + 1 == parseInt(mesNum)); const totalGastos = concluidas.reduce((sum, r) => sum + (r.gastosReais || r.valorTotalCompra || 0), 0); document.getElementById('resumoGastos').innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px;"><div style="text-align:center;"><strong>Total Gastos</strong><br><span style="font-size:24px;color:var(--primary-dark);">${formatarMoeda(totalGastos)}</span></div><div style="text-align:center;"><strong>c/ Gastos</strong><br><span style="font-size:24px;">${concluidas.filter(r => r.status === 'concluida_com_gastos').length}</span></div><div style="text-align:center;"><strong>s/ Gastos</strong><br><span style="font-size:24px;">${concluidas.filter(r => r.status === 'concluida_sem_gastos').length}</span></div></div>`; }
+            function inicializarGraficos() { const ctx = document.getElementById('statusChart')?.getContext('2d'); if (ctx) { state.graficos.status = new Chart(ctx, { type: 'doughnut', data: { labels: ['Pendente', 'Em Atendimento', 'Aguard. CG', 'Aguard. Director', 'Concluída'], datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#FF9800','#2196F3','#FFC107','#F44336','#4CAF50'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } } }); } }
+            function atualizarGraficos() { if (!state.graficos.status) return; state.graficos.status.data.datasets[0].data = [state.requisicoes.filter(r => r.status === 'pendente').length, state.requisicoes.filter(r => r.status === 'em_atendimento').length, state.requisicoes.filter(r => r.status === 'aguardando_aprovacao_cg').length, state.requisicoes.filter(r => r.status === 'aguardando_aprovacao_diretor').length, state.requisicoes.filter(r => r.status === 'concluida_sem_gastos' || r.status === 'concluida_com_gastos').length]; state.graficos.status.update(); }
+            function obterDadosRelatorio() { let dados = [...state.requisicoes]; const dataInicio = document.getElementById('relatorioDataInicio').value; const dataFim = document.getElementById('relatorioDataFim').value; const tipo = document.getElementById('relatorioTipo').value; if (dataInicio) dados = dados.filter(r => new Date(r.dataAbertura) >= new Date(dataInicio)); if (dataFim) dados = dados.filter(r => new Date(r.dataAbertura) <= new Date(dataFim + 'T23:59:59')); if (tipo !== 'all') dados = dados.filter(r => r.tipoManutencao === tipo); return dados; }
+            function exportarRelatorioPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const dados = obterDadosRelatorio(); doc.setFontSize(18); doc.setTextColor(230, 81, 0); doc.text('Relatório de Manutenção', 14, 20); doc.setFontSize(11); doc.setTextColor(100, 100, 100); doc.text(`Gerado: ${new Date().toLocaleDateString('pt-PT')}`, 14, 30); doc.autoTable({ startY: 40, head: [['Código', 'Equipamento', 'Local', 'Tipo', 'Status']], body: dados.map(r => [r.codigo, r.equipamento, r.local, getTipoManutencaoText(r.tipoManutencao), getStatusText(r.status)]), headStyles: { fillColor: [255, 152, 0] } }); doc.save(`relatorio_manutencao_${new Date().toISOString().slice(0,19)}.pdf`); mostrarNotificacao('PDF gerado!', 'success'); }
+            function exportarRelatorioExcel() { const dados = obterDadosRelatorio(); const wsData = [['Código','Tipo','Equipamento','Local','Prioridade','Status','Data']]; dados.forEach(r => wsData.push([r.codigo, getTipoManutencaoText(r.tipoManutencao), r.equipamento, r.local, r.prioridade, getStatusText(r.status), formatarData(r.dataAbertura)])); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), 'Manutenção'); XLSX.writeFile(wb, `relatorio_manutencao_${new Date().toISOString().slice(0,19)}.xlsx`); mostrarNotificacao('Excel gerado!', 'success'); }
+            function exportarRelatorioCSV() { const dados = obterDadosRelatorio(); let csv = 'Código;Tipo;Equipamento;Local;Prioridade;Status;Data\n'; dados.forEach(r => { csv += `"${r.codigo}";"${getTipoManutencaoText(r.tipoManutencao)}";"${r.equipamento}";"${r.local}";"${r.prioridade}";"${getStatusText(r.status)}";"${formatarData(r.dataAbertura)}"\n`; }); const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); const url = URL.createObjectURL(blob); link.href = url; link.setAttribute('download', `relatorio_manutencao_${new Date().toISOString().slice(0,19)}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); mostrarNotificacao('CSV gerado!', 'success'); }
+            function salvarConfiguracoes() { state.configuracoes.limiteCG = parseInt(document.getElementById('configLimiteCG').value) || 0; state.configuracoes.orcamentoAnual = parseInt(document.getElementById('configOrcamentoAnual').value) || 0; salvarDados(); mostrarNotificacao('Configurações salvas!', 'success'); }
+            function mostrarGastosMes() { mudarAba('gastos'); carregarResumoGastos(); }
+            function filtrarPorStatus(status) { state.filtrosAtivos.status = status === 'all' ? null : status; filtrarRequisicoes(); mudarAba('requisicoes'); }
+            function limparFiltros() { state.filtrosAtivos = {}; const filterPesquisa = document.getElementById('filterPesquisa'); const filterStatus = document.getElementById('filterStatus'); const filterTipoManutencao = document.getElementById('filterTipoManutencao'); const filterPrioridade = document.getElementById('filterPrioridade'); const filterDirecao = document.getElementById('filterDirecao'); if (filterPesquisa) filterPesquisa.value = ''; if (filterStatus) filterStatus.value = 'all'; if (filterTipoManutencao) filterTipoManutencao.value = 'all'; if (filterPrioridade) filterPrioridade.value = 'all'; if (filterDirecao) filterDirecao.value = 'all'; filtrarRequisicoes(); }
+            function inicializarDirecoes() { const selects = ['local', 'filterDirecao']; selects.forEach(id => { const sel = document.getElementById(id); if (sel) { sel.innerHTML = '<option value="">Selecione</option>'; todasDirecoes.forEach(d => { const option = document.createElement('option'); option.value = d; option.textContent = d; sel.appendChild(option); }); } }); }
+            function mudarAba(aba) { const secs = ['dashboardSection', 'requisicoesSection', 'aprovacoesSection', 'gastosSection', 'relatoriosSection', 'configuracoesSection']; secs.forEach(s => { const el = document.getElementById(s); if (el) el.style.display = 'none'; }); document.getElementById(aba + 'Section').style.display = 'block'; const navItems = document.querySelectorAll('.nav-item'); navItems.forEach(item => { item.classList.remove('active'); if (item.getAttribute('data-aba') === aba) { item.classList.add('active'); } }); if (aba === 'dashboard') { carregarDashboard(); atualizarKPIs(); atualizarGraficos(); } if (aba === 'aprovacoes') carregarAprovacoes(); if (aba === 'gastos') carregarResumoGastos(); }
+            function abrirModal(id) { const modal = document.getElementById(id); if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; } }
+            function fecharModal(id) { const modal = document.getElementById(id); if (modal) { modal.style.display = 'none'; document.body.style.overflow = 'auto'; } }
+            function visualizarAnexo(reqId, anexoIndex) { const req = state.requisicoes.find(r => r.id === reqId); if (req && req.anexos && req.anexos[anexoIndex]) { const anexo = req.anexos[anexoIndex]; if (anexo.type && anexo.type.includes('image')) { const win = window.open(); win.document.write(`<html><body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#333;"><img src="${anexo.data}" style="max-width:90%;max-height:90%;"></body></html>`); } else { const link = document.createElement('a'); link.href = anexo.data; link.download = anexo.name; link.click(); } } }
             
-            function abrirModalConcluir(id) {
-                document.getElementById('concluirRequisicaoId').value = id;
-                document.getElementById('relatorioExecucao').value = '';
-                document.getElementById('gastosReais').value = '0';
-                abrirModal('modalConcluir');
-            }
+            function inicializarSistema() { carregarDados(); inicializarDirecoes(); inicializarGraficos(); filtrarRequisicoes(); atualizarKPIs(); atualizarGraficos(); carregarDashboard(); const configLimiteCG = document.getElementById('configLimiteCG'); const configOrcamentoAnual = document.getElementById('configOrcamentoAnual'); const filtroMesGastos = document.getElementById('filtroMesGastos'); if (configLimiteCG) configLimiteCG.value = state.configuracoes.limiteCG; if (configOrcamentoAnual) configOrcamentoAnual.value = state.configuracoes.orcamentoAnual; if (filtroMesGastos) filtroMesGastos.value = new Date().toISOString().slice(0,7); }
             
-            function processarConclusao(e) {
-                e.preventDefault();
-                const id = document.getElementById('concluirRequisicaoId').value;
-                const relatorio = document.getElementById('relatorioExecucao').value;
-                const gastosReais = parseFloat(document.getElementById('gastosReais').value) || 0;
-                const req = state.requisicoes.find(r => r.id === id);
-                
-                if (!req) return;
-                
-                req.relatorioExecucao = relatorio;
-                req.gastosReais = gastosReais;
-                req.dataConclusao = new Date().toISOString();
-                req.status = gastosReais > 0 ? 'concluida_com_gastos' : 'concluida_sem_gastos';
-                
-                salvarDados();
-                fecharModal('modalConcluir');
-                filtrarRequisicoes();
-                atualizarKPIs();
-                atualizarGraficos();
-                carregarResumoGastos();
-                mostrarNotificacao(`Serviço concluído! ${gastosReais > 0 ? 'Gastos: ' + formatarMoeda(gastosReais) : 'Sem gastos'}`, 'success');
-            }
-            
-            // ============================================
-            // DASHBOARD E RELATÓRIOS
-            // ============================================
-            function carregarDashboard() {
-                const cont = document.getElementById('atividadesRecentes');
-                if (!cont) return;
-                const recentes = [...state.requisicoes].sort((a,b) => new Date(b.dataAbertura) - new Date(a.dataAbertura)).slice(0,5);
-                cont.innerHTML = recentes.map(r => `
-                    <div class="activity-item">
-                        <i class="fas fa-clipboard-list" style="color: var(--primary);"></i>
-                        <div>
-                            <strong>${escapeHtml(r.codigo)}</strong> - ${escapeHtml(r.equipamento)}<br>
-                            <small>${getStatusText(r.status)} - ${formatarData(r.dataAbertura)}</small>
-                        </div>
-                    </div>
-                `).join('');
-            }
-            
-            function atualizarKPIs() {
-                const todas = state.requisicoes;
-                document.getElementById('totalRequisicoes').textContent = todas.length;
-                document.getElementById('totalPendentes').textContent = todas.filter(r => r.status === 'pendente').length;
-                document.getElementById('totalEmAtendimento').textContent = todas.filter(r => r.status === 'em_atendimento').length;
-                document.getElementById('totalAguardCG').textContent = todas.filter(r => r.status === 'aguardando_aprovacao_cg').length;
-                document.getElementById('totalAguardDiretor').textContent = todas.filter(r => r.status === 'aguardando_aprovacao_diretor').length;
-                const gastosMes = todas.filter(r => r.dataConclusao && new Date(r.dataConclusao).getMonth() === new Date().getMonth()).reduce((sum, r) => sum + (r.gastosReais || r.valorTotalCompra || 0), 0);
-                document.getElementById('totalGastosMes').innerHTML = formatarMoeda(gastosMes);
-            }
-            
-            function carregarAprovacoes() {
-                const tbody = document.getElementById('corpoAprovacoes');
-                if (!tbody) return;
-                
-                tbody.innerHTML = '';
-                
-                let pendentes = [];
-                if (isCG()) pendentes = state.requisicoes.filter(r => r.status === 'aguardando_aprovacao_cg');
-                else if (isDiretor()) pendentes = state.requisicoes.filter(r => r.status === 'aguardando_aprovacao_diretor');
-                else if (isAdmin()) pendentes = state.requisicoes.filter(r => ['aguardando_aprovacao_cg', 'aguardando_aprovacao_diretor'].includes(r.status));
-                
-                if (pendentes.length === 0) {
-                    const row = tbody.insertRow();
-                    const cell = row.insertCell(0);
-                    cell.colSpan = 8;
-                    cell.textContent = 'Nenhuma aprovação pendente';
-                    cell.style.textAlign = 'center';
-                    return;
-                }
-                
-                pendentes.forEach(r => {
-                    const row = tbody.insertRow();
-                    row.dataset.id = r.id;
-                    row.addEventListener('click', () => visualizarRequisicao(r.id));
-                    
-                    const cells = [
-                        r.codigo,
-                        r.equipamento,
-                        r.local,
-                        `<span class="type-badge ${getTipoClass(r.tipoManutencao)}">${getTipoManutencaoText(r.tipoManutencao)}</span>`,
-                        `<span class="priority-badge ${getPrioridadeClass(r.prioridade)}">${r.prioridade}</span>`,
-                        formatarMoeda(r.valorTotalCompra),
-                        `<span class="status-badge ${getStatusClass(r.status)}">${getStatusText(r.status)}</span>`,
-                        ''
-                    ];
-                    
-                    cells.forEach((content, idx) => {
-                        const cell = row.insertCell(idx);
-                        if (idx === 7) {
-                            cell.innerHTML = `<div class="action-buttons">${getBotoesAcao(r)}</div>`;
-                        } else if ((idx >= 3 && idx <= 4) || idx === 6) {
-                            cell.innerHTML = content;
-                        } else {
-                            cell.textContent = content;
-                        }
-                    });
-                });
-            }
-            
-            function carregarResumoGastos() {
-                const mes = document.getElementById('filtroMesGastos').value;
-                if (!mes) return;
-                const [ano, mesNum] = mes.split('-');
-                const concluidas = state.requisicoes.filter(r => 
-                    (r.status === 'concluida_com_gastos' || r.status === 'concluida_sem_gastos') && 
-                    r.dataConclusao && 
-                    new Date(r.dataConclusao).getFullYear() == ano && 
-                    new Date(r.dataConclusao).getMonth() + 1 == parseInt(mesNum)
-                );
-                const totalGastos = concluidas.reduce((sum, r) => sum + (r.gastosReais || r.valorTotalCompra || 0), 0);
-                document.getElementById('resumoGastos').innerHTML = `
-                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px;">
-                        <div style="text-align:center;">
-                            <strong>Total Gastos</strong><br>
-                            <span style="font-size:24px;color:var(--primary-dark);">${formatarMoeda(totalGastos)}</span>
-                        </div>
-                        <div style="text-align:center;">
-                            <strong>c/ Gastos</strong><br>
-                            <span style="font-size:24px;">${concluidas.filter(r => r.status === 'concluida_com_gastos').length}</span>
-                        </div>
-                        <div style="text-align:center;">
-                            <strong>s/ Gastos</strong><br>
-                            <span style="font-size:24px;">${concluidas.filter(r => r.status === 'concluida_sem_gastos').length}</span>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            function inicializarGraficos() {
-                const ctx = document.getElementById('statusChart')?.getContext('2d');
-                if (ctx) {
-                    state.graficos.status = new Chart(ctx, { 
-                        type: 'doughnut', 
-                        data: { 
-                            labels: ['Pendente', 'Em Atendimento', 'Aguard. CG', 'Aguard. Director', 'Concluída'], 
-                            datasets: [{ 
-                                data: [0,0,0,0,0], 
-                                backgroundColor: ['#FF9800','#2196F3','#FFC107','#F44336','#4CAF50'],
-                                borderWidth: 0
-                            }] 
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: true,
-                            plugins: {
-                                legend: {
-                                    position: 'bottom'
-                                }
-                            }
-                        }
-                    });
-                }
-            }
-            
-            function atualizarGraficos() {
-                if (!state.graficos.status) return;
-                state.graficos.status.data.datasets[0].data = [
-                    state.requisicoes.filter(r => r.status === 'pendente').length,
-                    state.requisicoes.filter(r => r.status === 'em_atendimento').length,
-                    state.requisicoes.filter(r => r.status === 'aguardando_aprovacao_cg').length,
-                    state.requisicoes.filter(r => r.status === 'aguardando_aprovacao_diretor').length,
-                    state.requisicoes.filter(r => r.status === 'concluida_sem_gastos' || r.status === 'concluida_com_gastos').length
-                ];
-                state.graficos.status.update();
-            }
-            
-            function obterDadosRelatorio() {
-                let dados = [...state.requisicoes];
-                const dataInicio = document.getElementById('relatorioDataInicio').value;
-                const dataFim = document.getElementById('relatorioDataFim').value;
-                const tipo = document.getElementById('relatorioTipo').value;
-                if (dataInicio) dados = dados.filter(r => new Date(r.dataAbertura) >= new Date(dataInicio));
-                if (dataFim) dados = dados.filter(r => new Date(r.dataAbertura) <= new Date(dataFim + 'T23:59:59'));
-                if (tipo !== 'all') dados = dados.filter(r => r.tipoManutencao === tipo);
-                return dados;
-            }
-            
-            function exportarRelatorioPDF() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                const dados = obterDadosRelatorio();
-                doc.setFontSize(18); 
-                doc.setTextColor(230, 81, 0);
-                doc.text('Relatório de Manutenção', 14, 20);
-                doc.setFontSize(11); 
-                doc.setTextColor(100, 100, 100);
-                doc.text(`Gerado: ${new Date().toLocaleDateString('pt-PT')}`, 14, 30);
-                doc.autoTable({ 
-                    startY: 40, 
-                    head: [['Código', 'Equipamento', 'Local', 'Tipo', 'Status']], 
-                    body: dados.map(r => [r.codigo, r.equipamento, r.local, getTipoManutencaoText(r.tipoManutencao), getStatusText(r.status)]), 
-                    headStyles: { fillColor: [255, 152, 0] } 
-                });
-                doc.save(`relatorio_manutencao_${new Date().toISOString().slice(0,19)}.pdf`);
-                mostrarNotificacao('PDF gerado!', 'success');
-            }
-            
-            function exportarRelatorioExcel() {
-                const dados = obterDadosRelatorio();
-                const wsData = [['Código','Tipo','Equipamento','Local','Prioridade','Status','Data']];
-                dados.forEach(r => wsData.push([
-                    r.codigo, 
-                    getTipoManutencaoText(r.tipoManutencao), 
-                    r.equipamento, 
-                    r.local, 
-                    r.prioridade, 
-                    getStatusText(r.status), 
-                    formatarData(r.dataAbertura)
-                ]));
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), 'Manutenção');
-                XLSX.writeFile(wb, `relatorio_manutencao_${new Date().toISOString().slice(0,19)}.xlsx`);
-                mostrarNotificacao('Excel gerado!', 'success');
-            }
-            
-            function exportarRelatorioCSV() {
-                const dados = obterDadosRelatorio();
-                let csv = 'Código;Tipo;Equipamento;Local;Prioridade;Status;Data\n';
-                dados.forEach(r => {
-                    csv += `"${r.codigo}";"${getTipoManutencaoText(r.tipoManutencao)}";"${r.equipamento}";"${r.local}";"${r.prioridade}";"${getStatusText(r.status)}";"${formatarData(r.dataAbertura)}"\n`;
-                });
-                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                const url = URL.createObjectURL(blob);
-                link.href = url;
-                link.setAttribute('download', `relatorio_manutencao_${new Date().toISOString().slice(0,19)}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                mostrarNotificacao('CSV gerado!', 'success');
-            }
-            
-            function salvarConfiguracoes() {
-                state.configuracoes.limiteCG = parseInt(document.getElementById('configLimiteCG').value) || 0;
-                state.configuracoes.orcamentoAnual = parseInt(document.getElementById('configOrcamentoAnual').value) || 0;
-                salvarDados();
-                mostrarNotificacao('Configurações salvas!', 'success');
-            }
-            
-            function mostrarGastosMes() { 
-                mudarAba('gastos'); 
-                carregarResumoGastos(); 
-            }
-            
-            function filtrarPorStatus(status) {
-                state.filtrosAtivos.status = status === 'all' ? null : status;
-                filtrarRequisicoes();
-                mudarAba('requisicoes');
-            }
-            
-            function limparFiltros() {
-                state.filtrosAtivos = {};
-                const filterPesquisa = document.getElementById('filterPesquisa');
-                const filterStatus = document.getElementById('filterStatus');
-                const filterTipoManutencao = document.getElementById('filterTipoManutencao');
-                const filterPrioridade = document.getElementById('filterPrioridade');
-                const filterDirecao = document.getElementById('filterDirecao');
-                
-                if (filterPesquisa) filterPesquisa.value = '';
-                if (filterStatus) filterStatus.value = 'all';
-                if (filterTipoManutencao) filterTipoManutencao.value = 'all';
-                if (filterPrioridade) filterPrioridade.value = 'all';
-                if (filterDirecao) filterDirecao.value = 'all';
-                
-                filtrarRequisicoes();
-            }
-            
-            // ============================================
-            // INICIALIZAÇÃO
-            // ============================================
-            function inicializarDirecoes() {
-                const selects = ['local', 'filterDirecao'];
-                selects.forEach(id => {
-                    const sel = document.getElementById(id);
-                    if (sel) {
-                        sel.innerHTML = '<option value="">Selecione</option>';
-                        todasDirecoes.forEach(d => {
-                            const option = document.createElement('option');
-                            option.value = d;
-                            option.textContent = d;
-                            sel.appendChild(option);
-                        });
-                    }
-                });
-            }
-            
-            function mudarAba(aba) {
-                const secs = ['dashboardSection', 'requisicoesSection', 'aprovacoesSection', 'gastosSection', 'relatoriosSection', 'configuracoesSection'];
-                secs.forEach(s => { 
-                    const el = document.getElementById(s); 
-                    if (el) el.style.display = 'none'; 
-                });
-                document.getElementById(aba + 'Section').style.display = 'block';
-                
-                const navItems = document.querySelectorAll('.nav-item');
-                navItems.forEach(item => {
-                    item.classList.remove('active');
-                    if (item.getAttribute('data-aba') === aba) {
-                        item.classList.add('active');
-                    }
-                });
-                
-                if (aba === 'dashboard') { 
-                    carregarDashboard(); 
-                    atualizarKPIs(); 
-                    atualizarGraficos(); 
-                }
-                if (aba === 'aprovacoes') carregarAprovacoes();
-                if (aba === 'gastos') carregarResumoGastos();
-            }
-            
-            function abrirModal(id) { 
-                const modal = document.getElementById(id);
-                if (modal) {
-                    modal.style.display = 'flex'; 
-                    document.body.style.overflow = 'hidden';
-                }
-            }
-            
-            function fecharModal(id) { 
-                const modal = document.getElementById(id);
-                if (modal) {
-                    modal.style.display = 'none'; 
-                    document.body.style.overflow = 'auto';
-                }
-            }
-            
-            function inicializarSistema() {
-                carregarDados();
-                inicializarDirecoes();
-                inicializarGraficos();
-                filtrarRequisicoes();
-                atualizarKPIs();
-                atualizarGraficos();
-                carregarDashboard();
-                
-                const configLimiteCG = document.getElementById('configLimiteCG');
-                const configOrcamentoAnual = document.getElementById('configOrcamentoAnual');
-                const filtroMesGastos = document.getElementById('filtroMesGastos');
-                
-                if (configLimiteCG) configLimiteCG.value = state.configuracoes.limiteCG;
-                if (configOrcamentoAnual) configOrcamentoAnual.value = state.configuracoes.orcamentoAnual;
-                if (filtroMesGastos) filtroMesGastos.value = new Date().toISOString().slice(0,7);
-            }
-            
-            // Configurar Event Listeners
             function setupEventListeners() {
-                // Navegação
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.addEventListener('click', () => mudarAba(item.getAttribute('data-aba')));
-                });
-                
-                // KPIs
-                document.querySelectorAll('.kpi-card[data-status]').forEach(card => {
-                    card.addEventListener('click', () => filtrarPorStatus(card.getAttribute('data-status')));
-                });
-                
-                // Formulários
-                const formNovaRequisicao = document.getElementById('formNovaRequisicao');
-                if (formNovaRequisicao) formNovaRequisicao.addEventListener('submit', salvarRequisicao);
-                
-                const formAvaliacao = document.getElementById('formAvaliacao');
-                if (formAvaliacao) formAvaliacao.addEventListener('submit', processarAvaliacao);
-                
-                const formAprovacao = document.getElementById('formAprovacao');
-                if (formAprovacao) formAprovacao.addEventListener('submit', processarAprovacao);
-                
-                const formConcluir = document.getElementById('formConcluir');
-                if (formConcluir) formConcluir.addEventListener('submit', processarConclusao);
-                
-                // Botões
-                const btnNovaRequisicao = document.getElementById('btnNovaRequisicao');
-                if (btnNovaRequisicao) btnNovaRequisicao.addEventListener('click', () => abrirModal('modalNovaRequisicao'));
-                
-                // Filtros
-                const filterPesquisa = document.getElementById('filterPesquisa');
-                if (filterPesquisa) filterPesquisa.addEventListener('input', e => { 
-                    state.filtrosAtivos.pesquisa = e.target.value || null; 
-                    filtrarRequisicoes(); 
-                });
-                
-                const filterStatus = document.getElementById('filterStatus');
-                if (filterStatus) filterStatus.addEventListener('change', e => { 
-                    state.filtrosAtivos.status = e.target.value === 'all' ? null : e.target.value; 
-                    filtrarRequisicoes(); 
-                });
-                
-                const filterTipoManutencao = document.getElementById('filterTipoManutencao');
-                if (filterTipoManutencao) filterTipoManutencao.addEventListener('change', e => { 
-                    state.filtrosAtivos.tipo = e.target.value === 'all' ? null : e.target.value; 
-                    filtrarRequisicoes(); 
-                });
-                
-                const filterPrioridade = document.getElementById('filterPrioridade');
-                if (filterPrioridade) filterPrioridade.addEventListener('change', e => { 
-                    state.filtrosAtivos.prioridade = e.target.value === 'all' ? null : e.target.value; 
-                    filtrarRequisicoes(); 
-                });
-                
-                const filterDirecao = document.getElementById('filterDirecao');
-                if (filterDirecao) filterDirecao.addEventListener('change', e => { 
-                    state.filtrosAtivos.direcao = e.target.value === 'all' ? null : e.target.value; 
-                    filtrarRequisicoes(); 
-                });
-                
-                const sortRequisicoes = document.getElementById('sortRequisicoes');
-                if (sortRequisicoes) sortRequisicoes.addEventListener('change', e => { 
-                    state.ordenacao = e.target.value; 
-                    filtrarRequisicoes(); 
-                });
-                
-                const precisaComprar = document.getElementById('precisaComprar');
-                if (precisaComprar) precisaComprar.addEventListener('change', e => toggleCamposCompra(e.target.value));
-                
-                // Paginação
-                const paginaAnterior = document.getElementById('paginaAnterior');
-                if (paginaAnterior) paginaAnterior.addEventListener('click', () => { 
-                    if (state.paginaAtual > 1) { 
-                        state.paginaAtual--; 
-                        carregarRequisicoes(); 
-                    } 
-                });
-                
-                const paginaProxima = document.getElementById('paginaProxima');
-                if (paginaProxima) paginaProxima.addEventListener('click', () => { 
-                    const total = Math.ceil(state.requisicoesFiltradas.length / state.itensPorPagina); 
-                    if (state.paginaAtual < total) { 
-                        state.paginaAtual++; 
-                        carregarRequisicoes(); 
-                    } 
-                });
-                
-                const filtroMesGastos = document.getElementById('filtroMesGastos');
-                if (filtroMesGastos) filtroMesGastos.addEventListener('change', () => carregarResumoGastos());
-                
-                // Fechar modais ao clicar fora
-                document.querySelectorAll('.modal').forEach(modal => {
-                    modal.addEventListener('click', function(e) { 
-                        if (e.target === this) fecharModal(this.id); 
-                    });
-                });
-                
-                // Dropzone para anexos
-                const dropzone = document.getElementById('dropzoneAvaliacao');
-                const fileInput = document.getElementById('avaliacaoFileInput');
-                
+                document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => mudarAba(item.getAttribute('data-aba'))); });
+                document.querySelectorAll('.kpi-card[data-status]').forEach(card => { card.addEventListener('click', () => filtrarPorStatus(card.getAttribute('data-status'))); });
+                document.getElementById('formNovaRequisicao')?.addEventListener('submit', salvarRequisicao);
+                document.getElementById('formAvaliacao')?.addEventListener('submit', processarAvaliacao);
+                document.getElementById('formAprovacao')?.addEventListener('submit', processarAprovacao);
+                document.getElementById('formConcluir')?.addEventListener('submit', processarConclusao);
+                document.getElementById('btnNovaRequisicao')?.addEventListener('click', () => abrirModal('modalNovaRequisicao'));
+                document.getElementById('filterPesquisa')?.addEventListener('input', e => { state.filtrosAtivos.pesquisa = e.target.value || null; filtrarRequisicoes(); });
+                document.getElementById('filterStatus')?.addEventListener('change', e => { state.filtrosAtivos.status = e.target.value === 'all' ? null : e.target.value; filtrarRequisicoes(); });
+                document.getElementById('filterTipoManutencao')?.addEventListener('change', e => { state.filtrosAtivos.tipo = e.target.value === 'all' ? null : e.target.value; filtrarRequisicoes(); });
+                document.getElementById('filterPrioridade')?.addEventListener('change', e => { state.filtrosAtivos.prioridade = e.target.value === 'all' ? null : e.target.value; filtrarRequisicoes(); });
+                document.getElementById('filterDirecao')?.addEventListener('change', e => { state.filtrosAtivos.direcao = e.target.value === 'all' ? null : e.target.value; filtrarRequisicoes(); });
+                document.getElementById('sortRequisicoes')?.addEventListener('change', e => { state.ordenacao = e.target.value; filtrarRequisicoes(); });
+                document.getElementById('opcaoResolucao')?.addEventListener('change', e => toggleOpcaoResolucao(e.target.value));
+                document.getElementById('paginaAnterior')?.addEventListener('click', () => { if (state.paginaAtual > 1) { state.paginaAtual--; carregarRequisicoes(); } });
+                document.getElementById('paginaProxima')?.addEventListener('click', () => { const total = Math.ceil(state.requisicoesFiltradas.length / state.itensPorPagina); if (state.paginaAtual < total) { state.paginaAtual++; carregarRequisicoes(); } });
+                document.getElementById('filtroMesGastos')?.addEventListener('change', () => carregarResumoGastos());
+                document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', function(e) { if (e.target === this) fecharModal(this.id); }); });
+                const dropzone = document.getElementById('dropzoneAvaliacao'); const fileInput = document.getElementById('avaliacaoFileInput');
                 if (dropzone && fileInput) {
                     dropzone.addEventListener('click', () => fileInput.click());
-                    dropzone.addEventListener('dragover', (e) => {
-                        e.preventDefault();
-                        dropzone.style.borderColor = 'var(--primary)';
-                        dropzone.style.background = 'var(--primary-light)';
-                    });
-                    dropzone.addEventListener('dragleave', (e) => {
-                        e.preventDefault();
-                        dropzone.style.borderColor = 'var(--gray-200)';
-                        dropzone.style.background = 'transparent';
-                    });
-                    dropzone.addEventListener('drop', (e) => {
-                        e.preventDefault();
-                        dropzone.style.borderColor = 'var(--gray-200)';
-                        dropzone.style.background = 'transparent';
-                        const files = e.dataTransfer.files;
-                        if (files.length > 0) handleAvaliacaoFiles(files);
-                    });
-                    fileInput.addEventListener('change', (e) => {
-                        if (e.target.files.length > 0) handleAvaliacaoFiles(e.target.files);
-                        fileInput.value = '';
-                    });
+                    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--primary)'; dropzone.style.background = 'var(--primary-light)'; });
+                    dropzone.addEventListener('dragleave', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--gray-200)'; dropzone.style.background = 'transparent'; });
+                    dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--gray-200)'; dropzone.style.background = 'transparent'; const files = e.dataTransfer.files; if (files.length > 0) handleAvaliacaoFiles(files); });
+                    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleAvaliacaoFiles(e.target.files); fileInput.value = ''; });
                 }
             }
             
-            // Expor funções públicas globalmente
-            window.app = {
-                loginComo,
-                logout,
-                mudarAba,
-                filtrarRequisicoes,
-                limparFiltros,
-                abrirModalAvaliacao,
-                abrirModalAprovacao,
-                abrirModalConcluir,
-                fecharModal,
-                visualizarAnexo,
-                removerAnexo,
-                adicionarItemCompra,
-                calcularItemTotal,
-                exportarRelatorioPDF,
-                exportarRelatorioExcel,
-                exportarRelatorioCSV,
-                salvarConfiguracoes,
-                mostrarGastosMes,
-                carregarDadosExemplo,
-                visualizarRequisicao
-            };
+            window.app = { loginComo, logout, mudarAba, filtrarRequisicoes, limparFiltros, abrirModalAvaliacao, abrirModalAprovacao, abrirModalConcluir, fecharModal, visualizarAnexo, removerAnexo, adicionarItemCompraForm, exportarRelatorioPDF, exportarRelatorioExcel, exportarRelatorioCSV, salvarConfiguracoes, mostrarGastosMes, carregarDadosExemplo, visualizarRequisicao };
             
-            // Inicializar quando o DOM estiver pronto
-            document.addEventListener('DOMContentLoaded', () => {
-                setupEventListeners();
-            });
+            document.addEventListener('DOMContentLoaded', () => { setupEventListeners(); });
         })();
     </script>
 </body>
