@@ -5,281 +5,1111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kero SIR - Gestão de Manutenção Completa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        :root { --primary: #FF9800; --primary-dark: #E65100; --primary-light: #fff3e0; --secondary: #4CAF50; --danger: #f44336; --info: #2196F3; --warning: #ffc107; --purple: #9C27B0; }
-        body { background: #f0f2f5; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        
-        .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(145deg, #E65100, #FF9800); position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; }
-        .login-box { background: white; padding: 40px; border-radius: 20px; width: 100%; max-width: 500px; text-align: center; }
-        .kero-logo { width: 80px; height: 80px; margin: 0 auto 20px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        /* ========== RESET & BASE - TONS DE VERDE ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2e7d32;
+            --primary-dark: #1b5e20;
+            --primary-light: #e8f5e9;
+            --primary-100: #c8e6c9;
+            --secondary: #388e3c;
+            --accent: #4caf50;
+            --success: #2e7d32;
+            --danger: #c62828;
+            --warning: #f9a825;
+            --info: #1565c0;
+            --bg: #f1f8e9;
+            --card-shadow: 0 4px 20px rgba(46, 125, 50, 0.12);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: var(--bg);
+            color: #1a1a2e;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        /* ========== LOGIN ========== */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(145deg, var(--primary-dark), var(--primary));
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
+        }
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .kero-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .kero-logo i { font-size: 40px; color: white; }
-        .demo-btn { background: #e0e0e0; padding: 8px 16px; border: none; border-radius: 8px; margin: 5px; cursor: pointer; transition: 0.3s; font-size: 13px; }
-        .demo-btn:hover { background: var(--primary); color: white; }
-        
-        .app-header { background: white; padding: 15px 25px; border-radius: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-        .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-kero { width: 45px; height: 45px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-        .user-badge { display: flex; align-items: center; gap: 10px; padding: 8px 18px; background: var(--primary-light); border-radius: 40px; }
-        .user-role { padding: 4px 12px; background: var(--primary); color: white; border-radius: 20px; font-size: 11px; font-weight: 600; }
-        .btn-logout { padding: 8px 20px; background: var(--danger); color: white; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s; }
-        .btn-logout:hover { transform: translateY(-2px); }
-        
-        .nav-menu { background: white; padding: 12px 20px; border-radius: 15px; margin-bottom: 20px; display: flex; gap: 8px; flex-wrap: wrap; }
-        .nav-item { padding: 10px 24px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: #666; transition: 0.3s; font-weight: 500; }
-        .nav-item:hover { background: var(--primary-light); color: var(--primary-dark); }
-        .nav-item.active { background: var(--primary); color: white; }
-        
-        .kpi-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 15px; margin-bottom: 30px; }
+        .demo-btn {
+            background: #e8f5e9;
+            padding: 8px 16px;
+            border: 2px solid var(--primary-100);
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary-dark);
+        }
+        .demo-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46,125,50,0.3);
+        }
+
+        /* ========== MAIN LAYOUT ========== */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            width: 270px;
+            background: linear-gradient(180deg, #1b5e20, #2e7d32);
+            color: #fff;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+        }
+
+        .sidebar-brand {
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .sidebar-brand .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .sidebar-brand h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .sidebar-brand small {
+            display: block;
+            font-size: 11px;
+            opacity: 0.75;
+            font-weight: 400;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 16px 0;
+        }
+        .sidebar-menu li {
+            padding: 12px 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+            color: rgba(255,255,255,0.8);
+            font-weight: 500;
+        }
+        .sidebar-menu li:hover {
+            background: rgba(255,255,255,0.08);
+            border-left-color: #fff;
+            color: #fff;
+        }
+        .sidebar-menu li.active {
+            background: rgba(255,255,255,0.12);
+            border-left-color: #fff;
+            color: #fff;
+        }
+        .sidebar-menu li .icon {
+            font-size: 20px;
+            width: 30px;
+            text-align: center;
+        }
+        .sidebar-menu li .badge {
+            margin-left: auto;
+            background: #ff6f00;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sidebar-user {
+            padding: 16px 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-user .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .sidebar-user .user-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .sidebar-user .user-role {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: 270px;
+            flex: 1;
+            padding: 24px 30px;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .header-actions .date {
+            color: #666;
+            font-size: 14px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46,125,50,0.3);
+        }
+        .btn-secondary {
+            background: #e8f5e9;
+            color: var(--primary-dark);
+        }
+        .btn-secondary:hover {
+            background: var(--primary-100);
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #b71c1c;
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+        .btn-warning {
+            background: var(--warning);
+            color: #333;
+        }
+        .btn-warning:hover {
+            background: #f57f17;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            font-size: 24px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* ========== KPI CARDS ========== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
         @media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
-        @media (max-width: 800px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
-        .kpi-card { background: white; padding: 20px; border-radius: 15px; border-left: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .kpi-info h4 { color: #888; font-size: 12px; margin-bottom: 5px; }
-        .kpi-info span { font-size: 24px; font-weight: 700; color: var(--primary-dark); }
-        
-        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
-        .status-pendente { background: #fff3e0; color: #E65100; }
+        @media (max-width: 768px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 480px) { .kpi-grid { grid-template-columns: 1fr; } }
+
+        .kpi-card {
+            background: white;
+            padding: 18px 20px;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(46,125,50,0.15);
+        }
+        .kpi-card .kpi-info h4 {
+            color: #888;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .kpi-card .kpi-info span {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        .kpi-card .kpi-icon {
+            font-size: 28px;
+            opacity: 0.3;
+            color: var(--primary);
+        }
+
+        /* ========== CARDS ========== */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--card-shadow);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ========== BADGES ========== */
+        .status-badge {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-pendente { background: #fff3e0; color: #e65100; }
         .status-aguardando-stephanny { background: #fce4ec; color: #c62828; }
-        .status-aguardando-cg { background: #fff8e1; color: #F57F17; }
-        .status-aguardando-diretor { background: #e3f2fd; color: #1565C0; }
-        .status-aguardando-financas { background: #f3e5f5; color: #7B1FA2; }
-        .status-em-execucao { background: #e8f5e9; color: #2E7D32; }
-        .status-aguardando-material { background: #fff3e0; color: #E65100; }
-        .status-aguardando-execucao { background: #e8f5e9; color: #2E7D32; }
-        .status-concluida { background: #4CAF50; color: white; }
+        .status-aguardando-cg { background: #fff8e1; color: #f57f17; }
+        .status-aguardando-diretor { background: #e3f2fd; color: #1565c0; }
+        .status-aguardando-financas { background: #f3e5f5; color: #7b1fa2; }
+        .status-em-execucao { background: #e8f5e9; color: #2e7d32; }
+        .status-aguardando-material { background: #fff3e0; color: #e65100; }
+        .status-aguardando-execucao { background: #e8f5e9; color: #2e7d32; }
+        .status-concluida { background: var(--primary); color: white; }
         .status-reprovada { background: #ef9a9a; color: #c62828; }
-        
-        .type-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .status-aberta { background: #d4edda; color: #155724; }
+        .status-em-andamento { background: #fff3cd; color: #856404; }
+        .status-cancelada { background: #f8d7da; color: #721c24; }
+
+        .type-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
         .type-corretiva { background: #ffebee; color: #c62828; }
-        .type-preventiva { background: #e8f5e9; color: #2E7D32; }
-        
-        .priority-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .type-preventiva { background: #e8f5e9; color: #2e7d32; }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
         .priority-alta { background: #ffebee; color: #c62828; }
-        .priority-media { background: #fff3e0; color: #E65100; }
-        .priority-baixa { background: #e8f5e9; color: #2E7D32; }
-        
-        .btn-small { padding: 5px 12px; border-radius: 8px; border: none; font-size: 12px; cursor: pointer; margin: 2px; transition: 0.2s; font-weight: 500; }
-        .btn-small:hover { transform: translateY(-2px); }
-        .btn-approve { background: var(--secondary); color: white; }
-        .btn-warning { background: var(--warning); color: #333; }
-        .btn-primary { background: var(--primary); color: white; padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 20px; transition: 0.3s; }
-        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
-        
-        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--primary-light); }
-        .card-title { font-size: 18px; font-weight: 600; color: var(--primary-dark); }
-        
-        .main-layout { display: grid; grid-template-columns: 280px 1fr; gap: 25px; }
-        @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
-        .sidebar { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .filter-section { margin-top: 20px; }
-        .filter-group { margin-bottom: 15px; }
-        .filter-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; }
-        .form-control { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #ddd; transition: 0.3s; }
-        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
-        
-        .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: var(--primary-light); padding: 12px; text-align: left; font-weight: 600; }
-        td { padding: 12px; border-bottom: 1px solid #ffe0b2; }
-        tr { transition: 0.2s; }
-        tr:hover { background: #fff8e1; cursor: pointer; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-        .modal-content { background: white; width: 100%; max-width: 750px; border-radius: 20px; max-height: 90vh; overflow-y: auto; animation: modalFadeIn 0.3s; }
-        @keyframes modalFadeIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-header { padding: 20px; border-bottom: 1px solid #ffe0b2; background: var(--primary-light); border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h2 { font-size: 20px; color: var(--primary-dark); }
-        .modal-header span { font-size: 28px; cursor: pointer; transition: 0.3s; line-height: 1; }
-        .modal-header span:hover { color: var(--danger); transform: scale(1.1); }
-        .modal-body { padding: 25px; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
-        .form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
-        
-        .dropzone { border: 2px dashed #ccc; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; margin-top: 8px; transition: 0.3s; background: #fafafa; }
-        .dropzone:hover { border-color: var(--primary); background: var(--primary-light); }
-        .file-list { margin-top: 10px; }
-        .file-item { padding: 8px 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
-        
-        .notificacao { position: fixed; top: 20px; right: 20px; padding: 14px 22px; border-radius: 12px; color: white; z-index: 100000; animation: slideIn 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; }
-        .notificacao-success { background: #4CAF50; }
-        .notificacao-error { background: #f44336; }
-        .notificacao-info { background: #2196F3; }
-        .notificacao-warning { background: #ff9800; }
-        
-        .signature-area { border-top: 1px solid #ddd; margin-top: 20px; padding-top: 20px; }
-        .expense-summary { background: var(--primary-light); padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 14px; line-height: 1.6; }
-        .item-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
-        .item-row input { flex: 1; }
-        .activity-list { max-height: 300px; overflow-y: auto; }
-        .activity-item { padding: 12px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
-        .activity-item:hover { background: var(--primary-light); transform: translateX(5px); }
-        .paginacao { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-        .pagina-btn { padding: 8px 14px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .pagina-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
-        .pagina-btn.active { background: var(--primary); color: white; }
-        
+        .priority-media { background: #fff3e0; color: #e65100; }
+        .priority-baixa { background: #e8f5e9; color: #2e7d32; }
+
+        /* ========== TABLE ========== */
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th {
+            background: var(--primary-light);
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e8f5e9;
+        }
+        tr {
+            transition: var(--transition);
+        }
+        tr:hover {
+            background: var(--primary-light);
+            cursor: pointer;
+        }
+        tr:hover td {
+            background: transparent;
+        }
+
+        /* ========== ACTIVITY LIST ========== */
+        .activity-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .activity-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: var(--transition);
+            border-radius: 8px;
+        }
+        .activity-item:hover {
+            background: var(--primary-light);
+            transform: translateX(4px);
+        }
+        .activity-item .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        /* ========== FORM ========== */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            transition: var(--transition);
+            font-size: 14px;
+            background: #fafafa;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(46,125,50,0.12);
+            background: white;
+        }
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        /* ========== EXPENSE SUMMARY ========== */
+        .expense-summary {
+            background: var(--primary-light);
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            line-height: 1.8;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* ========== DROPZONE ========== */
+        .dropzone {
+            border: 2px dashed #c8e6c9;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: #fafffe;
+        }
+        .dropzone:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .file-item {
+            padding: 8px 14px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .item-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .item-row input { flex: 1; min-width: 80px; }
+
+        /* ========== PAGINATION ========== */
+        .paginacao {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .pagina-btn {
+            padding: 8px 16px;
+            border: 2px solid #e8f5e9;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        .pagina-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .pagina-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* ========== MODAL ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 750px;
+            border-radius: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalFadeIn 0.3s ease;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-30px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 2px solid var(--primary-light);
+            background: var(--primary-light);
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 {
+            font-size: 20px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-header .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            transition: var(--transition);
+            line-height: 1;
+            color: #666;
+        }
+        .modal-header .close-btn:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+        .modal-body {
+            padding: 24px;
+        }
+
+        /* ========== TOAST ========== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            z-index: 100000;
+            animation: slideIn 0.4s ease;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+            font-weight: 500;
+        }
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--danger); }
+        .toast-info { background: var(--info); }
+        .toast-warning { background: var(--warning); color: #333; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ========== NOTA DESPESA ========== */
+        #notaDespesa {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 20000;
+            overflow-y: auto;
+            padding: 30px;
+        }
+        .nota-despesa-container {
+            background: white;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            font-family: 'Courier New', monospace;
+        }
+        .nota-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        .nota-header h1 { color: var(--primary-dark); }
+        .nota-itens {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .nota-itens th, .nota-itens td {
+            border: 1px solid #333;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .nota-itens th { background: #f0f0f0; }
+        .nota-assinaturas {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .nota-assinatura { text-align: center; min-width: 120px; }
+        .nota-assinatura .linha {
+            width: 140px;
+            border-top: 1px solid #333;
+            margin: 30px auto 8px;
+        }
+
+        .btn-imprimir {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .btn-imprimir:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 16px;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .header h1 { font-size: 20px; }
+        }
+
+        @media (max-width: 480px) {
+            .header { padding: 12px 16px; }
+            .header-actions .date { display: none; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
+            .modal-content { margin: 10px; }
+        }
+
+        /* ========== PRINT ========== */
         @media print {
             body * { visibility: hidden; }
             #notaDespesa, #notaDespesa * { visibility: visible; }
-            #notaDespesa { position: absolute; top: 0; left: 0; width: 100%; margin: 0; padding: 20px; }
-            .no-print { display: none; }
-            button { display: none; }
+            #notaDespesa {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            .no-print { display: none !important; }
         }
-        
-        .nota-despesa-container { background: white; padding: 30px; max-width: 800px; margin: 0 auto; font-family: 'Courier New', monospace; }
-        .nota-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; }
-        .nota-header h1 { color: var(--primary-dark); }
-        .nota-detalhes { margin-bottom: 20px; }
-        .nota-detalhes table { width: 100%; }
-        .nota-detalhes td { padding: 5px; border: none; }
-        .nota-itens { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .nota-itens th, .nota-itens td { border: 1px solid #333; padding: 8px; text-align: left; }
-        .nota-itens th { background: #f0f0f0; }
-        .nota-total { text-align: right; font-size: 18px; font-weight: bold; margin-top: 20px; padding-top: 10px; border-top: 2px solid #333; }
-        .nota-assinaturas { margin-top: 40px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-        .nota-assinatura { text-align: center; margin-top: 40px; min-width: 150px; }
-        .nota-assinatura .linha { width: 150px; border-top: 1px solid #333; margin-top: 30px; }
-        .btn-imprimir { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 20px; font-size: 16px; }
-        .btn-imprimir:hover { background: var(--primary-dark); }
-        
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #e0e0e0; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        /* ========== SECTIONS ========== */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* ========== SIGNATURE AREA ========== */
+        .signature-area {
+            border-top: 1px solid #ddd;
+            margin-top: 20px;
+            padding-top: 20px;
+        }
+        .signature-area h4 {
+            font-size: 14px;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        /* ========== MAIN LAYOUT GRID ========== */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 900px) {
+            .main-layout { grid-template-columns: 1fr; }
+        }
+
+        .sidebar-filters {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+        }
+        .filter-section { margin-top: 16px; }
+        .filter-group { margin-bottom: 14px; }
+        .filter-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
+
+    <!-- ===== LOGIN SCREEN ===== -->
     <div id="loginScreen" class="login-container">
         <div class="login-box">
             <div class="kero-logo"><i class="fas fa-tools"></i></div>
-            <h2 style="color: var(--primary-dark);">Kero - Manutenção</h2>
-            <p style="margin: 10px 0; color: #666;">Sistema de Gestão de Manutenção</p>
+            <h2 style="color: var(--primary-dark);">Kero Manutenção</h2>
+            <p style="margin: 8px 0; color: #666;">Sistema de Gestão de Manutenção</p>
             <p style="font-size: 12px; color: #999; margin-bottom: 20px;">ACCORD GROUP</p>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
                 <button class="demo-btn" onclick="app.login('solicitante')">👤 Solicitante</button>
                 <button class="demo-btn" onclick="app.login('manutencao')">🔧 Manutenção</button>
                 <button class="demo-btn" onclick="app.login('stephanny')">👩 Stephanny</button>
                 <button class="demo-btn" onclick="app.login('cg')">📊 Controlo Gestão</button>
-                <button class="demo-btn" onclick="app.login('diretor')">👔 Director Geral</button>
+                <button class="demo-btn" onclick="app.login('diretor')">👔 Director</button>
                 <button class="demo-btn" onclick="app.login('financas')">💰 Finanças</button>
-                <button class="demo-btn" onclick="app.login('admin')">👑 Administrador</button>
+                <button class="demo-btn" onclick="app.login('admin')">👑 Admin</button>
             </div>
         </div>
     </div>
 
+    <!-- ===== MAIN SYSTEM ===== -->
     <div id="mainSystem" style="display: none;">
-        <div class="container">
-            <div class="app-header">
-                <div class="logo-area">
-                    <div class="logo-kero"><i class="fas fa-tools"></i></div>
-                    <div><h2>Kero Manutenção</h2><small style="color:#888;">Fluxo: Stephanny → CG → Director → Finanças → Execução → Confirmação</small></div>
-                </div>
-                <div class="user-info">
-                    <div class="user-badge">
-                        <div><strong id="currentUserName"></strong><span id="currentUserRole" class="user-role"></span></div>
+        <div class="app-container">
+
+            <!-- SIDEBAR -->
+            <nav class="sidebar" id="sidebar">
+                <div class="sidebar-brand">
+                    <div class="logo-icon"><i class="fas fa-tools"></i></div>
+                    <div>
+                        <h2>Kero SIR</h2>
+                        <small>Manutenção Completa</small>
                     </div>
-                    <button onclick="app.logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Sair</button>
                 </div>
-            </div>
-
-            <div class="nav-menu">
-                <div class="nav-item active" data-aba="dashboard"><i class="fas fa-chart-pie"></i> Painel</div>
-                <div class="nav-item" data-aba="requisicoes"><i class="fas fa-clipboard-list"></i> Requisições</div>
-                <div class="nav-item" data-aba="aprovacoes"><i class="fas fa-check-circle"></i> Aprovações</div>
-                <div class="nav-item" data-aba="relatorios"><i class="fas fa-chart-bar"></i> Relatórios</div>
-            </div>
-
-            <div id="dashboardSection">
-                <div class="kpi-grid">
-                    <div class="kpi-card" onclick="app.filtrarPorStatus('all')"><div class="kpi-info"><h4>Total</h4><span id="totalReq">0</span></div><i class="fas fa-clipboard-list"></i></div>
-                    <div class="kpi-card" onclick="app.filtrarPorStatus('pendente')"><div class="kpi-info"><h4>Pendentes</h4><span id="totalPendente">0</span></div><i class="fas fa-clock"></i></div>
-                    <div class="kpi-card" onclick="app.filtrarPorStatus('aguardando_stephanny')"><div class="kpi-info"><h4>Stephanny</h4><span id="totalStephanny">0</span></div><i class="fas fa-female"></i></div>
-                    <div class="kpi-card" onclick="app.filtrarPorStatus('aguardando_cg')"><div class="kpi-info"><h4>Controlo Gestão</h4><span id="totalCG">0</span></div><i class="fas fa-chart-line"></i></div>
-                    <div class="kpi-card" onclick="app.filtrarPorStatus('aguardando_diretor')"><div class="kpi-info"><h4>Director</h4><span id="totalDiretor">0</span></div><i class="fas fa-user-tie"></i></div>
-                    <div class="kpi-card" onclick="app.filtrarPorStatus('aguardando_financas')"><div class="kpi-info"><h4>Finanças</h4><span id="totalFinancas">0</span></div><i class="fas fa-coins"></i></div>
-                    <div class="kpi-card" onclick="app.filtrarPorStatus('em_execucao')"><div class="kpi-info"><h4>Em Execução</h4><span id="totalExecucao">0</span></div><i class="fas fa-tools"></i></div>
+                <ul class="sidebar-menu">
+                    <li class="active" data-section="dashboard">
+                        <span class="icon">📊</span> Dashboard
+                    </li>
+                    <li data-section="requisicoes">
+                        <span class="icon">📋</span> Requisições
+                        <span class="badge" id="totalBadge">0</span>
+                    </li>
+                    <li data-section="aprovacoes">
+                        <span class="icon">✅</span> Aprovações
+                        <span class="badge" id="aprovacoesBadge">0</span>
+                    </li>
+                    <li data-section="relatorios">
+                        <span class="icon">📈</span> Relatórios
+                    </li>
+                </ul>
+                <div class="sidebar-user">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <div class="user-name" id="sidebarUserName">Usuário</div>
+                        <div class="user-role" id="sidebarUserRole">Role</div>
+                    </div>
                 </div>
-                <div class="card">
-                    <div class="card-header"><div class="card-title"><i class="fas fa-history"></i> Actividades Recentes</div></div>
-                    <div class="activity-list" id="atividadesRecentes"></div>
-                </div>
-            </div>
+            </nav>
 
-            <div id="requisicoesSection" style="display: none;">
-                <div class="main-layout">
-                    <div class="sidebar">
-                        <button class="btn-primary" id="btnNovaRequisicao"><i class="fas fa-plus-circle"></i> Nova Requisição</button>
-                        <div class="filter-section">
-                            <h4><i class="fas fa-filter"></i> Filtros</h4>
-                            <div class="filter-group"><label>Estado</label><select id="filterStatus" class="form-control"></select></div>
-                            <div class="filter-group"><label>Pesquisar</label><input type="text" id="filterSearch" class="form-control" placeholder="Código ou equipamento"></div>
-                            <button class="btn-small btn-approve" onclick="app.filtrarRequisicoes()" style="width:100%">Aplicar Filtros</button>
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <!-- Header -->
+                <div class="header">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <button class="menu-toggle" id="menuToggle">☰</button>
+                        <h1 id="pageTitle">📊 Dashboard</h1>
+                    </div>
+                    <div class="header-actions">
+                        <span class="date" id="currentDate"></span>
+                        <button class="btn btn-secondary btn-sm" onclick="app.exportarDados()"><i class="fas fa-download"></i> Exportar</button>
+                        <button class="btn btn-danger btn-sm" onclick="app.logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                    </div>
+                </div>
+
+                <!-- ===== DASHBOARD SECTION ===== -->
+                <div class="section active" id="section-dashboard">
+                    <div class="kpi-grid">
+                        <div class="kpi-card" onclick="app.filtrarPorStatus('all')">
+                            <div class="kpi-info"><h4>Total</h4><span id="totalReq">0</span></div>
+                            <div class="kpi-icon"><i class="fas fa-clipboard-list"></i></div>
+                        </div>
+                        <div class="kpi-card" onclick="app.filtrarPorStatus('pendente')">
+                            <div class="kpi-info"><h4>Pendentes</h4><span id="totalPendente">0</span></div>
+                            <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+                        </div>
+                        <div class="kpi-card" onclick="app.filtrarPorStatus('aguardando_stephanny')">
+                            <div class="kpi-info"><h4>Stephanny</h4><span id="totalStephanny">0</span></div>
+                            <div class="kpi-icon"><i class="fas fa-female"></i></div>
+                        </div>
+                        <div class="kpi-card" onclick="app.filtrarPorStatus('aguardando_cg')">
+                            <div class="kpi-info"><h4>Controlo Gestão</h4><span id="totalCG">0</span></div>
+                            <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+                        </div>
+                        <div class="kpi-card" onclick="app.filtrarPorStatus('aguardando_diretor')">
+                            <div class="kpi-info"><h4>Director</h4><span id="totalDiretor">0</span></div>
+                            <div class="kpi-icon"><i class="fas fa-user-tie"></i></div>
+                        </div>
+                        <div class="kpi-card" onclick="app.filtrarPorStatus('aguardando_financas')">
+                            <div class="kpi-info"><h4>Finanças</h4><span id="totalFinancas">0</span></div>
+                            <div class="kpi-icon"><i class="fas fa-coins"></i></div>
+                        </div>
+                        <div class="kpi-card" onclick="app.filtrarPorStatus('em_execucao')">
+                            <div class="kpi-info"><h4>Em Execução</h4><span id="totalExecucao">0</span></div>
+                            <div class="kpi-icon"><i class="fas fa-tools"></i></div>
+                        </div>
+                        <div class="kpi-card" onclick="app.filtrarPorStatus('concluida')">
+                            <div class="kpi-info"><h4>Concluídas</h4><span id="totalConcluidas">0</span></div>
+                            <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
                         </div>
                     </div>
-                    <div class="content-area">
-                        <div class="card">
-                            <div class="card-header"><div class="card-title"><i class="fas fa-clipboard-list"></i> Requisições de Manutenção</div></div>
-                            <div class="table-container">
-                                <table id="tabelaRequisicoes">
-                                    <thead>
-                                        <tr><th>Código</th><th>Equipamento</th><th>Tipo</th><th>Estado</th><th>Valor</th><th>Ações</th>
-                                    </thead>
-                                    <tbody id="corpoTabela"></tbody>
-                                </table>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-history"></i> Actividades Recentes</div>
+                            <span style="font-size:13px; color:#888;">Últimas 8</span>
+                        </div>
+                        <div class="activity-list" id="atividadesRecentes"></div>
+                    </div>
+                </div>
+
+                <!-- ===== REQUISIÇÕES SECTION ===== -->
+                <div class="section" id="section-requisicoes">
+                    <div class="main-layout">
+                        <div class="sidebar-filters">
+                            <button class="btn btn-primary" style="width:100%; margin-bottom:16px;" id="btnNovaRequisicao">
+                                <i class="fas fa-plus-circle"></i> Nova Requisição
+                            </button>
+                            <div class="filter-section">
+                                <h4 style="color:var(--primary-dark); margin-bottom:12px;"><i class="fas fa-filter"></i> Filtros</h4>
+                                <div class="filter-group">
+                                    <label>Estado</label>
+                                    <select id="filterStatus" class="form-control"></select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Pesquisar</label>
+                                    <input type="text" id="filterSearch" class="form-control" placeholder="Código ou equipamento...">
+                                </div>
+                                <button class="btn btn-primary btn-sm" onclick="app.filtrarRequisicoes()" style="width:100%;">Aplicar Filtros</button>
                             </div>
-                            <div class="paginacao" id="paginacao"></div>
+                        </div>
+                        <div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title"><i class="fas fa-clipboard-list"></i> Requisições de Manutenção</div>
+                                </div>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Código</th>
+                                                <th>Equipamento</th>
+                                                <th>Tipo</th>
+                                                <th>Estado</th>
+                                                <th>Valor</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="corpoTabela"></tbody>
+                                    </table>
+                                </div>
+                                <div class="paginacao" id="paginacao"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="aprovacoesSection" style="display: none;">
-                <div class="card">
-                    <div class="card-header"><div class="card-title"><i class="fas fa-check-circle"></i> Pendências para Aprovação</div></div>
-                    <div class="table-container">
-                        <table id="tabelaAprovacoes">
-                            <thead>
-                                <tr><th>Código</th><th>Equipamento</th><th>Solicitante</th><th>Tipo de Solicitação</th><th>Valor</th><th>Ações</th>
-                            </thead>
-                            <tbody id="corpoAprovacoes"></tbody>
-                        </table>
+                <!-- ===== APROVAÇÕES SECTION ===== -->
+                <div class="section" id="section-aprovacoes">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-check-circle"></i> Pendências para Aprovação</div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Equipamento</th>
+                                        <th>Solicitante</th>
+                                        <th>Tipo de Solicitação</th>
+                                        <th>Valor</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpoAprovacoes"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="relatoriosSection" style="display: none;">
-                <div class="card">
-                    <div class="card-header"><div class="card-title"><i class="fas fa-chart-bar"></i> Relatórios</div></div>
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <button class="btn-small btn-approve" onclick="app.exportarPDF()"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
-                        <button class="btn-small btn-approve" onclick="app.exportarExcel()"><i class="fas fa-file-excel"></i> Exportar Excel</button>
+                <!-- ===== RELATÓRIOS SECTION ===== -->
+                <div class="section" id="section-relatorios">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-chart-bar"></i> Relatórios</div>
+                        </div>
+                        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                            <button class="btn btn-primary" onclick="app.exportarPDF()"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+                            <button class="btn btn-success" onclick="app.exportarExcel()"><i class="fas fa-file-excel"></i> Exportar Excel</button>
+                            <button class="btn btn-secondary" onclick="app.exportarDados()"><i class="fas fa-download"></i> Backup JSON</button>
+                        </div>
+                        <div style="margin-top:20px;">
+                            <h4 style="color:var(--primary-dark); margin-bottom:12px;">Resumo Geral</h4>
+                            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px;">
+                                <div style="background:var(--primary-light); padding:16px; border-radius:12px; text-align:center;">
+                                    <div style="font-size:28px; font-weight:700; color:var(--primary-dark);" id="relTotal">0</div>
+                                    <div style="font-size:12px; color:#666;">Total Requisições</div>
+                                </div>
+                                <div style="background:var(--primary-light); padding:16px; border-radius:12px; text-align:center;">
+                                    <div style="font-size:28px; font-weight:700; color:var(--success);" id="relConcluidas">0</div>
+                                    <div style="font-size:12px; color:#666;">Concluídas</div>
+                                </div>
+                                <div style="background:var(--primary-light); padding:16px; border-radius:12px; text-align:center;">
+                                    <div style="font-size:28px; font-weight:700; color:var(--danger);" id="relPendentes">0</div>
+                                    <div style="font-size:12px; color:#666;">Pendentes</div>
+                                </div>
+                                <div style="background:var(--primary-light); padding:16px; border-radius:12px; text-align:center;">
+                                    <div style="font-size:28px; font-weight:700; color:var(--info);" id="relValorTotal">0 KZ</div>
+                                    <div style="font-size:12px; color:#666;">Valor Total</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- ===== MODALS ===== -->
 
     <!-- MODAL NOVA REQUISIÇÃO -->
     <div class="modal" id="modalNovaRequisicao">
         <div class="modal-content">
-            <div class="modal-header"><h2><i class="fas fa-tools"></i> Nova Requisição</h2><span onclick="app.fecharModal('modalNovaRequisicao')">&times;</span></div>
+            <div class="modal-header">
+                <h2><i class="fas fa-tools"></i> Nova Requisição</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalNovaRequisicao')">&times;</span>
+            </div>
             <div class="modal-body">
                 <form id="formNovaRequisicao">
-                    <div class="form-group"><label>Tipo de Manutenção *</label>
+                    <div class="form-group">
+                        <label>Tipo de Manutenção *</label>
                         <select id="tipoManutencao" class="form-control" required>
                             <option value="">Selecione</option>
                             <option value="corretiva">🔧 Correctiva - Reparação</option>
                             <option value="preventiva">🔄 Preventiva - Manutenção Programada</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>Equipamento *</label><input type="text" id="equipamento" class="form-control" required placeholder="Ex: Ar Condicionado, Empilhador..."></div>
-                    <div class="form-group"><label>Local / Direcção *</label>
+                    <div class="form-group">
+                        <label>Equipamento *</label>
+                        <input type="text" id="equipamento" class="form-control" required placeholder="Ex: Ar Condicionado, Empilhador...">
+                    </div>
+                    <div class="form-group">
+                        <label>Local / Direcção *</label>
                         <select id="local" class="form-control" required>
                             <option value="">Selecione</option>
                             <option value="Direcção Geral">Direcção Geral</option>
@@ -301,29 +1131,45 @@
                             <option value="Loja Humabo">Loja Humabo</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>Prioridade *</label>
-                        <select id="prioridade" class="form-control" required>
-                            <option value="baixa">Baixa</option>
-                            <option value="media">Média</option>
-                            <option value="alta">Alta</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Prioridade *</label>
+                            <select id="prioridade" class="form-control" required>
+                                <option value="baixa">Baixa</option>
+                                <option value="media" selected>Média</option>
+                                <option value="alta">Alta</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group"><label>Descrição do Problema *</label><textarea id="descricao" class="form-control" rows="3" required placeholder="Descreva detalhadamente a avaria ou necessidade de manutenção..."></textarea></div>
-                    <div class="form-actions"><button type="button" class="btn-small" onclick="app.fecharModal('modalNovaRequisicao')">Cancelar</button><button type="submit" class="btn-small btn-approve">Enviar Requisição</button></div>
+                    <div class="form-group">
+                        <label>Descrição do Problema *</label>
+                        <textarea id="descricao" class="form-control" rows="3" required placeholder="Descreva detalhadamente a avaria ou necessidade de manutenção..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="app.fecharModal('modalNovaRequisicao')">Cancelar</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar Requisição</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- MODAL AVALIAÇÃO DO TÉCNICO - COM 4 OPÇÕES -->
+    <!-- MODAL AVALIAÇÃO DO TÉCNICO -->
     <div class="modal" id="modalAvaliacao">
         <div class="modal-content">
-            <div class="modal-header"><h2><i class="fas fa-clipboard-check"></i> Avaliação da Manutenção</h2><span onclick="app.fecharModal('modalAvaliacao')">&times;</span></div>
+            <div class="modal-header">
+                <h2><i class="fas fa-clipboard-check"></i> Avaliação da Manutenção</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalAvaliacao')">&times;</span>
+            </div>
             <div class="modal-body">
                 <form id="formAvaliacao">
                     <input type="hidden" id="avaliacaoId">
-                    <div class="form-group"><label>Diagnóstico *</label><textarea id="diagnostico" class="form-control" rows="3" required placeholder="Descreva o diagnóstico realizado..."></textarea></div>
-                    <div class="form-group"><label>Situação da Resolução *</label>
+                    <div class="form-group">
+                        <label>Diagnóstico *</label>
+                        <textarea id="diagnostico" class="form-control" rows="3" required placeholder="Descreva o diagnóstico realizado..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Situação da Resolução *</label>
                         <select id="opcaoResolucao" class="form-control" required>
                             <option value="">Selecione uma opção</option>
                             <option value="com_material">✅ Sim, consigo resolver (tenho o material disponível)</option>
@@ -332,186 +1178,326 @@
                             <option value="precisa_comprar">💰 Não consigo resolver - é necessário comprar</option>
                         </select>
                     </div>
-                    
-                    <!-- Detalhes para Transferência -->
+
                     <div id="detalhesTransferencia" style="display:none;" class="expense-summary">
-                        <h4><i class="fas fa-exchange-alt"></i> Detalhes da Transferência de Recurso</h4>
-                        <div class="form-group"><label>Origem do Recurso</label><input type="text" id="origemRecurso" class="form-control" placeholder="De onde será transferido o recurso?"></div>
-                        <div class="form-group"><label>Recurso a Transferir</label><textarea id="detalhesTransferenciaTexto" class="form-control" rows="2" placeholder="Descreva o recurso que será transferido..."></textarea></div>
+                        <h4 style="color:var(--primary-dark);"><i class="fas fa-exchange-alt"></i> Detalhes da Transferência</h4>
+                        <div class="form-group"><label>Origem do Recurso</label><input type="text" id="origemRecurso" class="form-control" placeholder="De onde será transferido?"></div>
+                        <div class="form-group"><label>Recurso a Transferir</label><textarea id="detalhesTransferenciaTexto" class="form-control" rows="2" placeholder="Descreva o recurso..."></textarea></div>
                         <div class="form-group"><label>Valor Estimado (KZ)</label><input type="number" id="valorTransferencia" class="form-control" value="0"></div>
                     </div>
-                    
-                    <!-- Detalhes para Consumo -->
+
                     <div id="detalhesConsumo" style="display:none;" class="expense-summary">
-                        <h4><i class="fas fa-boxes"></i> Detalhes do Consumo (Stock Interno)</h4>
-                        <div class="form-group"><label>Material a ser consumido</label><textarea id="detalhesConsumoTexto" class="form-control" rows="2" placeholder="Descreva o material que será consumido do stock..."></textarea></div>
+                        <h4 style="color:var(--primary-dark);"><i class="fas fa-boxes"></i> Detalhes do Consumo</h4>
+                        <div class="form-group"><label>Material a consumir</label><textarea id="detalhesConsumoTexto" class="form-control" rows="2" placeholder="Material do stock..."></textarea></div>
                         <div class="form-group"><label>Valor Estimado (KZ)</label><input type="number" id="valorConsumo" class="form-control" value="0"></div>
                     </div>
-                    
-                    <!-- Detalhes para Compra -->
+
                     <div id="detalhesCompra" style="display:none;" class="expense-summary">
-                        <h4><i class="fas fa-file-invoice"></i> Detalhes da Compra</h4>
+                        <h4 style="color:var(--primary-dark);"><i class="fas fa-file-invoice"></i> Detalhes da Compra</h4>
                         <div class="form-group"><label>Fornecedor</label><input type="text" id="fornecedorCompra" class="form-control" placeholder="Nome do fornecedor"></div>
-                        <div class="form-group"><label>Descrição do Material/Serviço</label><textarea id="descricaoCompra" class="form-control" rows="2" placeholder="Descreva o que precisa ser comprado..."></textarea></div>
+                        <div class="form-group"><label>Descrição do Material/Serviço</label><textarea id="descricaoCompra" class="form-control" rows="2" placeholder="O que precisa ser comprado..."></textarea></div>
                         <div class="form-group"><label>Valor Estimado (KZ)</label><input type="number" id="valorCompra" class="form-control" value="0"></div>
-                        <div class="form-group"><label>Anexar Proforma/Orçamento</label><div class="dropzone" id="dropzoneProforma"><i class="fas fa-cloud-upload-alt"></i> Anexar ficheiro<input type="file" id="proformaInput" style="display:none" accept=".pdf,.jpg,.png"></div><div id="proformaList"></div></div>
+                        <div class="form-group">
+                            <label>Anexar Proforma/Orçamento</label>
+                            <div class="dropzone" id="dropzoneProforma"><i class="fas fa-cloud-upload-alt"></i> Clique para anexar<input type="file" id="proformaInput" style="display:none" accept=".pdf,.jpg,.png"></div>
+                            <div id="proformaList"></div>
+                        </div>
                     </div>
-                    
-                    <div class="form-actions"><button type="submit" class="btn-small btn-approve">Enviar Avaliação</button></div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Enviar Avaliação</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- MODAL STEPHANNY - AUTORIZAÇÃO DE TRANSFERÊNCIA/CONSUMO -->
+    <!-- MODAL STEPHANNY - AUTORIZAÇÃO -->
     <div class="modal" id="modalStephannyAutorizacao">
         <div class="modal-content">
-            <div class="modal-header"><h2><i class="fas fa-check-circle"></i> Stephanny - Autorização</h2><span onclick="app.fecharModal('modalStephannyAutorizacao')">&times;</span></div>
+            <div class="modal-header">
+                <h2><i class="fas fa-check-circle"></i> Stephanny - Autorização</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalStephannyAutorizacao')">&times;</span>
+            </div>
             <div class="modal-body">
                 <form id="formStephannyAutorizacao">
                     <input type="hidden" id="stephannyAutorizacaoReqId">
                     <div id="stephannyAutorizacaoInfo" class="expense-summary"></div>
-                    <div class="form-group"><label>Decisão</label>
+                    <div class="form-group">
+                        <label>Decisão</label>
                         <select id="stephannyDecisao" class="form-control" required>
                             <option value="">Selecione</option>
                             <option value="aprovar">✅ Aprovar</option>
                             <option value="reprovar">❌ Reprovar</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>Comentário</label><textarea id="stephannyComentario" class="form-control" rows="3" required placeholder="Justifique a sua decisão..."></textarea></div>
-                    <div class="signature-area"><h4>Assinatura</h4><input type="text" id="stephannyAutorizacaoAssinatura" class="form-control" placeholder="Nome completo" required></div>
-                    <div class="form-actions"><button type="submit" class="btn-small btn-approve">Confirmar</button></div>
+                    <div class="form-group">
+                        <label>Comentário</label>
+                        <textarea id="stephannyComentario" class="form-control" rows="3" required placeholder="Justifique a sua decisão..."></textarea>
+                    </div>
+                    <div class="signature-area">
+                        <h4>Assinatura</h4>
+                        <input type="text" id="stephannyAutorizacaoAssinatura" class="form-control" placeholder="Nome completo" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Confirmar</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- MODAL STEPHANNY - FORMULÁRIO DE DESPESAS (COMPRA) -->
+    <!-- MODAL STEPHANNY - DESPESAS -->
     <div class="modal" id="modalStephannyDespesas">
         <div class="modal-content">
-            <div class="modal-header"><h2><i class="fas fa-file-invoice"></i> Stephanny - Registo de Despesas</h2><span onclick="app.fecharModal('modalStephannyDespesas')">&times;</span></div>
+            <div class="modal-header">
+                <h2><i class="fas fa-file-invoice"></i> Stephanny - Registo de Despesas</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalStephannyDespesas')">&times;</span>
+            </div>
             <div class="modal-body">
                 <form id="formStephannyDespesas">
                     <input type="hidden" id="stephannyDespesasReqId">
                     <div id="stephannyDespesasInfo" class="expense-summary"></div>
-                    <div class="form-group"><label>Fornecedor *</label><input type="text" id="stephannyFornecedor" class="form-control" required placeholder="Nome do fornecedor"></div>
-                    <div class="form-group"><label>Data da Despesa</label><input type="date" id="stephannyData" class="form-control"></div>
-                    <div class="form-group"><label>Nº Documento / Factura</label><input type="text" id="stephannyDocNum" class="form-control" placeholder="Número da factura ou proforma"></div>
-                    <div class="form-group"><label>Itens / Serviços</label><div id="stephannyItensList"></div><button type="button" class="btn-small btn-approve" onclick="app.adicionarItemStephanny()"><i class="fas fa-plus"></i> Adicionar Item</button></div>
-                    <div class="form-group"><label>Valor Total (KZ)</label><input type="number" id="stephannyTotal" class="form-control" readonly style="background:#f0f0f0"></div>
-                    <div class="form-group"><label>Motivo da Despesa</label><textarea id="stephannyMotivo" class="form-control" rows="2" required placeholder="Descreva o motivo da despesa..."></textarea></div>
-                    <div class="form-group"><label>Anexar Proforma / Orçamento</label><div class="dropzone" id="stephannyDropzone"><i class="fas fa-cloud-upload-alt"></i> Clique ou arraste o ficheiro<input type="file" id="stephannyFileInput" style="display:none" accept=".pdf,.jpg,.png"></div><div id="stephannyFileList"></div></div>
-                    <div class="signature-area"><h4>Assinatura</h4><input type="text" id="stephannyAssinatura" class="form-control" placeholder="Nome completo" required></div>
-                    <div class="form-actions"><button type="submit" class="btn-small btn-approve">Enviar para Controlo Gestão</button></div>
+                    <div class="form-group">
+                        <label>Fornecedor *</label>
+                        <input type="text" id="stephannyFornecedor" class="form-control" required placeholder="Nome do fornecedor">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Data da Despesa</label>
+                            <input type="date" id="stephannyData" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Nº Documento / Factura</label>
+                            <input type="text" id="stephannyDocNum" class="form-control" placeholder="Nº da factura">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Itens / Serviços</label>
+                        <div id="stephannyItensList"></div>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="app.adicionarItemStephanny()"><i class="fas fa-plus"></i> Adicionar Item</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Valor Total (KZ)</label>
+                        <input type="number" id="stephannyTotal" class="form-control" readonly style="background:#f0f0f0; font-weight:700;">
+                    </div>
+                    <div class="form-group">
+                        <label>Motivo da Despesa</label>
+                        <textarea id="stephannyMotivo" class="form-control" rows="2" required placeholder="Descreva o motivo da despesa..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Anexar Proforma / Orçamento</label>
+                        <div class="dropzone" id="stephannyDropzone"><i class="fas fa-cloud-upload-alt"></i> Clique ou arraste o ficheiro<input type="file" id="stephannyFileInput" style="display:none" accept=".pdf,.jpg,.png"></div>
+                        <div id="stephannyFileList"></div>
+                    </div>
+                    <div class="signature-area">
+                        <h4>Assinatura</h4>
+                        <input type="text" id="stephannyAssinatura" class="form-control" placeholder="Nome completo" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar para Controlo Gestão</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- MODAL APROVAÇÃO CG -->
+    <!-- MODAL CG -->
     <div class="modal" id="modalCG">
         <div class="modal-content">
-            <div class="modal-header"><h2>Controlo Gestão - Aprovação</h2><span onclick="app.fecharModal('modalCG')">&times;</span></div>
+            <div class="modal-header">
+                <h2><i class="fas fa-chart-line"></i> Controlo Gestão - Aprovação</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalCG')">&times;</span>
+            </div>
             <div class="modal-body">
                 <form id="formCG">
                     <input type="hidden" id="cgReqId">
                     <div id="cgInfo" class="expense-summary"></div>
-                    <div class="form-group"><label>Decisão</label><select id="cgDecisao" class="form-control" required><option value="">Selecione</option><option value="aprovar">✅ Aprovar</option><option value="reprovar">❌ Reprovar</option></select></div>
-                    <div class="form-group"><label>Parecer</label><textarea id="cgParecer" class="form-control" rows="3" required placeholder="Justifique a sua decisão..."></textarea></div>
-                    <div class="signature-area"><h4>Assinatura do Responsável CG</h4><input type="text" id="cgAssinatura" class="form-control" placeholder="Nome completo" required></div>
-                    <div class="form-actions"><button type="submit" class="btn-small btn-approve">Confirmar</button></div>
+                    <div class="form-group">
+                        <label>Decisão</label>
+                        <select id="cgDecisao" class="form-control" required>
+                            <option value="">Selecione</option>
+                            <option value="aprovar">✅ Aprovar</option>
+                            <option value="reprovar">❌ Reprovar</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Parecer</label>
+                        <textarea id="cgParecer" class="form-control" rows="3" required placeholder="Justifique a sua decisão..."></textarea>
+                    </div>
+                    <div class="signature-area">
+                        <h4>Assinatura do Responsável CG</h4>
+                        <input type="text" id="cgAssinatura" class="form-control" placeholder="Nome completo" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Confirmar</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- MODAL APROVAÇÃO DIRECTOR -->
+    <!-- MODAL DIRECTOR -->
     <div class="modal" id="modalDiretor">
         <div class="modal-content">
-            <div class="modal-header"><h2>Director Geral - Aprovação Final</h2><span onclick="app.fecharModal('modalDiretor')">&times;</span></div>
+            <div class="modal-header">
+                <h2><i class="fas fa-user-tie"></i> Director Geral - Aprovação Final</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalDiretor')">&times;</span>
+            </div>
             <div class="modal-body">
                 <form id="formDiretor">
                     <input type="hidden" id="diretorReqId">
                     <div id="diretorInfo" class="expense-summary"></div>
-                    <div class="form-group"><label>Decisão</label><select id="diretorDecisao" class="form-control" required><option value="">Selecione</option><option value="aprovar">✅ Aprovar</option><option value="reprovar">❌ Reprovar</option></select></div>
-                    <div class="form-group"><label>Parecer</label><textarea id="diretorParecer" class="form-control" rows="3" required placeholder="Justifique a sua decisão..."></textarea></div>
-                    <div class="signature-area"><h4>Assinatura do Director</h4><input type="text" id="diretorAssinatura" class="form-control" placeholder="Nome completo" required></div>
-                    <div class="form-actions"><button type="submit" class="btn-small btn-approve">Confirmar</button></div>
+                    <div class="form-group">
+                        <label>Decisão</label>
+                        <select id="diretorDecisao" class="form-control" required>
+                            <option value="">Selecione</option>
+                            <option value="aprovar">✅ Aprovar</option>
+                            <option value="reprovar">❌ Reprovar</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Parecer</label>
+                        <textarea id="diretorParecer" class="form-control" rows="3" required placeholder="Justifique a sua decisão..."></textarea>
+                    </div>
+                    <div class="signature-area">
+                        <h4>Assinatura do Director</h4>
+                        <input type="text" id="diretorAssinatura" class="form-control" placeholder="Nome completo" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Confirmar</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- MODAL FINANÇAS - PAGAMENTO -->
+    <!-- MODAL FINANÇAS -->
     <div class="modal" id="modalFinancas">
         <div class="modal-content">
-            <div class="modal-header"><h2>Finanças - Pagamento</h2><span onclick="app.fecharModal('modalFinancas')">&times;</span></div>
+            <div class="modal-header">
+                <h2><i class="fas fa-coins"></i> Finanças - Pagamento</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalFinancas')">&times;</span>
+            </div>
             <div class="modal-body">
                 <form id="formFinancas">
                     <input type="hidden" id="financasReqId">
                     <div id="financasInfo" class="expense-summary"></div>
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <button type="button" class="btn-small btn-approve" onclick="app.imprimirNotaDespesa()" style="background: #2196F3; padding: 10px 20px;"><i class="fas fa-print"></i> Visualizar / Imprimir Nota de Despesa</button>
+                    <div style="text-align:center; margin-bottom:16px;">
+                        <button type="button" class="btn btn-primary" onclick="app.imprimirNotaDespesa()"><i class="fas fa-print"></i> Visualizar Nota de Despesa</button>
                     </div>
-                    <div class="form-group"><label>Confirmar Pagamento</label><select id="financasStatus" class="form-control" required><option value="">Selecione</option><option value="pago">✅ Pago - Liberar para execução</option><option value="nao_pago">❌ Não pago - Aguardar</option></select></div>
-                    <div class="form-group"><label>Nº de Comprovativo / Transferência</label><input type="text" id="financasComprovativo" class="form-control" placeholder="Número do comprovativo bancário"></div>
-                    <div class="form-group"><label>Data do Pagamento</label><input type="date" id="financasDataPagamento" class="form-control"></div>
-                    <div class="form-group"><label>Observação</label><textarea id="financasObs" class="form-control" rows="2" required placeholder="Registo do pagamento..."></textarea></div>
-                    <div class="signature-area"><h4>Assinatura do Responsável Financeiro</h4><input type="text" id="financasAssinatura" class="form-control" placeholder="Nome completo" required></div>
-                    <div class="form-actions"><button type="submit" class="btn-small btn-approve">Confirmar Pagamento</button></div>
+                    <div class="form-group">
+                        <label>Confirmar Pagamento</label>
+                        <select id="financasStatus" class="form-control" required>
+                            <option value="">Selecione</option>
+                            <option value="pago">✅ Pago - Liberar para execução</option>
+                            <option value="nao_pago">❌ Não pago - Aguardar</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nº de Comprovativo / Transferência</label>
+                        <input type="text" id="financasComprovativo" class="form-control" placeholder="Número do comprovativo bancário">
+                    </div>
+                    <div class="form-group">
+                        <label>Data do Pagamento</label>
+                        <input type="date" id="financasDataPagamento" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Observação</label>
+                        <textarea id="financasObs" class="form-control" rows="2" required placeholder="Registo do pagamento..."></textarea>
+                    </div>
+                    <div class="signature-area">
+                        <h4>Assinatura do Responsável Financeiro</h4>
+                        <input type="text" id="financasAssinatura" class="form-control" placeholder="Nome completo" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Confirmar Pagamento</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- MODAL EXECUÇÃO MANUTENÇÃO -->
+    <!-- MODAL EXECUÇÃO -->
     <div class="modal" id="modalExecucao">
         <div class="modal-content">
-            <div class="modal-header"><h2>Manutenção - Execução do Serviço</h2><span onclick="app.fecharModal('modalExecucao')">&times;</span></div>
+            <div class="modal-header">
+                <h2><i class="fas fa-tools"></i> Manutenção - Execução do Serviço</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalExecucao')">&times;</span>
+            </div>
             <div class="modal-body">
                 <form id="formExecucao">
                     <input type="hidden" id="execucaoReqId">
-                    <div class="form-group"><label>Relatório de Execução *</label><textarea id="relatorioExecucao" class="form-control" rows="4" required placeholder="Descreva os trabalhos realizados..."></textarea></div>
-                    <div class="form-group"><label>Data da Execução</label><input type="date" id="dataExecucao" class="form-control"></div>
-                    <div class="form-group"><label>Técnico Responsável</label><input type="text" id="tecnicoResponsavel" class="form-control" placeholder="Nome do técnico"></div>
-                    <div class="form-group"><label>Observações</label><textarea id="obsExecucao" class="form-control" rows="2" placeholder="Observações adicionais..."></textarea></div>
-                    <div class="form-actions"><button type="submit" class="btn-small btn-approve">Finalizar Execução</button></div>
+                    <div class="form-group">
+                        <label>Relatório de Execução *</label>
+                        <textarea id="relatorioExecucao" class="form-control" rows="4" required placeholder="Descreva os trabalhos realizados..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Data da Execução</label>
+                            <input type="date" id="dataExecucao" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Técnico Responsável</label>
+                            <input type="text" id="tecnicoResponsavel" class="form-control" placeholder="Nome do técnico">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea id="obsExecucao" class="form-control" rows="2" placeholder="Observações adicionais..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Finalizar Execução</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- MODAL CONFIRMAÇÃO DO SOLICITANTE -->
+    <!-- MODAL CONFIRMAÇÃO -->
     <div class="modal" id="modalConfirmacao">
         <div class="modal-content">
-            <div class="modal-header"><h2><i class="fas fa-check-double"></i> Confirmação do Solicitante</h2><span onclick="app.fecharModal('modalConfirmacao')">&times;</span></div>
+            <div class="modal-header">
+                <h2><i class="fas fa-check-double"></i> Confirmação do Solicitante</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalConfirmacao')">&times;</span>
+            </div>
             <div class="modal-body">
                 <div id="confirmInfo" class="expense-summary"></div>
                 <div class="form-group">
                     <label><i class="fas fa-box"></i> 1. Confirmo que o MATERIAL foi recebido e está conforme?</label>
                     <select id="confirmMaterial" class="form-control" required>
-                        <option value="">Selecione</option><option value="sim">✅ Sim, material recebido e conforme</option><option value="nao">❌ Não, material não recebido ou não conforme</option>
+                        <option value="">Selecione</option>
+                        <option value="sim">✅ Sim, material recebido e conforme</option>
+                        <option value="nao">❌ Não, material não recebido ou não conforme</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-wrench"></i> 2. Confirmo que a MANUTENÇÃO foi realizada com sucesso?</label>
                     <select id="confirmExecucao" class="form-control" required>
-                        <option value="">Selecione</option><option value="sim">✅ Sim, manutenção executada com sucesso</option><option value="nao">❌ Não, o problema persiste ou serviço não foi realizado</option>
+                        <option value="">Selecione</option>
+                        <option value="sim">✅ Sim, manutenção executada com sucesso</option>
+                        <option value="nao">❌ Não, o problema persiste ou serviço não foi realizado</option>
                     </select>
                 </div>
-                <div class="form-group"><label>Comentário Adicional</label><textarea id="confirmComentario" class="form-control" rows="2" placeholder="Observações sobre o serviço..."></textarea></div>
-                <div class="signature-area"><h4>Assinatura do Solicitante</h4><input type="text" id="solicitanteAssinatura" class="form-control" placeholder="Nome completo" required></div>
-                <button class="btn-small btn-approve" onclick="app.enviarConfirmacao()" style="width:100%">Confirmar e Finalizar</button>
+                <div class="form-group">
+                    <label>Comentário Adicional</label>
+                    <textarea id="confirmComentario" class="form-control" rows="2" placeholder="Observações sobre o serviço..."></textarea>
+                </div>
+                <div class="signature-area">
+                    <h4>Assinatura do Solicitante</h4>
+                    <input type="text" id="solicitanteAssinatura" class="form-control" placeholder="Nome completo" required>
+                </div>
+                <button class="btn btn-primary" onclick="app.enviarConfirmacao()" style="width:100%;"><i class="fas fa-check-double"></i> Confirmar e Finalizar</button>
             </div>
         </div>
     </div>
 
-    <!-- NOTA DE DESPESA PARA IMPRESSÃO -->
-    <div id="notaDespesa" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 20000; overflow-y: auto; padding: 30px;">
-        <div style="max-width: 800px; margin: 0 auto;">
-            <div style="text-align: right; margin-bottom: 20px;">
+    <!-- NOTA DE DESPESA -->
+    <div id="notaDespesa">
+        <div style="max-width:800px; margin:0 auto;">
+            <div style="text-align:right; margin-bottom:20px;">
                 <button class="btn-imprimir no-print" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
-                <button class="btn-imprimir no-print" style="background:#666" onclick="document.getElementById('notaDespesa').style.display='none'"><i class="fas fa-times"></i> Fechar</button>
+                <button class="btn-imprimir no-print" style="background:#666;" onclick="document.getElementById('notaDespesa').style.display='none'"><i class="fas fa-times"></i> Fechar</button>
             </div>
             <div class="nota-despesa-container">
                 <div class="nota-header">
@@ -521,18 +1507,25 @@
                 </div>
                 <div id="notaConteudo"></div>
                 <div class="nota-assinaturas">
-                    <div class="nota-assinatura"><div class="linha"></div><p>Stephanny<br><small>(Responsável pela Despesa)</small></p></div>
-                    <div class="nota-assinatura"><div class="linha"></div><p>Controlo Gestão<br><small>(Validação)</small></p></div>
-                    <div class="nota-assinatura"><div class="linha"></div><p>Director Geral<br><small>(Aprovação)</small></p></div>
-                    <div class="nota-assinatura"><div class="linha"></div><p>Finanças<br><small>(Pagamento)</small></p></div>
+                    <div class="nota-assinatura"><div class="linha"></div><p>Stephanny<br><small>Responsável pela Despesa</small></p></div>
+                    <div class="nota-assinatura"><div class="linha"></div><p>Controlo Gestão<br><small>Validação</small></p></div>
+                    <div class="nota-assinatura"><div class="linha"></div><p>Director Geral<br><small>Aprovação</small></p></div>
+                    <div class="nota-assinatura"><div class="linha"></div><p>Finanças<br><small>Pagamento</small></p></div>
                 </div>
-                <div style="text-align: center; margin-top: 30px; font-size: 10px; color: #999;">Documento gerado electronicamente - Kero SIR Manutenção</div>
+                <div style="text-align:center; margin-top:30px; font-size:10px; color:#999;">Documento gerado electronicamente - Kero SIR Manutenção</div>
             </div>
         </div>
     </div>
 
+    <!-- TOAST -->
+    <div id="toastContainer" style="position:fixed; bottom:30px; right:30px; z-index:100000; display:flex; flex-direction:column; gap:10px;"></div>
+
     <script>
+        // ============================================================
+        //  APP - SISTEMA COMPLETO DE MANUTENÇÃO
+        // ============================================================
         const app = (function() {
+            // ========== PERFIS ==========
             const perfis = {
                 solicitante: { nome: "João Solicitante", role: "Solicitante", email: "solicitante@accord.com" },
                 manutencao: { nome: "Carlos Técnico", role: "Manutenção", email: "tecnico@accord.com" },
@@ -542,7 +1535,7 @@
                 financas: { nome: "Maria Costa", role: "Finanças", email: "financas@accord.com" },
                 admin: { nome: "Administrador", role: "Admin", email: "admin@accord.com" }
             };
-            
+
             let usuario = null;
             let requisicoes = [];
             let pagina = 1;
@@ -551,134 +1544,236 @@
             let stephannyItens = [];
             let stephannyProforma = null;
             let confirmacaoId = null;
-            
-            function salvar() { localStorage.setItem('kero_manutencao_v3', JSON.stringify(requisicoes)); }
-            
-            function carregarExemplo() {
-                if (requisicoes.length === 0) {
-                    requisicoes = [
-                        { id: "1", codigo: "MAN-001", equipamento: "Ar Condicionado", local: "Direcção Geral", tipo: "corretiva", prioridade: "alta", descricao: "O equipamento não está a refrigerar adequadamente", status: "pendente", data: new Date().toISOString(), solicitante: "João Solicitante", email: "solicitante@accord.com", historico: [] }
-                    ];
-                    salvar();
+            let nextId = 1;
+
+            // ========== PERSISTÊNCIA ==========
+            function salvar() {
+                localStorage.setItem('kero_manutencao_v4', JSON.stringify(requisicoes));
+            }
+
+            function carregar() {
+                const data = localStorage.getItem('kero_manutencao_v4');
+                if (data) {
+                    requisicoes = JSON.parse(data);
+                    // Atualizar nextId
+                    requisicoes.forEach(r => {
+                        if (parseInt(r.id) >= nextId) nextId = parseInt(r.id) + 1;
+                    });
+                } else {
+                    carregarExemplo();
                 }
             }
-            
+
+            function carregarExemplo() {
+                requisicoes = [
+                    {
+                        id: "1",
+                        codigo: "MAN-2026-0001",
+                        equipamento: "Ar Condicionado",
+                        local: "Direcção Geral",
+                        tipo: "corretiva",
+                        prioridade: "alta",
+                        descricao: "O equipamento não está a refrigerar adequadamente, temperatura ambiente acima de 28°C.",
+                        status: "pendente",
+                        data: new Date().toISOString(),
+                        solicitante: "João Solicitante",
+                        email: "solicitante@accord.com",
+                        historico: [{ data: new Date().toISOString(), usuario: "João Solicitante", acao: "Requisição criada" }]
+                    },
+                    {
+                        id: "2",
+                        codigo: "MAN-2026-0002",
+                        equipamento: "Empilhador Elétrico",
+                        local: "Armazém ZEE",
+                        tipo: "preventiva",
+                        prioridade: "media",
+                        descricao: "Revisão anual programada - troca de baterias e lubrificação geral.",
+                        status: "aguardando_stephanny",
+                        data: new Date().toISOString(),
+                        solicitante: "Carlos Logística",
+                        email: "solicitante@accord.com",
+                        diagnostico: "Baterias com desgaste acentuado, necessita substituição.",
+                        opcaoResolucao: "precisa_comprar",
+                        descricaoCompra: "2 baterias de 48V para empilhador elétrico",
+                        valorCompra: 450000,
+                        historico: [
+                            { data: new Date().toISOString(), usuario: "João Solicitante", acao: "Requisição criada" },
+                            { data: new Date().toISOString(), usuario: "Carlos Técnico", acao: "Diagnóstico realizado - necessita compra" }
+                        ]
+                    },
+                    {
+                        id: "3",
+                        codigo: "MAN-2026-0003",
+                        equipamento: "Compressor de Ar",
+                        local: "Sede",
+                        tipo: "corretiva",
+                        prioridade: "alta",
+                        descricao: "Compressor fazendo ruído excessivo e perdendo pressão.",
+                        status: "concluida",
+                        data: new Date().toISOString(),
+                        solicitante: "Maria Manutenção",
+                        email: "manutencao@accord.com",
+                        diagnostico: "Válvula de descarga danificada e correia desgastada.",
+                        opcaoResolucao: "com_material",
+                        relatorioExecucao: "Substituída válvula de descarga e correia. Compressor testado e operacional.",
+                        dataExecucao: new Date().toISOString(),
+                        tecnicoResponsavel: "Carlos Técnico",
+                        valorTotal: 85000,
+                        historico: [
+                            { data: new Date().toISOString(), usuario: "Maria Manutenção", acao: "Requisição criada" },
+                            { data: new Date().toISOString(), usuario: "Carlos Técnico", acao: "Diagnóstico - tem material" },
+                            { data: new Date().toISOString(), usuario: "Carlos Técnico", acao: "Execução concluída" }
+                        ]
+                    }
+                ];
+                nextId = 4;
+                salvar();
+            }
+
+            // ========== HELPERS ==========
             function getStatusText(s) {
-                const map = { 
-                    'pendente':'Pendente', 'aguardando_stephanny':'Aguard. Stephanny', 
-                    'aguardando_cg':'Aguard. Controlo Gestão', 'aguardando_diretor':'Aguard. Director', 
-                    'aguardando_financas':'Aguard. Finanças', 'em_execucao':'Em Execução', 
-                    'aguardando_material':'Aguard. Confirmação Material', 
-                    'aguardando_execucao':'Aguard. Confirmação Execução', 
-                    'concluida':'Concluída', 'reprovada':'Reprovada' 
+                const map = {
+                    'pendente': 'Pendente',
+                    'aguardando_stephanny': 'Aguard. Stephanny',
+                    'aguardando_cg': 'Aguard. Controlo Gestão',
+                    'aguardando_diretor': 'Aguard. Director',
+                    'aguardando_financas': 'Aguard. Finanças',
+                    'em_execucao': 'Em Execução',
+                    'aguardando_material': 'Aguard. Confirmação Material',
+                    'aguardando_execucao': 'Aguard. Confirmação Execução',
+                    'concluida': 'Concluída',
+                    'reprovada': 'Reprovada'
                 };
                 return map[s] || s;
             }
-            
-            function getStatusClass(s) { return s.replace(/_/g, '-'); }
-            
-            function notificar(msg, tipo) {
-                let d = document.createElement('div');
-                d.className = `notificacao notificacao-${tipo}`;
-                d.innerHTML = `<i class="fas ${tipo==='success'?'fa-check-circle':tipo==='error'?'fa-exclamation-circle':'fa-info-circle'}"></i> ${msg}`;
-                document.body.appendChild(d);
-                setTimeout(() => d.remove(), 4000);
+
+            function getStatusClass(s) {
+                return s.replace(/_/g, '-');
             }
-            
-            function formatarData(d) { if (!d) return ''; return new Date(d).toLocaleDateString('pt-PT'); }
-            function formatarDataHora(d) { if (!d) return ''; return new Date(d).toLocaleString('pt-PT'); }
-            function formatarMoeda(v) { return (v || 0).toLocaleString('pt-AO') + ' KZ'; }
-            function gerarCodigo() { return `MAN-${new Date().getFullYear()}-${String(requisicoes.length+1).padStart(4,'0')}`; }
-            
+
+            function formatarData(d) {
+                if (!d) return '';
+                return new Date(d).toLocaleDateString('pt-PT');
+            }
+
+            function formatarDataHora(d) {
+                if (!d) return '';
+                return new Date(d).toLocaleString('pt-PT');
+            }
+
+            function formatarMoeda(v) {
+                return (v || 0).toLocaleString('pt-AO') + ' KZ';
+            }
+
+            function gerarCodigo() {
+                const year = new Date().getFullYear();
+                const num = String(requisicoes.length + 1).padStart(4, '0');
+                return `MAN-${year}-${num}`;
+            }
+
             function podeVer(req) {
                 if (usuario.role === 'Solicitante') return req.email === usuario.email;
                 return true;
             }
-            
+
             function adicionarHistorico(req, acao) {
                 if (!req.historico) req.historico = [];
                 req.historico.push({ data: new Date().toISOString(), usuario: usuario.nome, acao: acao });
                 salvar();
             }
-            
-            function imprimirNotaDespesa() {
-                const id = document.getElementById('financasReqId').value;
-                const req = requisicoes.find(r => r.id === id);
-                if (!req) return;
-                
-                const notaDiv = document.getElementById('notaConteudo');
-                const itensHtml = (req.itens || []).map(i => `<tr><td>${i.desc}</td><td style="text-align:center">${i.qtd}</td><td style="text-align:right">${formatarMoeda(i.preco)}</td><td style="text-align:right">${formatarMoeda(i.total)}</td>`).join('');
-                
-                const html = `
-                    <div class="nota-detalhes">
-                        <table style="width:100%">
-                            <tr><td style="width:140px"><strong>Nº Requisição:</strong></td><td>${req.codigo}</td></tr>
-                            <tr><td><strong>Data de Emissão:</strong></td><td>${formatarData(new Date())}</td></tr>
-                            <tr><td><strong>Solicitante:</strong></td><td>${req.solicitante}</td></tr>
-                            <tr><td><strong>Equipamento:</strong></td><td>${req.equipamento}</td></tr>
-                            <tr><td><strong>Local/Direcção:</strong></td><td>${req.local}</td></tr>
-                            <tr><td><strong>Fornecedor:</strong></td><td>${req.fornecedor || 'N/A'}</td></tr>
-                            <tr><td><strong>Nº Documento:</strong></td><td>${req.docNumero || 'N/A'}</td></tr>
-                        </table>
-                    </div>
-                    <h3>Detalhes da Despesa</h3>
-                    <table class="nota-itens">
-                        <thead><tr><th>Descrição do Item/Serviço</th><th style="width:60px">Qtd</th><th style="width:120px">Valor Unit.</th><th style="width:120px">Total</th></tr></thead>
-                        <tbody>${itensHtml || '<tr><td colspan="4">Nenhum item registado</td></tr>'}</tbody>
-                        <tfoot><tr style="background:#f0f0f0"><td colspan="3" style="text-align:right"><strong>TOTAL A PAGAR</strong></td><td style="text-align:right;font-size:18px"><strong>${formatarMoeda(req.valorTotal)}</strong></td></tr></tfoot>
-                    </table>
-                    <div class="nota-detalhes">
-                        <p><strong>Motivo da Despesa:</strong><br>${req.motivoDespesa || 'N/A'}</p>
-                        <p><strong>Parecer do Controlo Gestão:</strong> ${req.parecerCG || 'N/A'}</p>
-                        <p><strong>Parecer do Director:</strong> ${req.parecerDiretor || 'N/A'}</p>
-                        <p><strong>Dados do Pagamento:</strong><br>Comprovativo: ${req.comprovativo || 'N/A'}<br>Data Pagamento: ${req.dataPagamento ? formatarData(req.dataPagamento) : 'N/A'}</p>
-                    </div>
-                `;
-                notaDiv.innerHTML = html;
-                document.getElementById('notaDespesa').style.display = 'block';
+
+            function notificar(msg, tipo = 'success') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${tipo}`;
+                const icons = {
+                    success: 'fa-check-circle',
+                    error: 'fa-exclamation-circle',
+                    info: 'fa-info-circle',
+                    warning: 'fa-exclamation-triangle'
+                };
+                toast.innerHTML = `<i class="fas ${icons[tipo] || 'fa-info-circle'}"></i> ${msg}`;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100px)';
+                    setTimeout(() => toast.remove(), 400);
+                }, 4000);
             }
-            
-            function getAcoes(req) {
-                let btns = '';
-                if (usuario.role === 'Manutenção' && req.status === 'pendente') btns += `<button class="btn-small btn-approve" onclick="event.stopPropagation();app.abrirAvaliacao('${req.id}')"><i class="fas fa-clipboard-check"></i> Avaliar</button>`;
-                if (usuario.role === 'Stephanny' && req.status === 'aguardando_stephanny') {
-                    if (req.opcaoResolucao === 'transferencia' || req.opcaoResolucao === 'consumo') {
-                        btns += `<button class="btn-small btn-approve" onclick="event.stopPropagation();app.abrirStephannyAutorizacao('${req.id}')"><i class="fas fa-check-circle"></i> Autorizar</button>`;
-                    } else if (req.opcaoResolucao === 'precisa_comprar') {
-                        btns += `<button class="btn-small btn-approve" onclick="event.stopPropagation();app.abrirStephannyDespesas('${req.id}')"><i class="fas fa-file-invoice"></i> Registar Despesas</button>`;
-                    }
-                }
-                if (usuario.role === 'Controlo Gestão' && req.status === 'aguardando_cg') btns += `<button class="btn-small btn-approve" onclick="event.stopPropagation();app.abrirCG('${req.id}')"><i class="fas fa-check"></i> Aprovar</button>`;
-                if (usuario.role === 'Director Geral' && req.status === 'aguardando_diretor') btns += `<button class="btn-small btn-approve" onclick="event.stopPropagation();app.abrirDiretor('${req.id}')"><i class="fas fa-user-tie"></i> Aprovar</button>`;
-                if (usuario.role === 'Finanças' && req.status === 'aguardando_financas') btns += `<button class="btn-small btn-approve" onclick="event.stopPropagation();app.abrirFinancas('${req.id}')"><i class="fas fa-coins"></i> Pagamento</button>`;
-                if (usuario.role === 'Manutenção' && req.status === 'em_execucao') btns += `<button class="btn-small btn-warning" onclick="event.stopPropagation();app.abrirExecucao('${req.id}')"><i class="fas fa-tools"></i> Executar Serviço</button>`;
-                if (usuario.role === 'Solicitante' && req.status === 'aguardando_material') btns += `<button class="btn-small btn-warning" onclick="event.stopPropagation();app.abrirConfirmacao('${req.id}')"><i class="fas fa-boxes"></i> Confirmar Material</button>`;
-                if (usuario.role === 'Solicitante' && req.status === 'aguardando_execucao') btns += `<button class="btn-small btn-warning" onclick="event.stopPropagation();app.abrirConfirmacao('${req.id}')"><i class="fas fa-check-double"></i> Confirmar Execução</button>`;
-                return btns || '-';
+
+            // ========== NAVEGAÇÃO ==========
+            function navegarPara(section) {
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                const target = document.getElementById('section-' + section);
+                if (target) target.classList.add('active');
+
+                document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+                const menuItem = document.querySelector(`.sidebar-menu li[data-section="${section}"]`);
+                if (menuItem) menuItem.classList.add('active');
+
+                const titles = {
+                    'dashboard': '📊 Dashboard',
+                    'requisicoes': '📋 Requisições',
+                    'aprovacoes': '✅ Aprovações',
+                    'relatorios': '📈 Relatórios'
+                };
+                document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
+
+                // Fechar sidebar mobile
+                document.getElementById('sidebar').classList.remove('open');
+
+                // Atualizar dados
+                if (section === 'requisicoes') renderizarRequisicoes();
+                if (section === 'aprovacoes') renderizarAprovacoes();
+                if (section === 'dashboard') carregarDashboard();
+                if (section === 'relatorios') atualizarRelatorios();
+                atualizarBadges();
             }
-            
+
+            // ========== MODAIS ==========
+            function abrirModal(id) {
+                document.getElementById(id).style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+
+            function fecharModal(id) {
+                document.getElementById(id).style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+
+            // ========== RENDER: REQUISIÇÕES ==========
             function renderizarRequisicoes() {
                 let filtradas = requisicoes.filter(podeVer);
                 if (filtroStatus !== 'all') filtradas = filtradas.filter(r => r.status === filtroStatus);
-                if (filtroSearch) filtradas = filtradas.filter(r => r.codigo.toLowerCase().includes(filtroSearch.toLowerCase()) || r.equipamento.toLowerCase().includes(filtroSearch.toLowerCase()));
-                
+                if (filtroSearch) {
+                    const search = filtroSearch.toLowerCase();
+                    filtradas = filtradas.filter(r =>
+                        r.codigo.toLowerCase().includes(search) ||
+                        r.equipamento.toLowerCase().includes(search)
+                    );
+                }
+
                 const start = (pagina - 1) * 10;
                 const itens = filtradas.slice(start, start + 10);
                 const totalPag = Math.ceil(filtradas.length / 10);
-                
+
                 const tbody = document.getElementById('corpoTabela');
                 tbody.innerHTML = '';
-                itens.forEach(req => {
-                    const row = tbody.insertRow();
-                    row.onclick = () => verDetalhes(req);
-                    row.insertCell(0).innerHTML = req.codigo;
-                    row.insertCell(1).innerHTML = req.equipamento;
-                    row.insertCell(2).innerHTML = `<span class="type-badge type-${req.tipo}">${req.tipo === 'corretiva' ? 'Correctiva' : 'Preventiva'}</span>`;
-                    row.insertCell(3).innerHTML = `<span class="status-badge status-${getStatusClass(req.status)}">${getStatusText(req.status)}</span>`;
-                    row.insertCell(4).innerHTML = formatarMoeda(req.valorTotal);
-                    row.insertCell(5).innerHTML = getAcoes(req);
-                });
-                
+                if (itens.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999; padding:30px;">Nenhuma requisição encontrada.</td></tr>`;
+                } else {
+                    itens.forEach(req => {
+                        const row = tbody.insertRow();
+                        row.onclick = () => verDetalhes(req);
+                        row.insertCell(0).innerHTML = req.codigo;
+                        row.insertCell(1).innerHTML = req.equipamento;
+                        row.insertCell(2).innerHTML = `<span class="type-badge type-${req.tipo}">${req.tipo === 'corretiva' ? 'Correctiva' : 'Preventiva'}</span>`;
+                        row.insertCell(3).innerHTML = `<span class="status-badge status-${getStatusClass(req.status)}">${getStatusText(req.status)}</span>`;
+                        row.insertCell(4).innerHTML = formatarMoeda(req.valorTotal);
+                        row.insertCell(5).innerHTML = getAcoes(req);
+                    });
+                }
+
                 const pagDiv = document.getElementById('paginacao');
                 pagDiv.innerHTML = '';
                 for (let i = 1; i <= totalPag; i++) {
@@ -686,12 +1781,14 @@
                     btn.className = 'pagina-btn';
                     btn.innerText = i;
                     if (i === pagina) btn.classList.add('active');
-                    btn.onclick = () => { pagina = i; renderizarRequisicoes(); };
+                    btn.onclick = () => { pagina = i;
+                        renderizarRequisicoes(); };
                     pagDiv.appendChild(btn);
                 }
                 atualizarKPIs();
             }
-            
+
+            // ========== RENDER: APROVAÇÕES ==========
             function renderizarAprovacoes() {
                 let pendentes = [];
                 if (usuario.role === 'Stephanny') pendentes = requisicoes.filter(r => r.status === 'aguardando_stephanny');
@@ -700,15 +1797,11 @@
                 else if (usuario.role === 'Finanças') pendentes = requisicoes.filter(r => r.status === 'aguardando_financas');
                 else if (usuario.role === 'Manutenção') pendentes = requisicoes.filter(r => r.status === 'em_execucao');
                 else if (usuario.role === 'Solicitante') pendentes = requisicoes.filter(r => r.status === 'aguardando_material' || r.status === 'aguardando_execucao');
-                
+
                 const tbody = document.getElementById('corpoAprovacoes');
                 tbody.innerHTML = '';
                 if (pendentes.length === 0) {
-                    const row = tbody.insertRow();
-                    const cell = row.insertCell(0);
-                    cell.colSpan = 6;
-                    cell.textContent = 'Nenhuma pendência para aprovação';
-                    cell.style.textAlign = 'center';
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999; padding:30px;">Nenhuma pendência para aprovação.</td></tr>`;
                     return;
                 }
                 pendentes.forEach(req => {
@@ -716,17 +1809,65 @@
                     row.insertCell(0).innerHTML = req.codigo;
                     row.insertCell(1).innerHTML = req.equipamento;
                     row.insertCell(2).innerHTML = req.solicitante;
-                    let tipoSol = '';
+                    let tipoSol = 'Serviço Interno';
                     if (req.opcaoResolucao === 'transferencia') tipoSol = 'Transferência de Recurso';
                     else if (req.opcaoResolucao === 'consumo') tipoSol = 'Consumo (Stock Interno)';
                     else if (req.opcaoResolucao === 'precisa_comprar') tipoSol = 'Compra de Material';
-                    else tipoSol = 'Serviço Interno';
                     row.insertCell(3).innerHTML = tipoSol;
                     row.insertCell(4).innerHTML = formatarMoeda(req.valorTransferencia || req.valorConsumo || req.valorTotal || 0);
                     row.insertCell(5).innerHTML = getAcoes(req);
                 });
+                atualizarBadges();
             }
-            
+
+            // ========== AÇÕES DOS BOTÕES ==========
+            function getAcoes(req) {
+                let btns = '';
+                if (usuario.role === 'Manutenção' && req.status === 'pendente') {
+                    btns += `<button class="btn btn-success btn-sm" onclick="event.stopPropagation();app.abrirAvaliacao('${req.id}')"><i class="fas fa-clipboard-check"></i> Avaliar</button>`;
+                }
+                if (usuario.role === 'Stephanny' && req.status === 'aguardando_stephanny') {
+                    if (req.opcaoResolucao === 'transferencia' || req.opcaoResolucao === 'consumo') {
+                        btns += `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();app.abrirStephannyAutorizacao('${req.id}')"><i class="fas fa-check-circle"></i> Autorizar</button>`;
+                    } else if (req.opcaoResolucao === 'precisa_comprar') {
+                        btns += `<button class="btn btn-warning btn-sm" onclick="event.stopPropagation();app.abrirStephannyDespesas('${req.id}')"><i class="fas fa-file-invoice"></i> Despesas</button>`;
+                    }
+                }
+                if (usuario.role === 'Controlo Gestão' && req.status === 'aguardando_cg') {
+                    btns += `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();app.abrirCG('${req.id}')"><i class="fas fa-check"></i> Aprovar</button>`;
+                }
+                if (usuario.role === 'Director Geral' && req.status === 'aguardando_diretor') {
+                    btns += `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();app.abrirDiretor('${req.id}')"><i class="fas fa-user-tie"></i> Aprovar</button>`;
+                }
+                if (usuario.role === 'Finanças' && req.status === 'aguardando_financas') {
+                    btns += `<button class="btn btn-success btn-sm" onclick="event.stopPropagation();app.abrirFinancas('${req.id}')"><i class="fas fa-coins"></i> Pagar</button>`;
+                }
+                if (usuario.role === 'Manutenção' && req.status === 'em_execucao') {
+                    btns += `<button class="btn btn-warning btn-sm" onclick="event.stopPropagation();app.abrirExecucao('${req.id}')"><i class="fas fa-tools"></i> Executar</button>`;
+                }
+                if (usuario.role === 'Solicitante' && (req.status === 'aguardando_material' || req.status === 'aguardando_execucao')) {
+                    btns += `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();app.abrirConfirmacao('${req.id}')"><i class="fas fa-check-double"></i> Confirmar</button>`;
+                }
+                return btns || '<span style="color:#999;font-size:12px;">-</span>';
+            }
+
+            // ========== DASHBOARD ==========
+            function carregarDashboard() {
+                const div = document.getElementById('atividadesRecentes');
+                const recentes = [...requisicoes].reverse().slice(0, 8);
+                div.innerHTML = recentes.map(r => `
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-clipboard-list"></i></div>
+                        <div style="flex:1;">
+                            <strong>${r.codigo}</strong> - ${r.equipamento}
+                            <br><small style="color:#888;">${getStatusText(r.status)} • ${formatarData(r.data)}</small>
+                        </div>
+                        <span class="status-badge status-${getStatusClass(r.status)}">${getStatusText(r.status)}</span>
+                    </div>
+                `).join('');
+                atualizarKPIs();
+            }
+
             function atualizarKPIs() {
                 document.getElementById('totalReq').innerText = requisicoes.length;
                 document.getElementById('totalPendente').innerText = requisicoes.filter(r => r.status === 'pendente').length;
@@ -735,25 +1876,63 @@
                 document.getElementById('totalDiretor').innerText = requisicoes.filter(r => r.status === 'aguardando_diretor').length;
                 document.getElementById('totalFinancas').innerText = requisicoes.filter(r => r.status === 'aguardando_financas').length;
                 document.getElementById('totalExecucao').innerText = requisicoes.filter(r => r.status === 'em_execucao').length;
+                document.getElementById('totalConcluidas').innerText = requisicoes.filter(r => r.status === 'concluida').length;
+                atualizarBadges();
             }
-            
-            function carregarDashboard() {
-                const div = document.getElementById('atividadesRecentes');
-                div.innerHTML = requisicoes.slice(0, 8).map(r => `<div class="activity-item"><i class="fas fa-clipboard-list" style="color:var(--primary)"></i><div><strong>${r.codigo}</strong> - ${r.equipamento}<br><small>${getStatusText(r.status)} - ${formatarData(r.data)}</small></div></div>`).join('');
+
+            function atualizarBadges() {
+                const pendentes = requisicoes.filter(r => r.status !== 'concluida' && r.status !== 'reprovada').length;
+                document.getElementById('totalBadge').innerText = pendentes;
+
+                let aprovPendentes = 0;
+                if (usuario.role === 'Stephanny') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_stephanny').length;
+                else if (usuario.role === 'Controlo Gestão') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_cg').length;
+                else if (usuario.role === 'Director Geral') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_diretor').length;
+                else if (usuario.role === 'Finanças') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_financas').length;
+                else if (usuario.role === 'Manutenção') aprovPendentes = requisicoes.filter(r => r.status === 'em_execucao').length;
+                else if (usuario.role === 'Solicitante') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_material' || r.status === 'aguardando_execucao').length;
+                document.getElementById('aprovacoesBadge').innerText = aprovPendentes;
             }
-            
+
+            function atualizarRelatorios() {
+                const total = requisicoes.length;
+                const concluidas = requisicoes.filter(r => r.status === 'concluida').length;
+                const pendentes = requisicoes.filter(r => r.status !== 'concluida' && r.status !== 'reprovada').length;
+                let valorTotal = 0;
+                requisicoes.forEach(r => { valorTotal += (r.valorTotal || 0); });
+
+                document.getElementById('relTotal').innerText = total;
+                document.getElementById('relConcluidas').innerText = concluidas;
+                document.getElementById('relPendentes').innerText = pendentes;
+                document.getElementById('relValorTotal').innerText = formatarMoeda(valorTotal);
+            }
+
+            // ========== VER DETALHES ==========
             function verDetalhes(req) {
-                let msg = `📋 REQUISIÇÃO: ${req.codigo}\nEquipamento: ${req.equipamento}\nEstado: ${getStatusText(req.status)}\nDescrição: ${req.descricao}`;
-                if (req.diagnostico) msg += `\n\nDiagnóstico: ${req.diagnostico}`;
+                let msg = `📋 REQUISIÇÃO: ${req.codigo}\n`;
+                msg += `Equipamento: ${req.equipamento}\n`;
+                msg += `Local: ${req.local || 'N/A'}\n`;
+                msg += `Estado: ${getStatusText(req.status)}\n`;
+                msg += `Tipo: ${req.tipo === 'corretiva' ? 'Correctiva' : 'Preventiva'}\n`;
+                msg += `Prioridade: ${req.prioridade || 'N/A'}\n`;
+                msg += `Descrição: ${req.descricao}\n`;
+                if (req.diagnostico) msg += `\nDiagnóstico: ${req.diagnostico}`;
                 if (req.valorTotal) msg += `\nValor Total: ${formatarMoeda(req.valorTotal)}`;
                 if (req.relatorioExecucao) msg += `\n\nRelatório de Execução: ${req.relatorioExecucao}`;
+                if (req.historico && req.historico.length > 0) {
+                    msg += `\n\n📜 Histórico:`;
+                    req.historico.slice(-5).forEach(h => {
+                        msg += `\n  ${formatarDataHora(h.data)} - ${h.usuario}: ${h.acao}`;
+                    });
+                }
                 alert(msg);
             }
-            
+
+            // ========== CRUD: NOVA REQUISIÇÃO ==========
             function novaRequisicao(e) {
                 e.preventDefault();
                 const nova = {
-                    id: Date.now().toString(),
+                    id: String(nextId++),
                     codigo: gerarCodigo(),
                     tipo: document.getElementById('tipoManutencao').value,
                     equipamento: document.getElementById('equipamento').value,
@@ -774,7 +1953,8 @@
                 carregarDashboard();
                 notificar(`Requisição ${nova.codigo} criada com sucesso!`, 'success');
             }
-            
+
+            // ========== AVALIAÇÃO TÉCNICO ==========
             function abrirAvaliacao(id) {
                 document.getElementById('avaliacaoId').value = id;
                 document.getElementById('diagnostico').value = '';
@@ -782,15 +1962,17 @@
                 document.getElementById('detalhesTransferencia').style.display = 'none';
                 document.getElementById('detalhesConsumo').style.display = 'none';
                 document.getElementById('detalhesCompra').style.display = 'none';
+                document.getElementById('proformaList').innerHTML = '';
+                stephannyProforma = null;
                 abrirModal('modalAvaliacao');
             }
-            
+
             function toggleOpcaoResolucao(valor) {
                 document.getElementById('detalhesTransferencia').style.display = valor === 'transferencia' ? 'block' : 'none';
                 document.getElementById('detalhesConsumo').style.display = valor === 'consumo' ? 'block' : 'none';
                 document.getElementById('detalhesCompra').style.display = valor === 'precisa_comprar' ? 'block' : 'none';
             }
-            
+
             function salvarAvaliacao(e) {
                 e.preventDefault();
                 const id = document.getElementById('avaliacaoId').value;
@@ -798,58 +1980,41 @@
                 if (!req) return;
                 req.diagnostico = document.getElementById('diagnostico').value;
                 req.opcaoResolucao = document.getElementById('opcaoResolucao').value;
-                
+
                 if (req.opcaoResolucao === 'com_material') {
                     req.status = 'em_execucao';
                     adicionarHistorico(req, 'Técnico tem material, irá executar o serviço directamente');
-                    notificar('O técnico irá executar o serviço directamente.', 'info');
-                    salvar();
-                    fecharModal('modalAvaliacao');
-                    renderizarRequisicoes();
-                    renderizarAprovacoes();
-                    carregarDashboard();
-                } 
-                else if (req.opcaoResolucao === 'transferencia') {
+                    notificar('Técnico irá executar o serviço directamente.', 'info');
+                } else if (req.opcaoResolucao === 'transferencia') {
                     req.origemRecurso = document.getElementById('origemRecurso').value;
                     req.detalhesTransferencia = document.getElementById('detalhesTransferenciaTexto').value;
                     req.valorTransferencia = parseFloat(document.getElementById('valorTransferencia').value) || 0;
                     req.status = 'aguardando_stephanny';
-                    adicionarHistorico(req, `Solicitação de transferência de recurso. Aguardando autorização da Stephanny.`);
-                    notificar('Solicitação enviada para Stephanny autorizar a transferência.', 'info');
-                    salvar();
-                    fecharModal('modalAvaliacao');
-                    renderizarRequisicoes();
-                    renderizarAprovacoes();
-                    carregarDashboard();
-                }
-                else if (req.opcaoResolucao === 'consumo') {
+                    adicionarHistorico(req, 'Solicitação de transferência de recurso. Aguardando autorização.');
+                    notificar('Solicitação enviada para Stephanny autorizar transferência.', 'info');
+                } else if (req.opcaoResolucao === 'consumo') {
                     req.detalhesConsumo = document.getElementById('detalhesConsumoTexto').value;
                     req.valorConsumo = parseFloat(document.getElementById('valorConsumo').value) || 0;
                     req.status = 'aguardando_stephanny';
-                    adicionarHistorico(req, `Solicitação de consumo de stock interno. Aguardando autorização da Stephanny.`);
-                    notificar('Solicitação enviada para Stephanny autorizar o consumo.', 'info');
-                    salvar();
-                    fecharModal('modalAvaliacao');
-                    renderizarRequisicoes();
-                    renderizarAprovacoes();
-                    carregarDashboard();
-                }
-                else if (req.opcaoResolucao === 'precisa_comprar') {
+                    adicionarHistorico(req, 'Solicitação de consumo de stock interno. Aguardando autorização.');
+                    notificar('Solicitação enviada para Stephanny autorizar consumo.', 'info');
+                } else if (req.opcaoResolucao === 'precisa_comprar') {
                     req.fornecedorCompra = document.getElementById('fornecedorCompra').value;
                     req.descricaoCompra = document.getElementById('descricaoCompra').value;
                     req.valorCompra = parseFloat(document.getElementById('valorCompra').value) || 0;
                     req.proformaData = stephannyProforma;
                     req.status = 'aguardando_stephanny';
-                    adicionarHistorico(req, `Solicitação de compra. Aguardando Stephanny registar despesas.`);
-                    notificar('Requisição enviada para Stephanny registar as despesas.', 'info');
-                    salvar();
-                    fecharModal('modalAvaliacao');
-                    renderizarRequisicoes();
-                    renderizarAprovacoes();
-                    carregarDashboard();
+                    adicionarHistorico(req, 'Solicitação de compra. Aguardando Stephanny registar despesas.');
+                    notificar('Requisição enviada para Stephanny registar despesas.', 'info');
                 }
+                salvar();
+                fecharModal('modalAvaliacao');
+                renderizarRequisicoes();
+                renderizarAprovacoes();
+                carregarDashboard();
             }
-            
+
+            // ========== STEPHANNY - AUTORIZAÇÃO ==========
             function abrirStephannyAutorizacao(id) {
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
@@ -860,7 +2025,7 @@
                 document.getElementById('stephannyAutorizacaoInfo').innerHTML = `
                     <strong>Requisição:</strong> ${req.codigo}<br>
                     <strong>Equipamento:</strong> ${req.equipamento}<br>
-                    <strong>Tipo de Solicitação:</strong> ${tipo}<br>
+                    <strong>Tipo:</strong> ${tipo}<br>
                     <strong>Detalhes:</strong> ${detalhes}<br>
                     <strong>Valor Estimado:</strong> ${formatarMoeda(valor)}<br>
                     <strong>Diagnóstico:</strong> ${req.diagnostico}
@@ -870,7 +2035,7 @@
                 document.getElementById('stephannyAutorizacaoAssinatura').value = usuario.nome;
                 abrirModal('modalStephannyAutorizacao');
             }
-            
+
             function salvarStephannyAutorizacao(e) {
                 e.preventDefault();
                 const id = document.getElementById('stephannyAutorizacaoReqId').value;
@@ -878,15 +2043,15 @@
                 if (!req) return;
                 const decisao = document.getElementById('stephannyDecisao').value;
                 const comentario = document.getElementById('stephannyComentario').value;
-                
+
                 if (decisao === 'reprovar') {
                     req.status = 'reprovada';
                     adicionarHistorico(req, `Stephanny reprovou: ${comentario}`);
-                    notificar(`Requisição reprovada por Stephanny.`, 'error');
+                    notificar('Requisição reprovada por Stephanny.', 'error');
                 } else {
                     req.status = 'em_execucao';
-                    adicionarHistorico(req, `Stephanny autorizou. Manutenção pode executar o serviço.`);
-                    notificar(`Autorização concedida! Manutenção pode executar o serviço.`, 'success');
+                    adicionarHistorico(req, `Stephanny autorizou. Manutenção pode executar.`);
+                    notificar('Autorização concedida! Manutenção pode executar o serviço.', 'success');
                 }
                 salvar();
                 fecharModal('modalStephannyAutorizacao');
@@ -894,17 +2059,22 @@
                 renderizarAprovacoes();
                 carregarDashboard();
             }
-            
-            // Stephanny Despesas (Compra)
+
+            // ========== STEPHANNY - DESPESAS ==========
             function adicionarItemStephanny() {
                 const idx = stephannyItens.length;
                 const div = document.createElement('div');
                 div.className = 'item-row';
-                div.innerHTML = `<input type="text" placeholder="Descrição do item/serviço" id="itemDesc_${idx}" style="flex:2"><input type="number" placeholder="Quantidade" id="itemQtd_${idx}" style="flex:1" value="1"><input type="number" placeholder="Valor Unitário (KZ)" id="itemPreco_${idx}" style="flex:1" onchange="app.calcularTotalStephanny()"><button type="button" class="btn-small" style="background:#f44336;color:white" onclick="this.parentElement.remove();app.calcularTotalStephanny()">✖</button>`;
+                div.innerHTML = `
+                    <input type="text" placeholder="Descrição" id="itemDesc_${idx}" style="flex:2">
+                    <input type="number" placeholder="Qtd" id="itemQtd_${idx}" style="flex:1" value="1">
+                    <input type="number" placeholder="Valor Unit." id="itemPreco_${idx}" style="flex:1" onchange="app.calcularTotalStephanny()">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove();app.calcularTotalStephanny()">✖</button>
+                `;
                 document.getElementById('stephannyItensList').appendChild(div);
                 stephannyItens.push(idx);
             }
-            
+
             function calcularTotalStephanny() {
                 let total = 0;
                 for (let i = 0; i < stephannyItens.length; i++) {
@@ -914,7 +2084,7 @@
                 }
                 document.getElementById('stephannyTotal').value = total;
             }
-            
+
             function getItensStephanny() {
                 let itens = [];
                 for (let i = 0; i < stephannyItens.length; i++) {
@@ -930,7 +2100,7 @@
                 }
                 return itens;
             }
-            
+
             function abrirStephannyDespesas(id) {
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
@@ -938,7 +2108,7 @@
                 stephannyItens = [];
                 document.getElementById('stephannyItensList').innerHTML = '';
                 document.getElementById('stephannyFornecedor').value = '';
-                document.getElementById('stephannyData').value = new Date().toISOString().slice(0,10);
+                document.getElementById('stephannyData').value = new Date().toISOString().slice(0, 10);
                 document.getElementById('stephannyDocNum').value = '';
                 document.getElementById('stephannyMotivo').value = '';
                 document.getElementById('stephannyTotal').value = '0';
@@ -954,7 +2124,7 @@
                 adicionarItemStephanny();
                 abrirModal('modalStephannyDespesas');
             }
-            
+
             function salvarStephannyDespesas(e) {
                 e.preventDefault();
                 const id = document.getElementById('stephannyDespesasReqId').value;
@@ -969,28 +2139,37 @@
                 req.assinaturaStephanny = document.getElementById('stephannyAssinatura').value;
                 req.status = 'aguardando_cg';
                 adicionarHistorico(req, `Stephanny registou despesas: Fornecedor ${req.fornecedor}, Valor ${formatarMoeda(req.valorTotal)}`);
-                notificar(`Despesas registadas. Enviado para Controlo Gestão aprovar.`, 'success');
+                notificar('Despesas registadas. Enviado para Controlo Gestão.', 'success');
                 salvar();
                 fecharModal('modalStephannyDespesas');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
                 carregarDashboard();
             }
-            
+
+            // ========== CG ==========
             function abrirCG(id) {
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
                 document.getElementById('cgReqId').value = id;
-                let itensHtml = '<ul style="margin-top:5px">';
-                if (req.itens) req.itens.forEach(i => { itensHtml += `<li>${i.desc} - ${i.qtd}x ${formatarMoeda(i.preco)} = ${formatarMoeda(i.total)}</li>`; });
+                let itensHtml = '<ul style="margin-top:5px;">';
+                if (req.itens) req.itens.forEach(i => {
+                    itensHtml += `<li>${i.desc} - ${i.qtd}x ${formatarMoeda(i.preco)} = ${formatarMoeda(i.total)}</li>`;
+                });
                 itensHtml += '</ul>';
-                document.getElementById('cgInfo').innerHTML = `<strong>Requisição:</strong> ${req.codigo}<br><strong>Fornecedor:</strong> ${req.fornecedor}<br><strong>Valor Total:</strong> ${formatarMoeda(req.valorTotal)}<br><strong>Itens:</strong> ${itensHtml}<br><strong>Motivo:</strong> ${req.motivoDespesa}`;
+                document.getElementById('cgInfo').innerHTML = `
+                    <strong>Requisição:</strong> ${req.codigo}<br>
+                    <strong>Fornecedor:</strong> ${req.fornecedor}<br>
+                    <strong>Valor Total:</strong> ${formatarMoeda(req.valorTotal)}<br>
+                    <strong>Itens:</strong> ${itensHtml}<br>
+                    <strong>Motivo:</strong> ${req.motivoDespesa}
+                `;
                 document.getElementById('cgDecisao').value = '';
                 document.getElementById('cgParecer').value = '';
                 document.getElementById('cgAssinatura').value = usuario.nome;
                 abrirModal('modalCG');
             }
-            
+
             function salvarCG(e) {
                 e.preventDefault();
                 const id = document.getElementById('cgReqId').value;
@@ -999,16 +2178,16 @@
                 const decisao = document.getElementById('cgDecisao').value;
                 const parecer = document.getElementById('cgParecer').value;
                 req.assinaturaCG = document.getElementById('cgAssinatura').value;
-                
+
                 if (decisao === 'reprovar') {
                     req.status = 'reprovada';
                     adicionarHistorico(req, `Controlo Gestão reprovou: ${parecer}`);
-                    notificar(`Requisição reprovada pelo Controlo Gestão.`, 'error');
+                    notificar('Requisição reprovada pelo Controlo Gestão.', 'error');
                 } else {
                     req.status = 'aguardando_diretor';
                     req.parecerCG = parecer;
-                    adicionarHistorico(req, `Controlo Gestão aprovou. Enviado para Director Geral.`);
-                    notificar(`Controlo Gestão aprovou. Enviado para o Director Geral.`, 'success');
+                    adicionarHistorico(req, 'Controlo Gestão aprovou. Enviado para Director Geral.');
+                    notificar('Controlo Gestão aprovou. Enviado para o Director Geral.', 'success');
                 }
                 salvar();
                 fecharModal('modalCG');
@@ -1016,18 +2195,24 @@
                 renderizarAprovacoes();
                 carregarDashboard();
             }
-            
+
+            // ========== DIRECTOR ==========
             function abrirDiretor(id) {
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
                 document.getElementById('diretorReqId').value = id;
-                document.getElementById('diretorInfo').innerHTML = `<strong>Requisição:</strong> ${req.codigo}<br><strong>Fornecedor:</strong> ${req.fornecedor}<br><strong>Valor Total:</strong> ${formatarMoeda(req.valorTotal)}<br><strong>Parecer do CG:</strong> ${req.parecerCG || 'N/A'}`;
+                document.getElementById('diretorInfo').innerHTML = `
+                    <strong>Requisição:</strong> ${req.codigo}<br>
+                    <strong>Fornecedor:</strong> ${req.fornecedor}<br>
+                    <strong>Valor Total:</strong> ${formatarMoeda(req.valorTotal)}<br>
+                    <strong>Parecer CG:</strong> ${req.parecerCG || 'N/A'}
+                `;
                 document.getElementById('diretorDecisao').value = '';
                 document.getElementById('diretorParecer').value = '';
                 document.getElementById('diretorAssinatura').value = usuario.nome;
                 abrirModal('modalDiretor');
             }
-            
+
             function salvarDiretor(e) {
                 e.preventDefault();
                 const id = document.getElementById('diretorReqId').value;
@@ -1036,16 +2221,16 @@
                 const decisao = document.getElementById('diretorDecisao').value;
                 const parecer = document.getElementById('diretorParecer').value;
                 req.assinaturaDiretor = document.getElementById('diretorAssinatura').value;
-                
+
                 if (decisao === 'reprovar') {
                     req.status = 'reprovada';
                     adicionarHistorico(req, `Director Geral reprovou: ${parecer}`);
-                    notificar(`Requisição reprovada pelo Director Geral.`, 'error');
+                    notificar('Requisição reprovada pelo Director Geral.', 'error');
                 } else {
                     req.status = 'aguardando_financas';
                     req.parecerDiretor = parecer;
-                    adicionarHistorico(req, `Director Geral aprovou. Enviado para Finanças.`);
-                    notificar(`Director Geral aprovou. Aguardando pagamento das Finanças.`, 'success');
+                    adicionarHistorico(req, 'Director Geral aprovou. Enviado para Finanças.');
+                    notificar('Director Geral aprovou. Aguardando pagamento.', 'success');
                 }
                 salvar();
                 fecharModal('modalDiretor');
@@ -1053,20 +2238,27 @@
                 renderizarAprovacoes();
                 carregarDashboard();
             }
-            
+
+            // ========== FINANÇAS ==========
             function abrirFinancas(id) {
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
                 document.getElementById('financasReqId').value = id;
-                document.getElementById('financasInfo').innerHTML = `<strong>Requisição:</strong> ${req.codigo}<br><strong>Fornecedor:</strong> ${req.fornecedor}<br><strong>Valor a Pagar:</strong> ${formatarMoeda(req.valorTotal)}<br><strong>Motivo:</strong> ${req.motivoDespesa}<br><strong>Aprovado por:</strong> ${req.assinaturaDiretor || 'N/A'}`;
+                document.getElementById('financasInfo').innerHTML = `
+                    <strong>Requisição:</strong> ${req.codigo}<br>
+                    <strong>Fornecedor:</strong> ${req.fornecedor}<br>
+                    <strong>Valor a Pagar:</strong> ${formatarMoeda(req.valorTotal)}<br>
+                    <strong>Motivo:</strong> ${req.motivoDespesa}<br>
+                    <strong>Aprovado por:</strong> ${req.assinaturaDiretor || 'N/A'}
+                `;
                 document.getElementById('financasStatus').value = '';
                 document.getElementById('financasComprovativo').value = '';
-                document.getElementById('financasDataPagamento').value = new Date().toISOString().slice(0,10);
+                document.getElementById('financasDataPagamento').value = new Date().toISOString().slice(0, 10);
                 document.getElementById('financasObs').value = '';
                 document.getElementById('financasAssinatura').value = usuario.nome;
                 abrirModal('modalFinancas');
             }
-            
+
             function salvarFinancas(e) {
                 e.preventDefault();
                 const id = document.getElementById('financasReqId').value;
@@ -1077,16 +2269,16 @@
                 const dataPagamento = document.getElementById('financasDataPagamento').value;
                 const obs = document.getElementById('financasObs').value;
                 req.assinaturaFinancas = document.getElementById('financasAssinatura').value;
-                
+
                 if (status === 'pago') {
                     req.status = 'em_execucao';
                     req.dataPagamento = dataPagamento;
                     req.comprovativo = comprovativo;
                     req.obsFinanceiras = obs;
-                    adicionarHistorico(req, `Pagamento confirmado: ${obs}. Comprovativo: ${comprovativo}`);
-                    notificar(`Pagamento confirmado! A Manutenção pode executar o serviço.`, 'success');
+                    adicionarHistorico(req, `Pagamento confirmado. Comprovativo: ${comprovativo}`);
+                    notificar('Pagamento confirmado! Manutenção pode executar o serviço.', 'success');
                 } else {
-                    notificar(`Pagamento pendente.`, 'warning');
+                    notificar('Pagamento pendente.', 'warning');
                     fecharModal('modalFinancas');
                     return;
                 }
@@ -1096,18 +2288,19 @@
                 renderizarAprovacoes();
                 carregarDashboard();
             }
-            
+
+            // ========== EXECUÇÃO ==========
             function abrirExecucao(id) {
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
                 document.getElementById('execucaoReqId').value = id;
                 document.getElementById('relatorioExecucao').value = '';
-                document.getElementById('dataExecucao').value = new Date().toISOString().slice(0,10);
+                document.getElementById('dataExecucao').value = new Date().toISOString().slice(0, 10);
                 document.getElementById('tecnicoResponsavel').value = usuario.nome;
                 document.getElementById('obsExecucao').value = '';
                 abrirModal('modalExecucao');
             }
-            
+
             function salvarExecucao(e) {
                 e.preventDefault();
                 const id = document.getElementById('execucaoReqId').value;
@@ -1118,23 +2311,24 @@
                 req.tecnicoResponsavel = document.getElementById('tecnicoResponsavel').value;
                 req.obsExecucao = document.getElementById('obsExecucao').value;
                 req.status = 'aguardando_material';
-                adicionarHistorico(req, `Manutenção executou o serviço. Aguardando confirmação do solicitante.`);
-                notificar(`Serviço executado! Aguardando confirmação do solicitante.`, 'success');
+                adicionarHistorico(req, 'Manutenção executou o serviço. Aguardando confirmação do solicitante.');
+                notificar('Serviço executado! Aguardando confirmação do solicitante.', 'success');
                 salvar();
                 fecharModal('modalExecucao');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
                 carregarDashboard();
             }
-            
+
+            // ========== CONFIRMAÇÃO ==========
             function abrirConfirmacao(id) {
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
                 confirmacaoId = id;
                 let info = `<strong>Requisição:</strong> ${req.codigo}<br><strong>Equipamento:</strong> ${req.equipamento}<br>`;
                 if (req.valorTotal) info += `<strong>Valor:</strong> ${formatarMoeda(req.valorTotal)}<br>`;
-                if (req.relatorioExecucao) info += `<strong>Relatório de Execução:</strong> ${req.relatorioExecucao}<br>`;
-                if (req.tecnicoResponsavel) info += `<strong>Técnico Responsável:</strong> ${req.tecnicoResponsavel}`;
+                if (req.relatorioExecucao) info += `<strong>Relatório:</strong> ${req.relatorioExecucao}<br>`;
+                if (req.tecnicoResponsavel) info += `<strong>Técnico:</strong> ${req.tecnicoResponsavel}`;
                 document.getElementById('confirmInfo').innerHTML = info;
                 document.getElementById('confirmMaterial').value = '';
                 document.getElementById('confirmExecucao').value = '';
@@ -1142,27 +2336,27 @@
                 document.getElementById('solicitanteAssinatura').value = usuario.nome;
                 abrirModal('modalConfirmacao');
             }
-            
+
             function enviarConfirmacao() {
                 const confirmMaterial = document.getElementById('confirmMaterial').value;
                 const confirmExecucao = document.getElementById('confirmExecucao').value;
                 const comentario = document.getElementById('confirmComentario').value;
                 const assinatura = document.getElementById('solicitanteAssinatura').value;
-                
+
                 if (!confirmMaterial || !confirmExecucao) {
-                    notificar('Por favor, confirme tanto o MATERIAL quanto a EXECUÇÃO da manutenção.', 'error');
+                    notificar('Confirme o MATERIAL e a EXECUÇÃO da manutenção.', 'error');
                     return;
                 }
                 const req = requisicoes.find(r => r.id === confirmacaoId);
                 if (!req) return;
-                
+
                 if (confirmMaterial === 'nao' || confirmExecucao === 'nao') {
                     req.status = 'reprovada';
-                    notificar(`Requisição reprovada pelo solicitante devido a inconformidades.`, 'error');
+                    notificar('Requisição reprovada pelo solicitante.', 'error');
                 } else {
                     if (req.status === 'aguardando_material') {
                         req.status = 'aguardando_execucao';
-                        notificar(`Material confirmado! Aguardando confirmação da execução do serviço.`, 'success');
+                        notificar('Material confirmado! Aguardando confirmação da execução.', 'success');
                         salvar();
                         fecharModal('modalConfirmacao');
                         renderizarRequisicoes();
@@ -1171,26 +2365,27 @@
                     } else if (req.status === 'aguardando_execucao') {
                         req.status = 'concluida';
                         req.dataConclusao = new Date().toISOString();
-                        notificar(`🎉 REQUISIÇÃO CONCLUÍDA COM SUCESSO! Obrigado pela confirmação.`, 'success');
+                        notificar('🎉 REQUISIÇÃO CONCLUÍDA COM SUCESSO!', 'success');
                     }
                 }
                 req.comentarioFinal = comentario;
                 req.assinaturaSolicitante = assinatura;
-                adicionarHistorico(req, `Solicitante confirmou: Material=${confirmMaterial}, Execução=${confirmExecucao}. Comentário: ${comentario}`);
+                adicionarHistorico(req, `Solicitante confirmou: Material=${confirmMaterial}, Execução=${confirmExecucao}`);
                 salvar();
                 fecharModal('modalConfirmacao');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
                 carregarDashboard();
             }
-            
+
+            // ========== FILTROS ==========
             function filtrarRequisicoes() {
                 filtroStatus = document.getElementById('filterStatus').value;
                 filtroSearch = document.getElementById('filterSearch').value;
                 pagina = 1;
                 renderizarRequisicoes();
             }
-            
+
             function filtrarPorStatus(status) {
                 filtroStatus = status;
                 const statusSelect = document.getElementById('filterStatus');
@@ -1198,125 +2393,272 @@
                 const searchInput = document.getElementById('filterSearch');
                 if (searchInput) searchInput.value = '';
                 pagina = 1;
+                navegarPara('requisicoes');
                 renderizarRequisicoes();
-                document.querySelector('.nav-item[data-aba="requisicoes"]').click();
             }
-            
+
+            // ========== NOTA DE DESPESA ==========
+            function imprimirNotaDespesa() {
+                const id = document.getElementById('financasReqId').value;
+                const req = requisicoes.find(r => r.id === id);
+                if (!req) return;
+
+                const notaDiv = document.getElementById('notaConteudo');
+                const itensHtml = (req.itens || []).map(i =>
+                    `<tr><td>${i.desc}</td><td style="text-align:center">${i.qtd}</td><td style="text-align:right">${formatarMoeda(i.preco)}</td><td style="text-align:right">${formatarMoeda(i.total)}</td></tr>`
+                ).join('');
+
+                const html = `
+                    <div class="nota-detalhes">
+                        <table style="width:100%">
+                            <tr><td style="width:140px"><strong>Nº Requisição:</strong></td><td>${req.codigo}</td></tr>
+                            <tr><td><strong>Data Emissão:</strong></td><td>${formatarData(new Date())}</td></tr>
+                            <tr><td><strong>Solicitante:</strong></td><td>${req.solicitante}</td></tr>
+                            <tr><td><strong>Equipamento:</strong></td><td>${req.equipamento}</td></tr>
+                            <tr><td><strong>Local:</strong></td><td>${req.local}</td></tr>
+                            <tr><td><strong>Fornecedor:</strong></td><td>${req.fornecedor || 'N/A'}</td></tr>
+                            <tr><td><strong>Nº Documento:</strong></td><td>${req.docNumero || 'N/A'}</td></tr>
+                        </table>
+                    </div>
+                    <h3>Detalhes da Despesa</h3>
+                    <table class="nota-itens">
+                        <thead><tr><th>Descrição</th><th style="width:60px">Qtd</th><th style="width:120px">Valor Unit.</th><th style="width:120px">Total</th></tr></thead>
+                        <tbody>${itensHtml || '<tr><td colspan="4">Nenhum item registado</td></tr>'}</tbody>
+                        <tfoot><tr style="background:#f0f0f0"><td colspan="3" style="text-align:right"><strong>TOTAL</strong></td><td style="text-align:right;font-size:18px"><strong>${formatarMoeda(req.valorTotal)}</strong></td></tr></tfoot>
+                    </table>
+                    <div class="nota-detalhes">
+                        <p><strong>Motivo:</strong> ${req.motivoDespesa || 'N/A'}</p>
+                        <p><strong>Parecer CG:</strong> ${req.parecerCG || 'N/A'}</p>
+                        <p><strong>Parecer Director:</strong> ${req.parecerDiretor || 'N/A'}</p>
+                        <p><strong>Pagamento:</strong> Comprovativo ${req.comprovativo || 'N/A'} - ${req.dataPagamento ? formatarData(req.dataPagamento) : 'N/A'}</p>
+                    </div>
+                `;
+                notaDiv.innerHTML = html;
+                document.getElementById('notaDespesa').style.display = 'block';
+            }
+
+            // ========== EXPORT ==========
+            function exportarDados() {
+                const data = {
+                    requisicoes,
+                    exportedAt: new Date().toISOString(),
+                    version: '4.0'
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `kero_backup_${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                notificar('Dados exportados com sucesso!', 'success');
+            }
+
+            function exportarPDF() { notificar('Relatório PDF gerado com sucesso!', 'success'); }
+            function exportarExcel() { notificar('Relatório Excel gerado com sucesso!', 'success'); }
+
+            // ========== LOGIN / LOGOUT ==========
             function login(tipo) {
                 usuario = perfis[tipo];
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainSystem').style.display = 'block';
-                document.getElementById('currentUserName').innerText = usuario.nome;
-                document.getElementById('currentUserRole').innerText = usuario.role;
-                carregarExemplo();
+                document.getElementById('sidebarUserName').innerText = usuario.nome;
+                document.getElementById('sidebarUserRole').innerText = usuario.role;
+
+                carregar();
                 renderizarRequisicoes();
                 renderizarAprovacoes();
                 carregarDashboard();
-                atualizarKPIs();
+                atualizarRelatorios();
+                atualizarBadges();
+
+                // Data atual
+                document.getElementById('currentDate').textContent =
+                    new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+
+                notificar(`Bem-vindo(a), ${usuario.nome}!`, 'success');
             }
-            
+
             function logout() {
-                if (confirm('Tem certeza que deseja sair do sistema?')) {
+                if (confirm('Tem certeza que deseja sair?')) {
                     usuario = null;
                     document.getElementById('mainSystem').style.display = 'none';
                     document.getElementById('loginScreen').style.display = 'flex';
                 }
             }
-            
-            function abrirModal(id) { document.getElementById(id).style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-            function fecharModal(id) { document.getElementById(id).style.display = 'none'; document.body.style.overflow = 'auto'; }
-            function exportarPDF() { notificar('Relatório PDF gerado com sucesso!', 'success'); }
-            function exportarExcel() { notificar('Relatório Excel gerado com sucesso!', 'success'); }
-            
+
+            // ========== EVENTOS ==========
             function configurarEventos() {
-                document.getElementById('formNovaRequisicao')?.addEventListener('submit', novaRequisicao);
-                document.getElementById('formAvaliacao')?.addEventListener('submit', salvarAvaliacao);
-                document.getElementById('formStephannyAutorizacao')?.addEventListener('submit', salvarStephannyAutorizacao);
-                document.getElementById('formStephannyDespesas')?.addEventListener('submit', salvarStephannyDespesas);
-                document.getElementById('formCG')?.addEventListener('submit', salvarCG);
-                document.getElementById('formDiretor')?.addEventListener('submit', salvarDiretor);
-                document.getElementById('formFinancas')?.addEventListener('submit', salvarFinancas);
-                document.getElementById('formExecucao')?.addEventListener('submit', salvarExecucao);
-                document.getElementById('btnNovaRequisicao')?.addEventListener('click', () => abrirModal('modalNovaRequisicao'));
-                document.getElementById('opcaoResolucao')?.addEventListener('change', (e) => toggleOpcaoResolucao(e.target.value));
-                
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        const aba = item.getAttribute('data-aba');
-                        document.querySelectorAll('[id$="Section"]').forEach(s => s.style.display = 'none');
-                        document.getElementById(aba + 'Section').style.display = 'block';
-                        if (aba === 'aprovacoes') renderizarAprovacoes();
-                        if (aba === 'dashboard') carregarDashboard();
-                        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                        item.classList.add('active');
+                // Sidebar navigation
+                document.querySelectorAll('.sidebar-menu li').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const section = this.dataset.section;
+                        if (section) navegarPara(section);
                     });
                 });
-                
+
+                // Menu toggle mobile
+                document.getElementById('menuToggle').addEventListener('click', () => {
+                    document.getElementById('sidebar').classList.toggle('open');
+                });
+
+                // Form: Nova Requisição
+                document.getElementById('formNovaRequisicao').addEventListener('submit', novaRequisicao);
+                document.getElementById('btnNovaRequisicao').addEventListener('click', () => abrirModal('modalNovaRequisicao'));
+
+                // Form: Avaliação
+                document.getElementById('formAvaliacao').addEventListener('submit', salvarAvaliacao);
+                document.getElementById('opcaoResolucao').addEventListener('change', (e) => toggleOpcaoResolucao(e.target.value));
+
+                // Form: Stephanny Autorização
+                document.getElementById('formStephannyAutorizacao').addEventListener('submit', salvarStephannyAutorizacao);
+
+                // Form: Stephanny Despesas
+                document.getElementById('formStephannyDespesas').addEventListener('submit', salvarStephannyDespesas);
+
+                // Form: CG
+                document.getElementById('formCG').addEventListener('submit', salvarCG);
+
+                // Form: Director
+                document.getElementById('formDiretor').addEventListener('submit', salvarDiretor);
+
+                // Form: Finanças
+                document.getElementById('formFinancas').addEventListener('submit', salvarFinancas);
+
+                // Form: Execução
+                document.getElementById('formExecucao').addEventListener('submit', salvarExecucao);
+
+                // Filter status options
                 const statusSelect = document.getElementById('filterStatus');
                 if (statusSelect) {
-                    const statuses = ['all', 'pendente', 'aguardando_stephanny', 'aguardando_cg', 'aguardando_diretor', 'aguardando_financas', 'em_execucao', 'aguardando_material', 'aguardando_execucao', 'concluida', 'reprovada'];
-                    statuses.forEach(s => { let opt = document.createElement('option'); opt.value = s; opt.innerText = getStatusText(s); statusSelect.appendChild(opt); });
+                    const statuses = ['all', 'pendente', 'aguardando_stephanny', 'aguardando_cg', 'aguardando_diretor',
+                        'aguardando_financas', 'em_execucao', 'aguardando_material', 'aguardando_execucao', 'concluida',
+                        'reprovada'
+                    ];
+                    statuses.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s;
+                        opt.innerText = getStatusText(s);
+                        statusSelect.appendChild(opt);
+                    });
                 }
-                
+
+                // Filter search enter key
+                document.getElementById('filterSearch').addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter') filtrarRequisicoes();
+                });
+
+                // Dropzone: Stephanny
                 const dropzone = document.getElementById('stephannyDropzone');
                 const fileInput = document.getElementById('stephannyFileInput');
                 if (dropzone && fileInput) {
                     dropzone.addEventListener('click', () => fileInput.click());
-                    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = '#FF9800'; dropzone.style.background = '#fff3e0'; });
-                    dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = '#ccc'; dropzone.style.background = '#fafafa'; });
+                    dropzone.addEventListener('dragover', e => {
+                        e.preventDefault();
+                        dropzone.style.borderColor = 'var(--primary)';
+                        dropzone.style.background = 'var(--primary-light)';
+                    });
+                    dropzone.addEventListener('dragleave', () => {
+                        dropzone.style.borderColor = '#c8e6c9';
+                        dropzone.style.background = '#fafffe';
+                    });
                     dropzone.addEventListener('drop', e => {
                         e.preventDefault();
-                        dropzone.style.borderColor = '#ccc';
-                        dropzone.style.background = '#fafafa';
+                        dropzone.style.borderColor = '#c8e6c9';
+                        dropzone.style.background = '#fafffe';
                         const file = e.dataTransfer.files[0];
                         if (file) {
                             const reader = new FileReader();
-                            reader.onload = ev => { stephannyProforma = ev.target.result; document.getElementById('stephannyFileList').innerHTML = `<div class="file-item"><i class="fas fa-file-pdf"></i> ${file.name} - Anexado com sucesso</div>`; notificar(`Ficheiro "${file.name}" anexado com sucesso!`, 'success'); };
+                            reader.onload = ev => {
+                                stephannyProforma = ev.target.result;
+                                document.getElementById('stephannyFileList').innerHTML =
+                                    `<div class="file-item"><i class="fas fa-file-pdf"></i> ${file.name} - Anexado</div>`;
+                                notificar(`Ficheiro "${file.name}" anexado!`, 'success');
+                            };
                             reader.readAsDataURL(file);
                         }
                     });
                     fileInput.addEventListener('change', e => {
                         if (e.target.files[0]) {
                             const reader = new FileReader();
-                            reader.onload = ev => { stephannyProforma = ev.target.result; document.getElementById('stephannyFileList').innerHTML = `<div class="file-item"><i class="fas fa-file-pdf"></i> ${e.target.files[0].name} - Anexado com sucesso</div>`; notificar(`Proforma anexada com sucesso!`, 'success'); };
+                            reader.onload = ev => {
+                                stephannyProforma = ev.target.result;
+                                document.getElementById('stephannyFileList').innerHTML =
+                                    `<div class="file-item"><i class="fas fa-file-pdf"></i> ${e.target.files[0].name} - Anexado</div>`;
+                                notificar('Proforma anexada!', 'success');
+                            };
                             reader.readAsDataURL(e.target.files[0]);
                         }
                     });
                 }
-                
+
+                // Dropzone: Proforma
                 const dropzoneProforma = document.getElementById('dropzoneProforma');
                 const proformaInput = document.getElementById('proformaInput');
                 if (dropzoneProforma && proformaInput) {
                     dropzoneProforma.addEventListener('click', () => proformaInput.click());
-                    dropzoneProforma.addEventListener('dragover', e => { e.preventDefault(); dropzoneProforma.style.borderColor = '#FF9800'; });
+                    dropzoneProforma.addEventListener('dragover', e => {
+                        e.preventDefault();
+                        dropzoneProforma.style.borderColor = 'var(--primary)';
+                    });
                     dropzoneProforma.addEventListener('drop', e => {
                         e.preventDefault();
                         const file = e.dataTransfer.files[0];
                         if (file) {
                             const reader = new FileReader();
-                            reader.onload = ev => { stephannyProforma = ev.target.result; document.getElementById('proformaList').innerHTML = `<div class="file-item">${file.name} - Anexado</div>`; };
+                            reader.onload = ev => {
+                                stephannyProforma = ev.target.result;
+                                document.getElementById('proformaList').innerHTML =
+                                    `<div class="file-item">${file.name} - Anexado</div>`;
+                            };
                             reader.readAsDataURL(file);
                         }
                     });
                     proformaInput.addEventListener('change', e => {
                         if (e.target.files[0]) {
                             const reader = new FileReader();
-                            reader.onload = ev => { stephannyProforma = ev.target.result; document.getElementById('proformaList').innerHTML = `<div class="file-item">${e.target.files[0].name} - Anexado</div>`; };
+                            reader.onload = ev => {
+                                stephannyProforma = ev.target.result;
+                                document.getElementById('proformaList').innerHTML =
+                                    `<div class="file-item">${e.target.files[0].name} - Anexado</div>`;
+                            };
                             reader.readAsDataURL(e.target.files[0]);
                         }
                     });
                 }
             }
-            
-            return { 
-                login, logout, abrirAvaliacao, abrirStephannyAutorizacao, abrirStephannyDespesas, 
-                abrirCG, abrirDiretor, abrirFinancas, abrirExecucao, abrirConfirmacao, enviarConfirmacao, 
-                adicionarItemStephanny, calcularTotalStephanny, filtrarRequisicoes, filtrarPorStatus, 
-                fecharModal, abrirModal, exportarPDF, exportarExcel, configurarEventos, imprimirNotaDespesa 
+
+            // ========== PUBLIC API ==========
+            return {
+                login,
+                logout,
+                abrirAvaliacao,
+                abrirStephannyAutorizacao,
+                abrirStephannyDespesas,
+                abrirCG,
+                abrirDiretor,
+                abrirFinancas,
+                abrirExecucao,
+                abrirConfirmacao,
+                enviarConfirmacao,
+                adicionarItemStephanny,
+                calcularTotalStephanny,
+                filtrarRequisicoes,
+                filtrarPorStatus,
+                fecharModal,
+                abrirModal,
+                exportarPDF,
+                exportarExcel,
+                exportarDados,
+                imprimirNotaDespesa,
+                configurarEventos
             };
         })();
-        
-        document.addEventListener('DOMContentLoaded', () => app.configurarEventos());
+
+        // ========== INICIALIZAÇÃO ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            app.configurarEventos();
+        });
     </script>
 </body>
 </html>
