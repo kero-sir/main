@@ -6,7 +6,7 @@
     <title>Kero SIR - Gestão de Manutenção Completa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ========== RESET & BASE - TONS DE VERDE ========== */
+        /* ========== RESET & BASE - TONS DE LARANJA ========== */
         * {
             margin: 0;
             padding: 0;
@@ -15,18 +15,18 @@
         }
 
         :root {
-            --primary: #2e7d32;
-            --primary-dark: #1b5e20;
-            --primary-light: #e8f5e9;
-            --primary-100: #c8e6c9;
-            --secondary: #388e3c;
-            --accent: #4caf50;
+            --primary: #FF9800;
+            --primary-dark: #E65100;
+            --primary-light: #fff3e0;
+            --primary-100: #ffe0b2;
+            --secondary: #FF9800;
+            --accent: #ffa726;
             --success: #2e7d32;
             --danger: #c62828;
             --warning: #f9a825;
             --info: #1565c0;
-            --bg: #f1f8e9;
-            --card-shadow: 0 4px 20px rgba(46, 125, 50, 0.12);
+            --bg: #faf5f0;
+            --card-shadow: 0 4px 20px rgba(230, 81, 0, 0.12);
             --radius: 16px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -84,7 +84,7 @@
         }
         .kero-logo i { font-size: 40px; color: white; }
         .demo-btn {
-            background: #e8f5e9;
+            background: var(--primary-light);
             padding: 8px 16px;
             border: 2px solid var(--primary-100);
             border-radius: 8px;
@@ -100,7 +100,7 @@
             color: white;
             border-color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(46,125,50,0.3);
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
         }
 
         /* ========== MAIN LAYOUT ========== */
@@ -112,7 +112,7 @@
         /* ========== SIDEBAR ========== */
         .sidebar {
             width: 270px;
-            background: linear-gradient(180deg, #1b5e20, #2e7d32);
+            background: linear-gradient(180deg, #E65100, #FF9800);
             color: #fff;
             padding: 20px 0;
             position: fixed;
@@ -275,10 +275,10 @@
         .btn-primary:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(46,125,50,0.3);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.3);
         }
         .btn-secondary {
-            background: #e8f5e9;
+            background: var(--primary-light);
             color: var(--primary-dark);
         }
         .btn-secondary:hover {
@@ -344,7 +344,7 @@
         }
         .kpi-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(46,125,50,0.15);
+            box-shadow: 0 8px 30px rgba(255, 152, 0, 0.15);
         }
         .kpi-card .kpi-info h4 {
             color: #888;
@@ -397,14 +397,14 @@
             font-weight: 600;
             display: inline-block;
         }
-        .status-pendente { background: #fff3e0; color: #e65100; }
+        .status-pendente { background: #fff3e0; color: #E65100; }
         .status-aguardando-stephanny { background: #fce4ec; color: #c62828; }
-        .status-aguardando-cg { background: #fff8e1; color: #f57f17; }
+        .status-aguardando-cg { background: #fff8e1; color: #F57F17; }
         .status-aguardando-diretor { background: #e3f2fd; color: #1565c0; }
-        .status-aguardando-financas { background: #f3e5f5; color: #7b1fa2; }
-        .status-em-execucao { background: #e8f5e9; color: #2e7d32; }
-        .status-aguardando-material { background: #fff3e0; color: #e65100; }
-        .status-aguardando-execucao { background: #e8f5e9; color: #2e7d32; }
+        .status-aguardando-financas { background: #f3e5f5; color: #7B1FA2; }
+        .status-em-execucao { background: #e8f5e9; color: #2E7D32; }
+        .status-aguardando-material { background: #fff3e0; color: #E65100; }
+        .status-aguardando-execucao { background: #e8f5e9; color: #2E7D32; }
         .status-concluida { background: var(--primary); color: white; }
         .status-reprovada { background: #ef9a9a; color: #c62828; }
         .status-aberta { background: #d4edda; color: #155724; }
@@ -419,7 +419,7 @@
             display: inline-block;
         }
         .type-corretiva { background: #ffebee; color: #c62828; }
-        .type-preventiva { background: #e8f5e9; color: #2e7d32; }
+        .type-preventiva { background: #e8f5e9; color: #2E7D32; }
 
         .priority-badge {
             padding: 4px 12px;
@@ -429,8 +429,8 @@
             display: inline-block;
         }
         .priority-alta { background: #ffebee; color: #c62828; }
-        .priority-media { background: #fff3e0; color: #e65100; }
-        .priority-baixa { background: #e8f5e9; color: #2e7d32; }
+        .priority-media { background: #fff3e0; color: #E65100; }
+        .priority-baixa { background: #e8f5e9; color: #2E7D32; }
 
         /* ========== TABLE ========== */
         .table-container {
@@ -450,7 +450,7 @@
         }
         td {
             padding: 12px 14px;
-            border-bottom: 1px solid #e8f5e9;
+            border-bottom: 1px solid #ffe0b2;
         }
         tr {
             transition: var(--transition);
@@ -517,7 +517,7 @@
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(46,125,50,0.12);
+            box-shadow: 0 0 0 4px rgba(255, 152, 0, 0.12);
             background: white;
         }
         select.form-control {
@@ -561,13 +561,13 @@
 
         /* ========== DROPZONE ========== */
         .dropzone {
-            border: 2px dashed #c8e6c9;
+            border: 2px dashed #ffe0b2;
             border-radius: 12px;
             padding: 24px;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
-            background: #fafffe;
+            background: #fffcf8;
         }
         .dropzone:hover {
             border-color: var(--primary);
@@ -603,7 +603,7 @@
         }
         .pagina-btn {
             padding: 8px 16px;
-            border: 2px solid #e8f5e9;
+            border: 2px solid #ffe0b2;
             background: white;
             border-radius: 8px;
             cursor: pointer;
@@ -1548,14 +1548,13 @@
 
             // ========== PERSISTÊNCIA ==========
             function salvar() {
-                localStorage.setItem('kero_manutencao_v4', JSON.stringify(requisicoes));
+                localStorage.setItem('kero_manutencao_v5', JSON.stringify(requisicoes));
             }
 
             function carregar() {
-                const data = localStorage.getItem('kero_manutencao_v4');
+                const data = localStorage.getItem('kero_manutencao_v5');
                 if (data) {
                     requisicoes = JSON.parse(data);
-                    // Atualizar nextId
                     requisicoes.forEach(r => {
                         if (parseInt(r.id) >= nextId) nextId = parseInt(r.id) + 1;
                     });
@@ -1719,10 +1718,8 @@
                 };
                 document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
 
-                // Fechar sidebar mobile
                 document.getElementById('sidebar').classList.remove('open');
 
-                // Atualizar dados
                 if (section === 'requisicoes') renderizarRequisicoes();
                 if (section === 'aprovacoes') renderizarAprovacoes();
                 if (section === 'dashboard') carregarDashboard();
@@ -2442,7 +2439,7 @@
                 const data = {
                     requisicoes,
                     exportedAt: new Date().toISOString(),
-                    version: '4.0'
+                    version: '5.0'
                 };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -2472,7 +2469,6 @@
                 atualizarRelatorios();
                 atualizarBadges();
 
-                // Data atual
                 document.getElementById('currentDate').textContent =
                     new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
@@ -2489,7 +2485,6 @@
 
             // ========== EVENTOS ==========
             function configurarEventos() {
-                // Sidebar navigation
                 document.querySelectorAll('.sidebar-menu li').forEach(item => {
                     item.addEventListener('click', function() {
                         const section = this.dataset.section;
@@ -2497,38 +2492,23 @@
                     });
                 });
 
-                // Menu toggle mobile
                 document.getElementById('menuToggle').addEventListener('click', () => {
                     document.getElementById('sidebar').classList.toggle('open');
                 });
 
-                // Form: Nova Requisição
                 document.getElementById('formNovaRequisicao').addEventListener('submit', novaRequisicao);
                 document.getElementById('btnNovaRequisicao').addEventListener('click', () => abrirModal('modalNovaRequisicao'));
 
-                // Form: Avaliação
                 document.getElementById('formAvaliacao').addEventListener('submit', salvarAvaliacao);
                 document.getElementById('opcaoResolucao').addEventListener('change', (e) => toggleOpcaoResolucao(e.target.value));
 
-                // Form: Stephanny Autorização
                 document.getElementById('formStephannyAutorizacao').addEventListener('submit', salvarStephannyAutorizacao);
-
-                // Form: Stephanny Despesas
                 document.getElementById('formStephannyDespesas').addEventListener('submit', salvarStephannyDespesas);
-
-                // Form: CG
                 document.getElementById('formCG').addEventListener('submit', salvarCG);
-
-                // Form: Director
                 document.getElementById('formDiretor').addEventListener('submit', salvarDiretor);
-
-                // Form: Finanças
                 document.getElementById('formFinancas').addEventListener('submit', salvarFinancas);
-
-                // Form: Execução
                 document.getElementById('formExecucao').addEventListener('submit', salvarExecucao);
 
-                // Filter status options
                 const statusSelect = document.getElementById('filterStatus');
                 if (statusSelect) {
                     const statuses = ['all', 'pendente', 'aguardando_stephanny', 'aguardando_cg', 'aguardando_diretor',
@@ -2543,12 +2523,11 @@
                     });
                 }
 
-                // Filter search enter key
                 document.getElementById('filterSearch').addEventListener('keyup', (e) => {
                     if (e.key === 'Enter') filtrarRequisicoes();
                 });
 
-                // Dropzone: Stephanny
+                // Dropzone Stephanny
                 const dropzone = document.getElementById('stephannyDropzone');
                 const fileInput = document.getElementById('stephannyFileInput');
                 if (dropzone && fileInput) {
@@ -2559,13 +2538,13 @@
                         dropzone.style.background = 'var(--primary-light)';
                     });
                     dropzone.addEventListener('dragleave', () => {
-                        dropzone.style.borderColor = '#c8e6c9';
-                        dropzone.style.background = '#fafffe';
+                        dropzone.style.borderColor = '#ffe0b2';
+                        dropzone.style.background = '#fffcf8';
                     });
                     dropzone.addEventListener('drop', e => {
                         e.preventDefault();
-                        dropzone.style.borderColor = '#c8e6c9';
-                        dropzone.style.background = '#fafffe';
+                        dropzone.style.borderColor = '#ffe0b2';
+                        dropzone.style.background = '#fffcf8';
                         const file = e.dataTransfer.files[0];
                         if (file) {
                             const reader = new FileReader();
@@ -2592,7 +2571,7 @@
                     });
                 }
 
-                // Dropzone: Proforma
+                // Dropzone Proforma
                 const dropzoneProforma = document.getElementById('dropzoneProforma');
                 const proformaInput = document.getElementById('proformaInput');
                 if (dropzoneProforma && proformaInput) {
@@ -2655,7 +2634,6 @@
             };
         })();
 
-        // ========== INICIALIZAÇÃO ==========
         document.addEventListener('DOMContentLoaded', () => {
             app.configurarEventos();
         });
