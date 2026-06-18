@@ -398,7 +398,7 @@
             display: inline-block;
         }
         .status-pendente { background: #fff3e0; color: #E65100; }
-        .status-aguardando-stephanny { background: #fce4ec; color: #c62828; }
+        .status-aguardando-consumiveis { background: #fce4ec; color: #c62828; }
         .status-aguardando-cg { background: #fff8e1; color: #F57F17; }
         .status-aguardando-diretor { background: #e3f2fd; color: #1565c0; }
         .status-aguardando-financas { background: #f3e5f5; color: #7B1FA2; }
@@ -582,6 +582,18 @@
             justify-content: space-between;
             align-items: center;
             font-size: 13px;
+        }
+        .file-item .file-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .file-item .file-remove {
+            color: var(--danger);
+            cursor: pointer;
+            font-weight: 700;
+            margin-left: 10px;
         }
 
         .item-row {
@@ -869,11 +881,17 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
                 <button class="demo-btn" onclick="app.login('solicitante')">👤 Solicitante</button>
                 <button class="demo-btn" onclick="app.login('manutencao')">🔧 Manutenção</button>
-                <button class="demo-btn" onclick="app.login('stephanny')">👩 Stephanny</button>
+                <button class="demo-btn" onclick="app.login('consumiveis')">📦 Consumíveis</button>
                 <button class="demo-btn" onclick="app.login('cg')">📊 Controlo Gestão</button>
                 <button class="demo-btn" onclick="app.login('diretor')">👔 Director</button>
                 <button class="demo-btn" onclick="app.login('financas')">💰 Finanças</button>
                 <button class="demo-btn" onclick="app.login('admin')">👑 Admin</button>
+            </div>
+            <div style="margin-top: 12px; font-size: 11px; color: #999; border-top: 1px solid #eee; padding-top: 12px;">
+                <p><strong>Emails:</strong></p>
+                <p>Consumíveis: gescps3@accordgrouplda.com</p>
+                <p>Controlo Gestão: dircg@accordgrouplda.com</p>
+                <p>Director Geral: paulo.silva@accordgrouplda.com</p>
             </div>
         </div>
     </div>
@@ -912,6 +930,7 @@
                     <div>
                         <div class="user-name" id="sidebarUserName">Usuário</div>
                         <div class="user-role" id="sidebarUserRole">Role</div>
+                        <div style="font-size:10px; opacity:0.6;" id="sidebarUserEmail"></div>
                     </div>
                 </div>
             </nav>
@@ -942,9 +961,9 @@
                             <div class="kpi-info"><h4>Pendentes</h4><span id="totalPendente">0</span></div>
                             <div class="kpi-icon"><i class="fas fa-clock"></i></div>
                         </div>
-                        <div class="kpi-card" onclick="app.filtrarPorStatus('aguardando_stephanny')">
-                            <div class="kpi-info"><h4>Stephanny</h4><span id="totalStephanny">0</span></div>
-                            <div class="kpi-icon"><i class="fas fa-female"></i></div>
+                        <div class="kpi-card" onclick="app.filtrarPorStatus('aguardando_consumiveis')">
+                            <div class="kpi-info"><h4>Consumíveis</h4><span id="totalConsumiveis">0</span></div>
+                            <div class="kpi-icon"><i class="fas fa-boxes"></i></div>
                         </div>
                         <div class="kpi-card" onclick="app.filtrarPorStatus('aguardando_cg')">
                             <div class="kpi-info"><h4>Controlo Gestão</h4><span id="totalCG">0</span></div>
@@ -1145,6 +1164,11 @@
                         <label>Descrição do Problema *</label>
                         <textarea id="descricao" class="form-control" rows="3" required placeholder="Descreva detalhadamente a avaria ou necessidade de manutenção..."></textarea>
                     </div>
+                    <div class="form-group">
+                        <label>Anexar Ficheiro</label>
+                        <div class="dropzone" id="dropzoneRequisicao"><i class="fas fa-cloud-upload-alt"></i> Clique ou arraste para anexar (PDF, JPG, PNG)<input type="file" id="requisicaoFileInput" style="display:none" accept=".pdf,.jpg,.png,.jpeg"></div>
+                        <div id="requisicaoFileList"></div>
+                    </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" onclick="app.fecharModal('modalNovaRequisicao')">Cancelar</button>
                         <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar Requisição</button>
@@ -1204,6 +1228,12 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label>Anexar Ficheiro</label>
+                        <div class="dropzone" id="dropzoneAvaliacao"><i class="fas fa-cloud-upload-alt"></i> Clique ou arraste para anexar (PDF, JPG, PNG)<input type="file" id="avaliacaoFileInput" style="display:none" accept=".pdf,.jpg,.png,.jpeg"></div>
+                        <div id="avaliacaoFileList"></div>
+                    </div>
+
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Enviar Avaliação</button>
                     </div>
@@ -1212,20 +1242,20 @@
         </div>
     </div>
 
-    <!-- MODAL STEPHANNY - AUTORIZAÇÃO -->
-    <div class="modal" id="modalStephannyAutorizacao">
+    <!-- MODAL CONSUMÍVEIS - AUTORIZAÇÃO (Transferência) -->
+    <div class="modal" id="modalConsumiveisAutorizacao">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-check-circle"></i> Stephanny - Autorização</h2>
-                <span class="close-btn" onclick="app.fecharModal('modalStephannyAutorizacao')">&times;</span>
+                <h2><i class="fas fa-check-circle"></i> Consumíveis - Autorização de Transferência</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalConsumiveisAutorizacao')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="formStephannyAutorizacao">
-                    <input type="hidden" id="stephannyAutorizacaoReqId">
-                    <div id="stephannyAutorizacaoInfo" class="expense-summary"></div>
+                <form id="formConsumiveisAutorizacao">
+                    <input type="hidden" id="consumiveisAutorizacaoReqId">
+                    <div id="consumiveisAutorizacaoInfo" class="expense-summary"></div>
                     <div class="form-group">
                         <label>Decisão</label>
-                        <select id="stephannyDecisao" class="form-control" required>
+                        <select id="consumiveisDecisao" class="form-control" required>
                             <option value="">Selecione</option>
                             <option value="aprovar">✅ Aprovar</option>
                             <option value="reprovar">❌ Reprovar</option>
@@ -1233,11 +1263,11 @@
                     </div>
                     <div class="form-group">
                         <label>Comentário</label>
-                        <textarea id="stephannyComentario" class="form-control" rows="3" required placeholder="Justifique a sua decisão..."></textarea>
+                        <textarea id="consumiveisComentario" class="form-control" rows="3" required placeholder="Justifique a sua decisão..."></textarea>
                     </div>
                     <div class="signature-area">
                         <h4>Assinatura</h4>
-                        <input type="text" id="stephannyAutorizacaoAssinatura" class="form-control" placeholder="Nome completo" required>
+                        <input type="text" id="consumiveisAutorizacaoAssinatura" class="form-control" placeholder="Nome completo" required>
                     </div>
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">Confirmar</button>
@@ -1247,52 +1277,52 @@
         </div>
     </div>
 
-    <!-- MODAL STEPHANNY - DESPESAS -->
-    <div class="modal" id="modalStephannyDespesas">
+    <!-- MODAL CONSUMÍVEIS - DESPESAS (Compra) -->
+    <div class="modal" id="modalConsumiveisDespesas">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-file-invoice"></i> Stephanny - Registo de Despesas</h2>
-                <span class="close-btn" onclick="app.fecharModal('modalStephannyDespesas')">&times;</span>
+                <h2><i class="fas fa-file-invoice"></i> Consumíveis - Registo de Despesas</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalConsumiveisDespesas')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="formStephannyDespesas">
-                    <input type="hidden" id="stephannyDespesasReqId">
-                    <div id="stephannyDespesasInfo" class="expense-summary"></div>
+                <form id="formConsumiveisDespesas">
+                    <input type="hidden" id="consumiveisDespesasReqId">
+                    <div id="consumiveisDespesasInfo" class="expense-summary"></div>
                     <div class="form-group">
                         <label>Fornecedor *</label>
-                        <input type="text" id="stephannyFornecedor" class="form-control" required placeholder="Nome do fornecedor">
+                        <input type="text" id="consumiveisFornecedor" class="form-control" required placeholder="Nome do fornecedor">
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Data da Despesa</label>
-                            <input type="date" id="stephannyData" class="form-control">
+                            <input type="date" id="consumiveisData" class="form-control">
                         </div>
                         <div class="form-group">
                             <label>Nº Documento / Factura</label>
-                            <input type="text" id="stephannyDocNum" class="form-control" placeholder="Nº da factura">
+                            <input type="text" id="consumiveisDocNum" class="form-control" placeholder="Nº da factura">
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Itens / Serviços</label>
-                        <div id="stephannyItensList"></div>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="app.adicionarItemStephanny()"><i class="fas fa-plus"></i> Adicionar Item</button>
+                        <div id="consumiveisItensList"></div>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="app.adicionarItemConsumiveis()"><i class="fas fa-plus"></i> Adicionar Item</button>
                     </div>
                     <div class="form-group">
                         <label>Valor Total (KZ)</label>
-                        <input type="number" id="stephannyTotal" class="form-control" readonly style="background:#f0f0f0; font-weight:700;">
+                        <input type="number" id="consumiveisTotal" class="form-control" readonly style="background:#f0f0f0; font-weight:700;">
                     </div>
                     <div class="form-group">
                         <label>Motivo da Despesa</label>
-                        <textarea id="stephannyMotivo" class="form-control" rows="2" required placeholder="Descreva o motivo da despesa..."></textarea>
+                        <textarea id="consumiveisMotivo" class="form-control" rows="2" required placeholder="Descreva o motivo da despesa..."></textarea>
                     </div>
                     <div class="form-group">
                         <label>Anexar Proforma / Orçamento</label>
-                        <div class="dropzone" id="stephannyDropzone"><i class="fas fa-cloud-upload-alt"></i> Clique ou arraste o ficheiro<input type="file" id="stephannyFileInput" style="display:none" accept=".pdf,.jpg,.png"></div>
-                        <div id="stephannyFileList"></div>
+                        <div class="dropzone" id="consumiveisDropzone"><i class="fas fa-cloud-upload-alt"></i> Clique ou arraste o ficheiro<input type="file" id="consumiveisFileInput" style="display:none" accept=".pdf,.jpg,.png"></div>
+                        <div id="consumiveisFileList"></div>
                     </div>
                     <div class="signature-area">
                         <h4>Assinatura</h4>
-                        <input type="text" id="stephannyAssinatura" class="form-control" placeholder="Nome completo" required>
+                        <input type="text" id="consumiveisAssinatura" class="form-control" placeholder="Nome completo" required>
                     </div>
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar para Controlo Gestão</button>
@@ -1507,7 +1537,7 @@
                 </div>
                 <div id="notaConteudo"></div>
                 <div class="nota-assinaturas">
-                    <div class="nota-assinatura"><div class="linha"></div><p>Stephanny<br><small>Responsável pela Despesa</small></p></div>
+                    <div class="nota-assinatura"><div class="linha"></div><p>Consumíveis<br><small>Responsável pela Despesa</small></p></div>
                     <div class="nota-assinatura"><div class="linha"></div><p>Controlo Gestão<br><small>Validação</small></p></div>
                     <div class="nota-assinatura"><div class="linha"></div><p>Director Geral<br><small>Aprovação</small></p></div>
                     <div class="nota-assinatura"><div class="linha"></div><p>Finanças<br><small>Pagamento</small></p></div>
@@ -1525,15 +1555,43 @@
         //  APP - SISTEMA COMPLETO DE MANUTENÇÃO
         // ============================================================
         const app = (function() {
-            // ========== PERFIS ==========
+            // ========== PERFIS COM EMAILS ATUALIZADOS ==========
             const perfis = {
-                solicitante: { nome: "João Solicitante", role: "Solicitante", email: "solicitante@accord.com" },
-                manutencao: { nome: "Carlos Técnico", role: "Manutenção", email: "tecnico@accord.com" },
-                stephanny: { nome: "Stephanny Alves", role: "Stephanny", email: "stephanny@accord.com" },
-                cg: { nome: "Ana Santos", role: "Controlo Gestão", email: "cg@accord.com" },
-                diretor: { nome: "Dr. Paulo Mendes", role: "Director Geral", email: "diretor@accord.com" },
-                financas: { nome: "Maria Costa", role: "Finanças", email: "financas@accord.com" },
-                admin: { nome: "Administrador", role: "Admin", email: "admin@accord.com" }
+                solicitante: { 
+                    nome: "João Solicitante", 
+                    role: "Solicitante", 
+                    email: "solicitante@accord.com" 
+                },
+                manutencao: { 
+                    nome: "Carlos Técnico", 
+                    role: "Manutenção", 
+                    email: "tecnico@accord.com" 
+                },
+                consumiveis: { 
+                    nome: "Stephanny Alves", 
+                    role: "Consumíveis", 
+                    email: "gescps3@accordgrouplda.com" 
+                },
+                cg: { 
+                    nome: "Ana Santos", 
+                    role: "Controlo Gestão", 
+                    email: "dircg@accordgrouplda.com" 
+                },
+                diretor: { 
+                    nome: "Dr. Paulo Mendes", 
+                    role: "Director Geral", 
+                    email: "paulo.silva@accordgrouplda.com" 
+                },
+                financas: { 
+                    nome: "Maria Costa", 
+                    role: "Finanças", 
+                    email: "financas@accord.com" 
+                },
+                admin: { 
+                    nome: "Administrador", 
+                    role: "Admin", 
+                    email: "admin@accord.com" 
+                }
             };
 
             let usuario = null;
@@ -1541,18 +1599,20 @@
             let pagina = 1;
             let filtroStatus = 'all';
             let filtroSearch = '';
-            let stephannyItens = [];
-            let stephannyProforma = null;
+            let consumiveisItens = [];
+            let consumiveisProforma = null;
             let confirmacaoId = null;
             let nextId = 1;
+            let requisicaoAnexo = null;
+            let avaliacaoAnexo = null;
 
             // ========== PERSISTÊNCIA ==========
             function salvar() {
-                localStorage.setItem('kero_manutencao_v5', JSON.stringify(requisicoes));
+                localStorage.setItem('kero_manutencao_v7', JSON.stringify(requisicoes));
             }
 
             function carregar() {
-                const data = localStorage.getItem('kero_manutencao_v5');
+                const data = localStorage.getItem('kero_manutencao_v7');
                 if (data) {
                     requisicoes = JSON.parse(data);
                     requisicoes.forEach(r => {
@@ -1577,6 +1637,7 @@
                         data: new Date().toISOString(),
                         solicitante: "João Solicitante",
                         email: "solicitante@accord.com",
+                        anexos: [],
                         historico: [{ data: new Date().toISOString(), usuario: "João Solicitante", acao: "Requisição criada" }]
                     },
                     {
@@ -1587,7 +1648,7 @@
                         tipo: "preventiva",
                         prioridade: "media",
                         descricao: "Revisão anual programada - troca de baterias e lubrificação geral.",
-                        status: "aguardando_stephanny",
+                        status: "aguardando_consumiveis",
                         data: new Date().toISOString(),
                         solicitante: "Carlos Logística",
                         email: "solicitante@accord.com",
@@ -1595,6 +1656,7 @@
                         opcaoResolucao: "precisa_comprar",
                         descricaoCompra: "2 baterias de 48V para empilhador elétrico",
                         valorCompra: 450000,
+                        anexos: [],
                         historico: [
                             { data: new Date().toISOString(), usuario: "João Solicitante", acao: "Requisição criada" },
                             { data: new Date().toISOString(), usuario: "Carlos Técnico", acao: "Diagnóstico realizado - necessita compra" }
@@ -1618,6 +1680,7 @@
                         dataExecucao: new Date().toISOString(),
                         tecnicoResponsavel: "Carlos Técnico",
                         valorTotal: 85000,
+                        anexos: [],
                         historico: [
                             { data: new Date().toISOString(), usuario: "Maria Manutenção", acao: "Requisição criada" },
                             { data: new Date().toISOString(), usuario: "Carlos Técnico", acao: "Diagnóstico - tem material" },
@@ -1633,7 +1696,7 @@
             function getStatusText(s) {
                 const map = {
                     'pendente': 'Pendente',
-                    'aguardando_stephanny': 'Aguard. Stephanny',
+                    'aguardando_consumiveis': 'Aguard. Consumíveis',
                     'aguardando_cg': 'Aguard. Controlo Gestão',
                     'aguardando_diretor': 'Aguard. Director',
                     'aguardando_financas': 'Aguard. Finanças',
@@ -1788,7 +1851,7 @@
             // ========== RENDER: APROVAÇÕES ==========
             function renderizarAprovacoes() {
                 let pendentes = [];
-                if (usuario.role === 'Stephanny') pendentes = requisicoes.filter(r => r.status === 'aguardando_stephanny');
+                if (usuario.role === 'Consumíveis') pendentes = requisicoes.filter(r => r.status === 'aguardando_consumiveis');
                 else if (usuario.role === 'Controlo Gestão') pendentes = requisicoes.filter(r => r.status === 'aguardando_cg');
                 else if (usuario.role === 'Director Geral') pendentes = requisicoes.filter(r => r.status === 'aguardando_diretor');
                 else if (usuario.role === 'Finanças') pendentes = requisicoes.filter(r => r.status === 'aguardando_financas');
@@ -1823,11 +1886,11 @@
                 if (usuario.role === 'Manutenção' && req.status === 'pendente') {
                     btns += `<button class="btn btn-success btn-sm" onclick="event.stopPropagation();app.abrirAvaliacao('${req.id}')"><i class="fas fa-clipboard-check"></i> Avaliar</button>`;
                 }
-                if (usuario.role === 'Stephanny' && req.status === 'aguardando_stephanny') {
-                    if (req.opcaoResolucao === 'transferencia' || req.opcaoResolucao === 'consumo') {
-                        btns += `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();app.abrirStephannyAutorizacao('${req.id}')"><i class="fas fa-check-circle"></i> Autorizar</button>`;
+                if (usuario.role === 'Consumíveis' && req.status === 'aguardando_consumiveis') {
+                    if (req.opcaoResolucao === 'transferencia') {
+                        btns += `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();app.abrirConsumiveisAutorizacao('${req.id}')"><i class="fas fa-check-circle"></i> Autorizar Transferência</button>`;
                     } else if (req.opcaoResolucao === 'precisa_comprar') {
-                        btns += `<button class="btn btn-warning btn-sm" onclick="event.stopPropagation();app.abrirStephannyDespesas('${req.id}')"><i class="fas fa-file-invoice"></i> Despesas</button>`;
+                        btns += `<button class="btn btn-warning btn-sm" onclick="event.stopPropagation();app.abrirConsumiveisDespesas('${req.id}')"><i class="fas fa-file-invoice"></i> Registo Despesas</button>`;
                     }
                 }
                 if (usuario.role === 'Controlo Gestão' && req.status === 'aguardando_cg') {
@@ -1868,7 +1931,7 @@
             function atualizarKPIs() {
                 document.getElementById('totalReq').innerText = requisicoes.length;
                 document.getElementById('totalPendente').innerText = requisicoes.filter(r => r.status === 'pendente').length;
-                document.getElementById('totalStephanny').innerText = requisicoes.filter(r => r.status === 'aguardando_stephanny').length;
+                document.getElementById('totalConsumiveis').innerText = requisicoes.filter(r => r.status === 'aguardando_consumiveis').length;
                 document.getElementById('totalCG').innerText = requisicoes.filter(r => r.status === 'aguardando_cg').length;
                 document.getElementById('totalDiretor').innerText = requisicoes.filter(r => r.status === 'aguardando_diretor').length;
                 document.getElementById('totalFinancas').innerText = requisicoes.filter(r => r.status === 'aguardando_financas').length;
@@ -1882,7 +1945,7 @@
                 document.getElementById('totalBadge').innerText = pendentes;
 
                 let aprovPendentes = 0;
-                if (usuario.role === 'Stephanny') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_stephanny').length;
+                if (usuario.role === 'Consumíveis') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_consumiveis').length;
                 else if (usuario.role === 'Controlo Gestão') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_cg').length;
                 else if (usuario.role === 'Director Geral') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_diretor').length;
                 else if (usuario.role === 'Finanças') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_financas').length;
@@ -1913,7 +1976,10 @@
                 msg += `Tipo: ${req.tipo === 'corretiva' ? 'Correctiva' : 'Preventiva'}\n`;
                 msg += `Prioridade: ${req.prioridade || 'N/A'}\n`;
                 msg += `Descrição: ${req.descricao}\n`;
-                if (req.diagnostico) msg += `\nDiagnóstico: ${req.diagnostico}`;
+                if (req.anexos && req.anexos.length > 0) {
+                    msg += `\n📎 Anexos: ${req.anexos.length} ficheiro(s) anexado(s)`;
+                }
+                if (req.diagnostico) msg += `\n\nDiagnóstico: ${req.diagnostico}`;
                 if (req.valorTotal) msg += `\nValor Total: ${formatarMoeda(req.valorTotal)}`;
                 if (req.relatorioExecucao) msg += `\n\nRelatório de Execução: ${req.relatorioExecucao}`;
                 if (req.historico && req.historico.length > 0) {
@@ -1940,12 +2006,15 @@
                     data: new Date().toISOString(),
                     solicitante: usuario.nome,
                     email: usuario.email,
+                    anexos: requisicaoAnexo ? [{ nome: requisicaoAnexo.name, data: requisicaoAnexo.data }] : [],
                     historico: [{ data: new Date().toISOString(), usuario: usuario.nome, acao: 'Requisição criada' }]
                 };
                 requisicoes.unshift(nova);
                 salvar();
                 fecharModal('modalNovaRequisicao');
                 document.getElementById('formNovaRequisicao').reset();
+                requisicaoAnexo = null;
+                document.getElementById('requisicaoFileList').innerHTML = '';
                 renderizarRequisicoes();
                 carregarDashboard();
                 notificar(`Requisição ${nova.codigo} criada com sucesso!`, 'success');
@@ -1960,7 +2029,9 @@
                 document.getElementById('detalhesConsumo').style.display = 'none';
                 document.getElementById('detalhesCompra').style.display = 'none';
                 document.getElementById('proformaList').innerHTML = '';
-                stephannyProforma = null;
+                document.getElementById('avaliacaoFileList').innerHTML = '';
+                avaliacaoAnexo = null;
+                consumiveisProforma = null;
                 abrirModal('modalAvaliacao');
             }
 
@@ -1977,6 +2048,11 @@
                 if (!req) return;
                 req.diagnostico = document.getElementById('diagnostico').value;
                 req.opcaoResolucao = document.getElementById('opcaoResolucao').value;
+                
+                if (avaliacaoAnexo) {
+                    if (!req.anexos) req.anexos = [];
+                    req.anexos.push({ nome: avaliacaoAnexo.name, data: avaliacaoAnexo.data, tipo: 'avaliacao' });
+                }
 
                 if (req.opcaoResolucao === 'com_material') {
                     req.status = 'em_execucao';
@@ -1986,23 +2062,23 @@
                     req.origemRecurso = document.getElementById('origemRecurso').value;
                     req.detalhesTransferencia = document.getElementById('detalhesTransferenciaTexto').value;
                     req.valorTransferencia = parseFloat(document.getElementById('valorTransferencia').value) || 0;
-                    req.status = 'aguardando_stephanny';
-                    adicionarHistorico(req, 'Solicitação de transferência de recurso. Aguardando autorização.');
-                    notificar('Solicitação enviada para Stephanny autorizar transferência.', 'info');
+                    req.status = 'aguardando_consumiveis';
+                    adicionarHistorico(req, 'Solicitação de transferência de recurso. Aguardando autorização dos Consumíveis.');
+                    notificar('Solicitação enviada para Consumíveis (gescps3@accordgrouplda.com) autorizar transferência.', 'info');
                 } else if (req.opcaoResolucao === 'consumo') {
                     req.detalhesConsumo = document.getElementById('detalhesConsumoTexto').value;
                     req.valorConsumo = parseFloat(document.getElementById('valorConsumo').value) || 0;
-                    req.status = 'aguardando_stephanny';
-                    adicionarHistorico(req, 'Solicitação de consumo de stock interno. Aguardando autorização.');
-                    notificar('Solicitação enviada para Stephanny autorizar consumo.', 'info');
+                    req.status = 'aguardando_cg';
+                    adicionarHistorico(req, 'Solicitação de consumo de stock interno. Aguardando aprovação do Controlo Gestão.');
+                    notificar('Solicitação enviada para Controlo Gestão (dircg@accordgrouplda.com) aprovar consumo.', 'info');
                 } else if (req.opcaoResolucao === 'precisa_comprar') {
                     req.fornecedorCompra = document.getElementById('fornecedorCompra').value;
                     req.descricaoCompra = document.getElementById('descricaoCompra').value;
                     req.valorCompra = parseFloat(document.getElementById('valorCompra').value) || 0;
-                    req.proformaData = stephannyProforma;
-                    req.status = 'aguardando_stephanny';
-                    adicionarHistorico(req, 'Solicitação de compra. Aguardando Stephanny registar despesas.');
-                    notificar('Requisição enviada para Stephanny registar despesas.', 'info');
+                    req.proformaData = consumiveisProforma;
+                    req.status = 'aguardando_consumiveis';
+                    adicionarHistorico(req, 'Solicitação de compra. Aguardando Consumíveis registar despesas.');
+                    notificar('Requisição enviada para Consumíveis (gescps3@accordgrouplda.com) registar despesas.', 'info');
                 }
                 salvar();
                 fecharModal('modalAvaliacao');
@@ -2011,134 +2087,132 @@
                 carregarDashboard();
             }
 
-            // ========== STEPHANNY - AUTORIZAÇÃO ==========
-            function abrirStephannyAutorizacao(id) {
+            // ========== CONSUMÍVEIS - AUTORIZAÇÃO (Transferência) ==========
+            function abrirConsumiveisAutorizacao(id) {
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
-                document.getElementById('stephannyAutorizacaoReqId').value = id;
-                let tipo = req.opcaoResolucao === 'transferencia' ? 'Transferência de Recurso' : 'Consumo de Stock Interno';
-                let detalhes = req.opcaoResolucao === 'transferencia' ? req.detalhesTransferencia : req.detalhesConsumo;
-                let valor = req.opcaoResolucao === 'transferencia' ? req.valorTransferencia : req.valorConsumo;
-                document.getElementById('stephannyAutorizacaoInfo').innerHTML = `
+                document.getElementById('consumiveisAutorizacaoReqId').value = id;
+                document.getElementById('consumiveisAutorizacaoInfo').innerHTML = `
                     <strong>Requisição:</strong> ${req.codigo}<br>
                     <strong>Equipamento:</strong> ${req.equipamento}<br>
-                    <strong>Tipo:</strong> ${tipo}<br>
-                    <strong>Detalhes:</strong> ${detalhes}<br>
-                    <strong>Valor Estimado:</strong> ${formatarMoeda(valor)}<br>
+                    <strong>Tipo:</strong> Transferência de Recurso<br>
+                    <strong>Origem:</strong> ${req.origemRecurso || 'N/A'}<br>
+                    <strong>Detalhes:</strong> ${req.detalhesTransferencia}<br>
+                    <strong>Valor Estimado:</strong> ${formatarMoeda(req.valorTransferencia)}<br>
                     <strong>Diagnóstico:</strong> ${req.diagnostico}
                 `;
-                document.getElementById('stephannyDecisao').value = '';
-                document.getElementById('stephannyComentario').value = '';
-                document.getElementById('stephannyAutorizacaoAssinatura').value = usuario.nome;
-                abrirModal('modalStephannyAutorizacao');
+                document.getElementById('consumiveisDecisao').value = '';
+                document.getElementById('consumiveisComentario').value = '';
+                document.getElementById('consumiveisAutorizacaoAssinatura').value = usuario.nome;
+                abrirModal('modalConsumiveisAutorizacao');
             }
 
-            function salvarStephannyAutorizacao(e) {
+            function salvarConsumiveisAutorizacao(e) {
                 e.preventDefault();
-                const id = document.getElementById('stephannyAutorizacaoReqId').value;
+                const id = document.getElementById('consumiveisAutorizacaoReqId').value;
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
-                const decisao = document.getElementById('stephannyDecisao').value;
-                const comentario = document.getElementById('stephannyComentario').value;
+                const decisao = document.getElementById('consumiveisDecisao').value;
+                const comentario = document.getElementById('consumiveisComentario').value;
 
                 if (decisao === 'reprovar') {
                     req.status = 'reprovada';
-                    adicionarHistorico(req, `Stephanny reprovou: ${comentario}`);
-                    notificar('Requisição reprovada por Stephanny.', 'error');
+                    adicionarHistorico(req, `Consumíveis reprovou: ${comentario}`);
+                    notificar('Requisição reprovada por Consumíveis.', 'error');
                 } else {
                     req.status = 'em_execucao';
-                    adicionarHistorico(req, `Stephanny autorizou. Manutenção pode executar.`);
+                    adicionarHistorico(req, `Consumíveis autorizou transferência. Manutenção pode executar.`);
                     notificar('Autorização concedida! Manutenção pode executar o serviço.', 'success');
                 }
                 salvar();
-                fecharModal('modalStephannyAutorizacao');
+                fecharModal('modalConsumiveisAutorizacao');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
                 carregarDashboard();
             }
 
-            // ========== STEPHANNY - DESPESAS ==========
-            function adicionarItemStephanny() {
-                const idx = stephannyItens.length;
+            // ========== CONSUMÍVEIS - DESPESAS (Compra) ==========
+            function adicionarItemConsumiveis() {
+                const idx = consumiveisItens.length;
                 const div = document.createElement('div');
                 div.className = 'item-row';
                 div.innerHTML = `
-                    <input type="text" placeholder="Descrição" id="itemDesc_${idx}" style="flex:2">
-                    <input type="number" placeholder="Qtd" id="itemQtd_${idx}" style="flex:1" value="1">
-                    <input type="number" placeholder="Valor Unit." id="itemPreco_${idx}" style="flex:1" onchange="app.calcularTotalStephanny()">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove();app.calcularTotalStephanny()">✖</button>
+                    <input type="text" placeholder="Descrição" id="consumivelDesc_${idx}" style="flex:2">
+                    <input type="number" placeholder="Qtd" id="consumivelQtd_${idx}" style="flex:1" value="1">
+                    <input type="number" placeholder="Valor Unit." id="consumivelPreco_${idx}" style="flex:1" onchange="app.calcularTotalConsumiveis()">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove();app.calcularTotalConsumiveis()">✖</button>
                 `;
-                document.getElementById('stephannyItensList').appendChild(div);
-                stephannyItens.push(idx);
+                document.getElementById('consumiveisItensList').appendChild(div);
+                consumiveisItens.push(idx);
             }
 
-            function calcularTotalStephanny() {
+            function calcularTotalConsumiveis() {
                 let total = 0;
-                for (let i = 0; i < stephannyItens.length; i++) {
-                    const qtd = parseFloat(document.getElementById(`itemQtd_${i}`)?.value) || 0;
-                    const preco = parseFloat(document.getElementById(`itemPreco_${i}`)?.value) || 0;
+                for (let i = 0; i < consumiveisItens.length; i++) {
+                    const qtd = parseFloat(document.getElementById(`consumivelQtd_${i}`)?.value) || 0;
+                    const preco = parseFloat(document.getElementById(`consumivelPreco_${i}`)?.value) || 0;
                     total += qtd * preco;
                 }
-                document.getElementById('stephannyTotal').value = total;
+                document.getElementById('consumiveisTotal').value = total;
             }
 
-            function getItensStephanny() {
+            function getItensConsumiveis() {
                 let itens = [];
-                for (let i = 0; i < stephannyItens.length; i++) {
-                    const desc = document.getElementById(`itemDesc_${i}`)?.value;
+                for (let i = 0; i < consumiveisItens.length; i++) {
+                    const desc = document.getElementById(`consumivelDesc_${i}`)?.value;
                     if (desc) {
                         itens.push({
                             desc: desc,
-                            qtd: parseFloat(document.getElementById(`itemQtd_${i}`)?.value) || 0,
-                            preco: parseFloat(document.getElementById(`itemPreco_${i}`)?.value) || 0,
-                            total: (parseFloat(document.getElementById(`itemQtd_${i}`)?.value) || 0) * (parseFloat(document.getElementById(`itemPreco_${i}`)?.value) || 0)
+                            qtd: parseFloat(document.getElementById(`consumivelQtd_${i}`)?.value) || 0,
+                            preco: parseFloat(document.getElementById(`consumivelPreco_${i}`)?.value) || 0,
+                            total: (parseFloat(document.getElementById(`consumivelQtd_${i}`)?.value) || 0) * (parseFloat(document.getElementById(`consumivelPreco_${i}`)?.value) || 0)
                         });
                     }
                 }
                 return itens;
             }
 
-            function abrirStephannyDespesas(id) {
+            function abrirConsumiveisDespesas(id) {
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
-                document.getElementById('stephannyDespesasReqId').value = id;
-                stephannyItens = [];
-                document.getElementById('stephannyItensList').innerHTML = '';
-                document.getElementById('stephannyFornecedor').value = '';
-                document.getElementById('stephannyData').value = new Date().toISOString().slice(0, 10);
-                document.getElementById('stephannyDocNum').value = '';
-                document.getElementById('stephannyMotivo').value = '';
-                document.getElementById('stephannyTotal').value = '0';
-                document.getElementById('stephannyAssinatura').value = usuario.nome;
-                stephannyProforma = null;
-                document.getElementById('stephannyFileList').innerHTML = '';
-                document.getElementById('stephannyDespesasInfo').innerHTML = `
+                document.getElementById('consumiveisDespesasReqId').value = id;
+                consumiveisItens = [];
+                document.getElementById('consumiveisItensList').innerHTML = '';
+                document.getElementById('consumiveisFornecedor').value = '';
+                document.getElementById('consumiveisData').value = new Date().toISOString().slice(0, 10);
+                document.getElementById('consumiveisDocNum').value = '';
+                document.getElementById('consumiveisMotivo').value = '';
+                document.getElementById('consumiveisTotal').value = '0';
+                document.getElementById('consumiveisAssinatura').value = usuario.nome;
+                consumiveisProforma = null;
+                document.getElementById('consumiveisFileList').innerHTML = '';
+                document.getElementById('consumiveisDespesasInfo').innerHTML = `
                     <strong>Requisição:</strong> ${req.codigo}<br>
                     <strong>Equipamento:</strong> ${req.equipamento}<br>
                     <strong>Descrição da Compra:</strong> ${req.descricaoCompra}<br>
                     <strong>Valor Estimado:</strong> ${formatarMoeda(req.valorCompra)}
                 `;
-                adicionarItemStephanny();
-                abrirModal('modalStephannyDespesas');
+                adicionarItemConsumiveis();
+                abrirModal('modalConsumiveisDespesas');
             }
 
-            function salvarStephannyDespesas(e) {
+            function salvarConsumiveisDespesas(e) {
                 e.preventDefault();
-                const id = document.getElementById('stephannyDespesasReqId').value;
+                const id = document.getElementById('consumiveisDespesasReqId').value;
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
-                req.fornecedor = document.getElementById('stephannyFornecedor').value;
-                req.dataDespesa = document.getElementById('stephannyData').value;
-                req.docNumero = document.getElementById('stephannyDocNum').value;
-                req.itens = getItensStephanny();
-                req.valorTotal = parseFloat(document.getElementById('stephannyTotal').value) || 0;
-                req.motivoDespesa = document.getElementById('stephannyMotivo').value;
-                req.assinaturaStephanny = document.getElementById('stephannyAssinatura').value;
+                req.fornecedor = document.getElementById('consumiveisFornecedor').value;
+                req.dataDespesa = document.getElementById('consumiveisData').value;
+                req.docNumero = document.getElementById('consumiveisDocNum').value;
+                req.itens = getItensConsumiveis();
+                req.valorTotal = parseFloat(document.getElementById('consumiveisTotal').value) || 0;
+                req.motivoDespesa = document.getElementById('consumiveisMotivo').value;
+                req.assinaturaConsumiveis = document.getElementById('consumiveisAssinatura').value;
                 req.status = 'aguardando_cg';
-                adicionarHistorico(req, `Stephanny registou despesas: Fornecedor ${req.fornecedor}, Valor ${formatarMoeda(req.valorTotal)}`);
-                notificar('Despesas registadas. Enviado para Controlo Gestão.', 'success');
+                adicionarHistorico(req, `Consumíveis registou despesas: Fornecedor ${req.fornecedor}, Valor ${formatarMoeda(req.valorTotal)}`);
+                notificar('Despesas registadas. Enviado para Controlo Gestão (dircg@accordgrouplda.com).', 'success');
                 salvar();
-                fecharModal('modalStephannyDespesas');
+                fecharModal('modalConsumiveisDespesas');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
                 carregarDashboard();
@@ -2183,7 +2257,7 @@
                 } else {
                     req.status = 'aguardando_diretor';
                     req.parecerCG = parecer;
-                    adicionarHistorico(req, 'Controlo Gestão aprovou. Enviado para Director Geral.');
+                    adicionarHistorico(req, 'Controlo Gestão aprovou. Enviado para Director Geral (paulo.silva@accordgrouplda.com).');
                     notificar('Controlo Gestão aprovou. Enviado para o Director Geral.', 'success');
                 }
                 salvar();
@@ -2439,7 +2513,7 @@
                 const data = {
                     requisicoes,
                     exportedAt: new Date().toISOString(),
-                    version: '5.0'
+                    version: '7.0'
                 };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -2461,6 +2535,7 @@
                 document.getElementById('mainSystem').style.display = 'block';
                 document.getElementById('sidebarUserName').innerText = usuario.nome;
                 document.getElementById('sidebarUserRole').innerText = usuario.role;
+                document.getElementById('sidebarUserEmail').innerText = usuario.email;
 
                 carregar();
                 renderizarRequisicoes();
@@ -2472,7 +2547,7 @@
                 document.getElementById('currentDate').textContent =
                     new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
-                notificar(`Bem-vindo(a), ${usuario.nome}!`, 'success');
+                notificar(`Bem-vindo(a), ${usuario.nome}! (${usuario.email})`, 'success');
             }
 
             function logout() {
@@ -2502,8 +2577,8 @@
                 document.getElementById('formAvaliacao').addEventListener('submit', salvarAvaliacao);
                 document.getElementById('opcaoResolucao').addEventListener('change', (e) => toggleOpcaoResolucao(e.target.value));
 
-                document.getElementById('formStephannyAutorizacao').addEventListener('submit', salvarStephannyAutorizacao);
-                document.getElementById('formStephannyDespesas').addEventListener('submit', salvarStephannyDespesas);
+                document.getElementById('formConsumiveisAutorizacao').addEventListener('submit', salvarConsumiveisAutorizacao);
+                document.getElementById('formConsumiveisDespesas').addEventListener('submit', salvarConsumiveisDespesas);
                 document.getElementById('formCG').addEventListener('submit', salvarCG);
                 document.getElementById('formDiretor').addEventListener('submit', salvarDiretor);
                 document.getElementById('formFinancas').addEventListener('submit', salvarFinancas);
@@ -2511,7 +2586,7 @@
 
                 const statusSelect = document.getElementById('filterStatus');
                 if (statusSelect) {
-                    const statuses = ['all', 'pendente', 'aguardando_stephanny', 'aguardando_cg', 'aguardando_diretor',
+                    const statuses = ['all', 'pendente', 'aguardando_consumiveis', 'aguardando_cg', 'aguardando_diretor',
                         'aguardando_financas', 'em_execucao', 'aguardando_material', 'aguardando_execucao', 'concluida',
                         'reprovada'
                     ];
@@ -2527,43 +2602,131 @@
                     if (e.key === 'Enter') filtrarRequisicoes();
                 });
 
-                // Dropzone Stephanny
-                const dropzone = document.getElementById('stephannyDropzone');
-                const fileInput = document.getElementById('stephannyFileInput');
-                if (dropzone && fileInput) {
-                    dropzone.addEventListener('click', () => fileInput.click());
-                    dropzone.addEventListener('dragover', e => {
+                // ===== DROPZONE: Requisição =====
+                const dropReq = document.getElementById('dropzoneRequisicao');
+                const fileReq = document.getElementById('requisicaoFileInput');
+                if (dropReq && fileReq) {
+                    dropReq.addEventListener('click', () => fileReq.click());
+                    dropReq.addEventListener('dragover', e => {
                         e.preventDefault();
-                        dropzone.style.borderColor = 'var(--primary)';
-                        dropzone.style.background = 'var(--primary-light)';
+                        dropReq.style.borderColor = 'var(--primary)';
+                        dropReq.style.background = 'var(--primary-light)';
                     });
-                    dropzone.addEventListener('dragleave', () => {
-                        dropzone.style.borderColor = '#ffe0b2';
-                        dropzone.style.background = '#fffcf8';
+                    dropReq.addEventListener('dragleave', () => {
+                        dropReq.style.borderColor = '#ffe0b2';
+                        dropReq.style.background = '#fffcf8';
                     });
-                    dropzone.addEventListener('drop', e => {
+                    dropReq.addEventListener('drop', e => {
                         e.preventDefault();
-                        dropzone.style.borderColor = '#ffe0b2';
-                        dropzone.style.background = '#fffcf8';
+                        dropReq.style.borderColor = '#ffe0b2';
+                        dropReq.style.background = '#fffcf8';
                         const file = e.dataTransfer.files[0];
                         if (file) {
                             const reader = new FileReader();
                             reader.onload = ev => {
-                                stephannyProforma = ev.target.result;
-                                document.getElementById('stephannyFileList').innerHTML =
-                                    `<div class="file-item"><i class="fas fa-file-pdf"></i> ${file.name} - Anexado</div>`;
+                                requisicaoAnexo = { name: file.name, data: ev.target.result };
+                                document.getElementById('requisicaoFileList').innerHTML =
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${file.name}</span><span class="file-remove" onclick="this.parentElement.remove();requisicaoAnexo=null;">✕</span></div>`;
                                 notificar(`Ficheiro "${file.name}" anexado!`, 'success');
                             };
                             reader.readAsDataURL(file);
                         }
                     });
-                    fileInput.addEventListener('change', e => {
+                    fileReq.addEventListener('change', e => {
                         if (e.target.files[0]) {
                             const reader = new FileReader();
                             reader.onload = ev => {
-                                stephannyProforma = ev.target.result;
-                                document.getElementById('stephannyFileList').innerHTML =
-                                    `<div class="file-item"><i class="fas fa-file-pdf"></i> ${e.target.files[0].name} - Anexado</div>`;
+                                requisicaoAnexo = { name: e.target.files[0].name, data: ev.target.result };
+                                document.getElementById('requisicaoFileList').innerHTML =
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${e.target.files[0].name}</span><span class="file-remove" onclick="this.parentElement.remove();requisicaoAnexo=null;">✕</span></div>`;
+                                notificar('Ficheiro anexado!', 'success');
+                            };
+                            reader.readAsDataURL(e.target.files[0]);
+                        }
+                    });
+                }
+
+                // ===== DROPZONE: Avaliação =====
+                const dropAval = document.getElementById('dropzoneAvaliacao');
+                const fileAval = document.getElementById('avaliacaoFileInput');
+                if (dropAval && fileAval) {
+                    dropAval.addEventListener('click', () => fileAval.click());
+                    dropAval.addEventListener('dragover', e => {
+                        e.preventDefault();
+                        dropAval.style.borderColor = 'var(--primary)';
+                        dropAval.style.background = 'var(--primary-light)';
+                    });
+                    dropAval.addEventListener('dragleave', () => {
+                        dropAval.style.borderColor = '#ffe0b2';
+                        dropAval.style.background = '#fffcf8';
+                    });
+                    dropAval.addEventListener('drop', e => {
+                        e.preventDefault();
+                        dropAval.style.borderColor = '#ffe0b2';
+                        dropAval.style.background = '#fffcf8';
+                        const file = e.dataTransfer.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = ev => {
+                                avaliacaoAnexo = { name: file.name, data: ev.target.result };
+                                document.getElementById('avaliacaoFileList').innerHTML =
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${file.name}</span><span class="file-remove" onclick="this.parentElement.remove();avaliacaoAnexo=null;">✕</span></div>`;
+                                notificar(`Ficheiro "${file.name}" anexado!`, 'success');
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                    fileAval.addEventListener('change', e => {
+                        if (e.target.files[0]) {
+                            const reader = new FileReader();
+                            reader.onload = ev => {
+                                avaliacaoAnexo = { name: e.target.files[0].name, data: ev.target.result };
+                                document.getElementById('avaliacaoFileList').innerHTML =
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${e.target.files[0].name}</span><span class="file-remove" onclick="this.parentElement.remove();avaliacaoAnexo=null;">✕</span></div>`;
+                                notificar('Ficheiro anexado!', 'success');
+                            };
+                            reader.readAsDataURL(e.target.files[0]);
+                        }
+                    });
+                }
+
+                // ===== DROPZONE: Consumíveis =====
+                const dropCons = document.getElementById('consumiveisDropzone');
+                const fileCons = document.getElementById('consumiveisFileInput');
+                if (dropCons && fileCons) {
+                    dropCons.addEventListener('click', () => fileCons.click());
+                    dropCons.addEventListener('dragover', e => {
+                        e.preventDefault();
+                        dropCons.style.borderColor = 'var(--primary)';
+                        dropCons.style.background = 'var(--primary-light)';
+                    });
+                    dropCons.addEventListener('dragleave', () => {
+                        dropCons.style.borderColor = '#ffe0b2';
+                        dropCons.style.background = '#fffcf8';
+                    });
+                    dropCons.addEventListener('drop', e => {
+                        e.preventDefault();
+                        dropCons.style.borderColor = '#ffe0b2';
+                        dropCons.style.background = '#fffcf8';
+                        const file = e.dataTransfer.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = ev => {
+                                consumiveisProforma = { name: file.name, data: ev.target.result };
+                                document.getElementById('consumiveisFileList').innerHTML =
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${file.name}</span><span class="file-remove" onclick="this.parentElement.remove();consumiveisProforma=null;">✕</span></div>`;
+                                notificar(`Ficheiro "${file.name}" anexado!`, 'success');
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                    fileCons.addEventListener('change', e => {
+                        if (e.target.files[0]) {
+                            const reader = new FileReader();
+                            reader.onload = ev => {
+                                consumiveisProforma = { name: e.target.files[0].name, data: ev.target.result };
+                                document.getElementById('consumiveisFileList').innerHTML =
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${e.target.files[0].name}</span><span class="file-remove" onclick="this.parentElement.remove();consumiveisProforma=null;">✕</span></div>`;
                                 notificar('Proforma anexada!', 'success');
                             };
                             reader.readAsDataURL(e.target.files[0]);
@@ -2571,35 +2734,35 @@
                     });
                 }
 
-                // Dropzone Proforma
-                const dropzoneProforma = document.getElementById('dropzoneProforma');
-                const proformaInput = document.getElementById('proformaInput');
-                if (dropzoneProforma && proformaInput) {
-                    dropzoneProforma.addEventListener('click', () => proformaInput.click());
-                    dropzoneProforma.addEventListener('dragover', e => {
+                // ===== DROPZONE: Proforma =====
+                const dropProforma = document.getElementById('dropzoneProforma');
+                const fileProforma = document.getElementById('proformaInput');
+                if (dropProforma && fileProforma) {
+                    dropProforma.addEventListener('click', () => fileProforma.click());
+                    dropProforma.addEventListener('dragover', e => {
                         e.preventDefault();
-                        dropzoneProforma.style.borderColor = 'var(--primary)';
+                        dropProforma.style.borderColor = 'var(--primary)';
                     });
-                    dropzoneProforma.addEventListener('drop', e => {
+                    dropProforma.addEventListener('drop', e => {
                         e.preventDefault();
                         const file = e.dataTransfer.files[0];
                         if (file) {
                             const reader = new FileReader();
                             reader.onload = ev => {
-                                stephannyProforma = ev.target.result;
+                                consumiveisProforma = { name: file.name, data: ev.target.result };
                                 document.getElementById('proformaList').innerHTML =
-                                    `<div class="file-item">${file.name} - Anexado</div>`;
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${file.name}</span><span class="file-remove" onclick="this.parentElement.remove();consumiveisProforma=null;">✕</span></div>`;
                             };
                             reader.readAsDataURL(file);
                         }
                     });
-                    proformaInput.addEventListener('change', e => {
+                    fileProforma.addEventListener('change', e => {
                         if (e.target.files[0]) {
                             const reader = new FileReader();
                             reader.onload = ev => {
-                                stephannyProforma = ev.target.result;
+                                consumiveisProforma = { name: e.target.files[0].name, data: ev.target.result };
                                 document.getElementById('proformaList').innerHTML =
-                                    `<div class="file-item">${e.target.files[0].name} - Anexado</div>`;
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${e.target.files[0].name}</span><span class="file-remove" onclick="this.parentElement.remove();consumiveisProforma=null;">✕</span></div>`;
                             };
                             reader.readAsDataURL(e.target.files[0]);
                         }
@@ -2612,16 +2775,16 @@
                 login,
                 logout,
                 abrirAvaliacao,
-                abrirStephannyAutorizacao,
-                abrirStephannyDespesas,
+                abrirConsumiveisAutorizacao,
+                abrirConsumiveisDespesas,
                 abrirCG,
                 abrirDiretor,
                 abrirFinancas,
                 abrirExecucao,
                 abrirConfirmacao,
                 enviarConfirmacao,
-                adicionarItemStephanny,
-                calcularTotalStephanny,
+                adicionarItemConsumiveis,
+                calcularTotalConsumiveis,
                 filtrarRequisicoes,
                 filtrarPorStatus,
                 fecharModal,
