@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kero SIR - Gestão de Manutenção Completa</title>
+    <title>Kero SIR - Gestão de Manutenção</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ========== RESET & BASE - TONS DE LARANJA ========== */
@@ -71,6 +71,11 @@
             max-width: 500px;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.6s ease;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .kero-logo {
             width: 80px;
@@ -192,33 +197,6 @@
             font-weight: 600;
         }
 
-        .sidebar-user {
-            padding: 16px 24px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            margin-top: auto;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .sidebar-user .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-        .sidebar-user .user-name {
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .sidebar-user .user-role {
-            font-size: 11px;
-            opacity: 0.7;
-        }
-
         /* ========== MAIN CONTENT ========== */
         .main-content {
             margin-left: 270px;
@@ -239,6 +217,11 @@
             border-radius: var(--radius);
             box-shadow: var(--card-shadow);
         }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
         .header h1 {
             font-size: 24px;
             font-weight: 700;
@@ -250,12 +233,46 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
             flex-wrap: wrap;
         }
         .header-actions .date {
             color: #666;
             font-size: 14px;
+        }
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px 6px 10px;
+            background: var(--primary-light);
+            border-radius: 30px;
+            border: 2px solid var(--primary-100);
+        }
+        .header-user .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .header-user .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .header-user .user-info .name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        .header-user .user-info .email {
+            font-size: 10px;
+            color: #888;
         }
         .btn {
             padding: 10px 20px;
@@ -307,6 +324,15 @@
         .btn-warning:hover {
             background: #f57f17;
         }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
 
         .menu-toggle {
             display: none;
@@ -341,10 +367,22 @@
             cursor: pointer;
             transition: var(--transition);
             box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 50%, rgba(255,152,0,0.05));
+            pointer-events: none;
         }
         .kpi-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(255, 152, 0, 0.15);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(255, 152, 0, 0.2);
         }
         .kpi-card .kpi-info h4 {
             color: #888;
@@ -371,6 +409,10 @@
             padding: 24px;
             margin-bottom: 24px;
             box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+        .card:hover {
+            box-shadow: 0 8px 30px rgba(230, 81, 0, 0.1);
         }
         .card-header {
             display: flex;
@@ -379,6 +421,8 @@
             margin-bottom: 20px;
             padding-bottom: 14px;
             border-bottom: 2px solid var(--primary-light);
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .card-title {
             font-size: 18px;
@@ -447,20 +491,26 @@
             text-align: left;
             font-weight: 600;
             color: var(--primary-dark);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         td {
             padding: 12px 14px;
             border-bottom: 1px solid #ffe0b2;
+            vertical-align: middle;
         }
         tr {
             transition: var(--transition);
         }
         tr:hover {
             background: var(--primary-light);
-            cursor: pointer;
         }
-        tr:hover td {
-            background: transparent;
+
+        .btn-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
         /* ========== ACTIVITY LIST ========== */
@@ -519,6 +569,10 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(255, 152, 0, 0.12);
             background: white;
+        }
+        .form-control:disabled {
+            background: #f0f0f0;
+            cursor: not-allowed;
         }
         select.form-control {
             appearance: none;
@@ -593,6 +647,11 @@
             color: var(--danger);
             cursor: pointer;
             font-weight: 700;
+            margin-left: 10px;
+        }
+        .file-item .file-download {
+            color: var(--primary);
+            cursor: pointer;
             margin-left: 10px;
         }
 
@@ -693,14 +752,19 @@
         }
 
         /* ========== TOAST ========== */
-        .toast {
+        .toast-container {
             position: fixed;
             bottom: 30px;
             right: 30px;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
             padding: 16px 24px;
             border-radius: 12px;
             color: white;
-            z-index: 100000;
             animation: slideIn 0.4s ease;
             box-shadow: 0 8px 30px rgba(0,0,0,0.2);
             display: flex;
@@ -708,6 +772,7 @@
             gap: 12px;
             max-width: 400px;
             font-weight: 500;
+            transition: all 0.3s ease;
         }
         .toast-success { background: var(--success); }
         .toast-error { background: var(--danger); }
@@ -803,6 +868,7 @@
                 display: block;
             }
             .header h1 { font-size: 20px; }
+            .header-user .user-info .email { display: none; }
         }
 
         @media (max-width: 480px) {
@@ -867,6 +933,74 @@
             font-size: 13px;
             color: #555;
         }
+
+        /* ========== LOADING ========== */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ========== ANEXOS ========== */
+        .anexos-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .anexo-tag {
+            background: var(--primary-light);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: var(--primary-dark);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            border: 1px solid var(--primary-100);
+        }
+        .anexo-tag:hover {
+            background: var(--primary-100);
+        }
+
+        /* ========== DETALHES REQ ========== */
+        .req-detalhes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 600px) {
+            .req-detalhes-grid { grid-template-columns: 1fr; }
+        }
+        .req-detalhes-grid .label {
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .req-detalhes-grid .value {
+            font-size: 14px;
+        }
+        .historico-item {
+            padding: 8px 12px;
+            border-left: 3px solid var(--primary);
+            margin-bottom: 6px;
+            background: #fafafa;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .historico-item .h-data {
+            font-size: 11px;
+            color: #999;
+        }
     </style>
 </head>
 <body>
@@ -889,9 +1023,11 @@
             </div>
             <div style="margin-top: 12px; font-size: 11px; color: #999; border-top: 1px solid #eee; padding-top: 12px;">
                 <p><strong>Emails:</strong></p>
-                <p>Consumíveis: gescps3@accordgrouplda.com</p>
-                <p>Controlo Gestão: dircg@accordgrouplda.com</p>
+                <p>Consumíveis: stephany.silva@accordgrouplda.com</p>
+                <p>Controlo Gestão: erikson.madureira@accordgrouplda.com</p>
                 <p>Director Geral: paulo.silva@accordgrouplda.com</p>
+                <p>Manutenção: francisco.sandramo@accordgrouplda.com</p>
+                <p>Finanças: liliana.borges@accordgrouplda.com</p>
             </div>
         </div>
     </div>
@@ -906,7 +1042,7 @@
                     <div class="logo-icon"><i class="fas fa-tools"></i></div>
                     <div>
                         <h2>Kero SIR</h2>
-                        <small>Manutenção Completa</small>
+                        <small>Manutenção</small>
                     </div>
                 </div>
                 <ul class="sidebar-menu">
@@ -925,27 +1061,25 @@
                         <span class="icon">📈</span> Relatórios
                     </li>
                 </ul>
-                <div class="sidebar-user">
-                    <div class="avatar"><i class="fas fa-user"></i></div>
-                    <div>
-                        <div class="user-name" id="sidebarUserName">Usuário</div>
-                        <div class="user-role" id="sidebarUserRole">Role</div>
-                        <div style="font-size:10px; opacity:0.6;" id="sidebarUserEmail"></div>
-                    </div>
-                </div>
             </nav>
 
             <!-- MAIN CONTENT -->
             <div class="main-content">
                 <!-- Header -->
                 <div class="header">
-                    <div style="display:flex; align-items:center; gap:14px;">
+                    <div class="header-left">
                         <button class="menu-toggle" id="menuToggle">☰</button>
                         <h1 id="pageTitle">📊 Dashboard</h1>
                     </div>
                     <div class="header-actions">
                         <span class="date" id="currentDate"></span>
-                        <button class="btn btn-secondary btn-sm" onclick="app.exportarDados()"><i class="fas fa-download"></i> Exportar</button>
+                        <div class="header-user">
+                            <div class="user-avatar" id="headerUserAvatar">JS</div>
+                            <div class="user-info">
+                                <span class="name" id="headerUserName">Usuário</span>
+                                <span class="email" id="headerUserEmail">email@accordgrouplda.com</span>
+                            </div>
+                        </div>
                         <button class="btn btn-danger btn-sm" onclick="app.logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
                     </div>
                 </div>
@@ -1014,12 +1148,14 @@
                                     <input type="text" id="filterSearch" class="form-control" placeholder="Código ou equipamento...">
                                 </div>
                                 <button class="btn btn-primary btn-sm" onclick="app.filtrarRequisicoes()" style="width:100%;">Aplicar Filtros</button>
+                                <button class="btn btn-secondary btn-sm" onclick="app.limparFiltros()" style="width:100%; margin-top:8px;">Limpar Filtros</button>
                             </div>
                         </div>
                         <div>
                             <div class="card">
                                 <div class="card-header">
                                     <div class="card-title"><i class="fas fa-clipboard-list"></i> Requisições de Manutenção</div>
+                                    <span id="requisicoesCount" style="font-size:13px; color:#888;">0 registos</span>
                                 </div>
                                 <div class="table-container">
                                     <table>
@@ -1030,6 +1166,7 @@
                                                 <th>Tipo</th>
                                                 <th>Estado</th>
                                                 <th>Valor</th>
+                                                <th>Anexos</th>
                                                 <th>Ações</th>
                                             </tr>
                                         </thead>
@@ -1047,6 +1184,7 @@
                     <div class="card">
                         <div class="card-header">
                             <div class="card-title"><i class="fas fa-check-circle"></i> Pendências para Aprovação</div>
+                            <span id="aprovacoesCount" style="font-size:13px; color:#888;">0 pendências</span>
                         </div>
                         <div class="table-container">
                             <table>
@@ -1057,6 +1195,7 @@
                                         <th>Solicitante</th>
                                         <th>Tipo de Solicitação</th>
                                         <th>Valor</th>
+                                        <th>Anexos</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
@@ -1114,7 +1253,7 @@
                 <span class="close-btn" onclick="app.fecharModal('modalNovaRequisicao')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="formNovaRequisicao">
+                <form id="formNovaRequisicao" novalidate>
                     <div class="form-group">
                         <label>Tipo de Manutenção *</label>
                         <select id="tipoManutencao" class="form-control" required>
@@ -1178,6 +1317,19 @@
         </div>
     </div>
 
+    <!-- MODAL VISUALIZAÇÃO DETALHADA -->
+    <div class="modal" id="modalDetalhes">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-alt"></i> Detalhes da Requisição</h2>
+                <span class="close-btn" onclick="app.fecharModal('modalDetalhes')">&times;</span>
+            </div>
+            <div class="modal-body" id="detalhesConteudo">
+                <!-- Preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL AVALIAÇÃO DO TÉCNICO -->
     <div class="modal" id="modalAvaliacao">
         <div class="modal-content">
@@ -1186,7 +1338,7 @@
                 <span class="close-btn" onclick="app.fecharModal('modalAvaliacao')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="formAvaliacao">
+                <form id="formAvaliacao" novalidate>
                     <input type="hidden" id="avaliacaoId">
                     <div class="form-group">
                         <label>Diagnóstico *</label>
@@ -1207,20 +1359,20 @@
                         <h4 style="color:var(--primary-dark);"><i class="fas fa-exchange-alt"></i> Detalhes da Transferência</h4>
                         <div class="form-group"><label>Origem do Recurso</label><input type="text" id="origemRecurso" class="form-control" placeholder="De onde será transferido?"></div>
                         <div class="form-group"><label>Recurso a Transferir</label><textarea id="detalhesTransferenciaTexto" class="form-control" rows="2" placeholder="Descreva o recurso..."></textarea></div>
-                        <div class="form-group"><label>Valor Estimado (KZ)</label><input type="number" id="valorTransferencia" class="form-control" value="0"></div>
+                        <div class="form-group"><label>Valor Estimado (KZ)</label><input type="number" id="valorTransferencia" class="form-control" value="0" min="0" step="0.01"></div>
                     </div>
 
                     <div id="detalhesConsumo" style="display:none;" class="expense-summary">
                         <h4 style="color:var(--primary-dark);"><i class="fas fa-boxes"></i> Detalhes do Consumo</h4>
                         <div class="form-group"><label>Material a consumir</label><textarea id="detalhesConsumoTexto" class="form-control" rows="2" placeholder="Material do stock..."></textarea></div>
-                        <div class="form-group"><label>Valor Estimado (KZ)</label><input type="number" id="valorConsumo" class="form-control" value="0"></div>
+                        <div class="form-group"><label>Valor Estimado (KZ)</label><input type="number" id="valorConsumo" class="form-control" value="0" min="0" step="0.01"></div>
                     </div>
 
                     <div id="detalhesCompra" style="display:none;" class="expense-summary">
                         <h4 style="color:var(--primary-dark);"><i class="fas fa-file-invoice"></i> Detalhes da Compra</h4>
                         <div class="form-group"><label>Fornecedor</label><input type="text" id="fornecedorCompra" class="form-control" placeholder="Nome do fornecedor"></div>
                         <div class="form-group"><label>Descrição do Material/Serviço</label><textarea id="descricaoCompra" class="form-control" rows="2" placeholder="O que precisa ser comprado..."></textarea></div>
-                        <div class="form-group"><label>Valor Estimado (KZ)</label><input type="number" id="valorCompra" class="form-control" value="0"></div>
+                        <div class="form-group"><label>Valor Estimado (KZ)</label><input type="number" id="valorCompra" class="form-control" value="0" min="0" step="0.01"></div>
                         <div class="form-group">
                             <label>Anexar Proforma/Orçamento</label>
                             <div class="dropzone" id="dropzoneProforma"><i class="fas fa-cloud-upload-alt"></i> Clique para anexar<input type="file" id="proformaInput" style="display:none" accept=".pdf,.jpg,.png"></div>
@@ -1235,6 +1387,7 @@
                     </div>
 
                     <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="app.fecharModal('modalAvaliacao')">Cancelar</button>
                         <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Enviar Avaliação</button>
                     </div>
                 </form>
@@ -1250,7 +1403,7 @@
                 <span class="close-btn" onclick="app.fecharModal('modalConsumiveisAutorizacao')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="formConsumiveisAutorizacao">
+                <form id="formConsumiveisAutorizacao" novalidate>
                     <input type="hidden" id="consumiveisAutorizacaoReqId">
                     <div id="consumiveisAutorizacaoInfo" class="expense-summary"></div>
                     <div class="form-group">
@@ -1270,6 +1423,7 @@
                         <input type="text" id="consumiveisAutorizacaoAssinatura" class="form-control" placeholder="Nome completo" required>
                     </div>
                     <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="app.fecharModal('modalConsumiveisAutorizacao')">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Confirmar</button>
                     </div>
                 </form>
@@ -1285,7 +1439,7 @@
                 <span class="close-btn" onclick="app.fecharModal('modalConsumiveisDespesas')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="formConsumiveisDespesas">
+                <form id="formConsumiveisDespesas" novalidate>
                     <input type="hidden" id="consumiveisDespesasReqId">
                     <div id="consumiveisDespesasInfo" class="expense-summary"></div>
                     <div class="form-group">
@@ -1298,8 +1452,11 @@
                             <input type="date" id="consumiveisData" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label>Nº Documento / Factura</label>
-                            <input type="text" id="consumiveisDocNum" class="form-control" placeholder="Nº da factura">
+                            <label>Tipo de Pagamento</label>
+                            <select id="consumiveisTipoPagamento" class="form-control">
+                                <option value="proforma">📄 Proforma</option>
+                                <option value="factura">🧾 Factura</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">
@@ -1316,8 +1473,8 @@
                         <textarea id="consumiveisMotivo" class="form-control" rows="2" required placeholder="Descreva o motivo da despesa..."></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Anexar Proforma / Orçamento</label>
-                        <div class="dropzone" id="consumiveisDropzone"><i class="fas fa-cloud-upload-alt"></i> Clique ou arraste o ficheiro<input type="file" id="consumiveisFileInput" style="display:none" accept=".pdf,.jpg,.png"></div>
+                        <label>Anexar Comprovativo (Factura/Proforma)</label>
+                        <div class="dropzone" id="consumiveisDropzone"><i class="fas fa-cloud-upload-alt"></i> Clique ou arraste o ficheiro (PDF, JPG, PNG)<input type="file" id="consumiveisFileInput" style="display:none" accept=".pdf,.jpg,.png"></div>
                         <div id="consumiveisFileList"></div>
                     </div>
                     <div class="signature-area">
@@ -1325,6 +1482,7 @@
                         <input type="text" id="consumiveisAssinatura" class="form-control" placeholder="Nome completo" required>
                     </div>
                     <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="app.fecharModal('modalConsumiveisDespesas')">Cancelar</button>
                         <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar para Controlo Gestão</button>
                     </div>
                 </form>
@@ -1340,7 +1498,7 @@
                 <span class="close-btn" onclick="app.fecharModal('modalCG')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="formCG">
+                <form id="formCG" novalidate>
                     <input type="hidden" id="cgReqId">
                     <div id="cgInfo" class="expense-summary"></div>
                     <div class="form-group">
@@ -1360,6 +1518,7 @@
                         <input type="text" id="cgAssinatura" class="form-control" placeholder="Nome completo" required>
                     </div>
                     <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="app.fecharModal('modalCG')">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Confirmar</button>
                     </div>
                 </form>
@@ -1375,7 +1534,7 @@
                 <span class="close-btn" onclick="app.fecharModal('modalDiretor')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="formDiretor">
+                <form id="formDiretor" novalidate>
                     <input type="hidden" id="diretorReqId">
                     <div id="diretorInfo" class="expense-summary"></div>
                     <div class="form-group">
@@ -1395,6 +1554,7 @@
                         <input type="text" id="diretorAssinatura" class="form-control" placeholder="Nome completo" required>
                     </div>
                     <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="app.fecharModal('modalDiretor')">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Confirmar</button>
                     </div>
                 </form>
@@ -1410,7 +1570,7 @@
                 <span class="close-btn" onclick="app.fecharModal('modalFinancas')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="formFinancas">
+                <form id="formFinancas" novalidate>
                     <input type="hidden" id="financasReqId">
                     <div id="financasInfo" class="expense-summary"></div>
                     <div style="text-align:center; margin-bottom:16px;">
@@ -1420,17 +1580,26 @@
                         <label>Confirmar Pagamento</label>
                         <select id="financasStatus" class="form-control" required>
                             <option value="">Selecione</option>
-                            <option value="pago">✅ Pago - Liberar para execução</option>
-                            <option value="nao_pago">❌ Não pago - Aguardar</option>
+                            <option value="pago">✅ Pago - Prosseguir com a execução</option>
+                            <option value="nao_pago">⏳ Não pago - Aguarde</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Nº de Comprovativo / Transferência</label>
-                        <input type="text" id="financasComprovativo" class="form-control" placeholder="Número do comprovativo bancário">
+                        <label>Tipo de Pagamento</label>
+                        <select id="financasTipoPagamento" class="form-control" required>
+                            <option value="">Selecione</option>
+                            <option value="proforma">📄 Proforma</option>
+                            <option value="factura">🧾 Factura</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Data do Pagamento</label>
                         <input type="date" id="financasDataPagamento" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Anexar Comprovativo de Pagamento</label>
+                        <div class="dropzone" id="financasDropzone"><i class="fas fa-cloud-upload-alt"></i> Clique ou arraste o comprovativo (PDF, JPG, PNG)<input type="file" id="financasFileInput" style="display:none" accept=".pdf,.jpg,.png"></div>
+                        <div id="financasFileList"></div>
                     </div>
                     <div class="form-group">
                         <label>Observação</label>
@@ -1441,6 +1610,7 @@
                         <input type="text" id="financasAssinatura" class="form-control" placeholder="Nome completo" required>
                     </div>
                     <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="app.fecharModal('modalFinancas')">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Confirmar Pagamento</button>
                     </div>
                 </form>
@@ -1456,7 +1626,7 @@
                 <span class="close-btn" onclick="app.fecharModal('modalExecucao')">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="formExecucao">
+                <form id="formExecucao" novalidate>
                     <input type="hidden" id="execucaoReqId">
                     <div class="form-group">
                         <label>Relatório de Execução *</label>
@@ -1477,6 +1647,7 @@
                         <textarea id="obsExecucao" class="form-control" rows="2" placeholder="Observações adicionais..."></textarea>
                     </div>
                     <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="app.fecharModal('modalExecucao')">Cancelar</button>
                         <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Finalizar Execução</button>
                     </div>
                 </form>
@@ -1532,7 +1703,7 @@
             <div class="nota-despesa-container">
                 <div class="nota-header">
                     <h1><i class="fas fa-tools"></i> ACCORD GROUP</h1>
-                    <h2>NOTA DE DESPESA / REQUISIÇÃO DE COMPRA</h2>
+                    <h2>NOTA DE DESPESA</h2>
                     <p>Sistema de Gestão de Manutenção - Kero SIR</p>
                 </div>
                 <div id="notaConteudo"></div>
@@ -1547,50 +1718,50 @@
         </div>
     </div>
 
-    <!-- TOAST -->
-    <div id="toastContainer" style="position:fixed; bottom:30px; right:30px; z-index:100000; display:flex; flex-direction:column; gap:10px;"></div>
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
         // ============================================================
         //  APP - SISTEMA COMPLETO DE MANUTENÇÃO
         // ============================================================
         const app = (function() {
-            // ========== PERFIS COM EMAILS ATUALIZADOS ==========
+            // ========== PERFIS COM NOMES CORRETOS ==========
             const perfis = {
                 solicitante: { 
-                    nome: "João Solicitante", 
+                    nome: "Teodoro Tavare", 
                     role: "Solicitante", 
-                    email: "solicitante@accord.com" 
+                    email: "teodoro.tavare@accordgrouplda.com" 
                 },
                 manutencao: { 
-                    nome: "Carlos Técnico", 
+                    nome: "Francisco Sandramo", 
                     role: "Manutenção", 
-                    email: "tecnico@accord.com" 
+                    email: "francisco.sandramo@accordgrouplda.com" 
                 },
                 consumiveis: { 
-                    nome: "Stephanny Alves", 
+                    nome: "Stephany Silva", 
                     role: "Consumíveis", 
-                    email: "gescps3@accordgrouplda.com" 
+                    email: "stephany.silva@accordgrouplda.com" 
                 },
                 cg: { 
-                    nome: "Ana Santos", 
+                    nome: "Erikson Madureira", 
                     role: "Controlo Gestão", 
-                    email: "dircg@accordgrouplda.com" 
+                    email: "erikson.madureira@accordgrouplda.com" 
                 },
                 diretor: { 
-                    nome: "Dr. Paulo Mendes", 
+                    nome: "Paulo Silva", 
                     role: "Director Geral", 
                     email: "paulo.silva@accordgrouplda.com" 
                 },
                 financas: { 
-                    nome: "Maria Costa", 
+                    nome: "Liliana Borges", 
                     role: "Finanças", 
-                    email: "financas@accord.com" 
+                    email: "liliana.borges@accordgrouplda.com" 
                 },
                 admin: { 
                     nome: "Administrador", 
                     role: "Admin", 
-                    email: "admin@accord.com" 
+                    email: "admin@accordgrouplda.com" 
                 }
             };
 
@@ -1600,7 +1771,8 @@
             let filtroStatus = 'all';
             let filtroSearch = '';
             let consumiveisItens = [];
-            let consumiveisProforma = null;
+            let consumiveisAnexo = null;
+            let financasAnexo = null;
             let confirmacaoId = null;
             let nextId = 1;
             let requisicaoAnexo = null;
@@ -1608,17 +1780,25 @@
 
             // ========== PERSISTÊNCIA ==========
             function salvar() {
-                localStorage.setItem('kero_manutencao_v7', JSON.stringify(requisicoes));
+                try {
+                    localStorage.setItem('kero_manutencao_v8', JSON.stringify(requisicoes));
+                } catch (e) {
+                    notificar('Erro ao salvar dados!', 'error');
+                }
             }
 
             function carregar() {
-                const data = localStorage.getItem('kero_manutencao_v7');
-                if (data) {
-                    requisicoes = JSON.parse(data);
-                    requisicoes.forEach(r => {
-                        if (parseInt(r.id) >= nextId) nextId = parseInt(r.id) + 1;
-                    });
-                } else {
+                try {
+                    const data = localStorage.getItem('kero_manutencao_v8');
+                    if (data) {
+                        requisicoes = JSON.parse(data);
+                        requisicoes.forEach(r => {
+                            if (parseInt(r.id) >= nextId) nextId = parseInt(r.id) + 1;
+                        });
+                    } else {
+                        carregarExemplo();
+                    }
+                } catch (e) {
                     carregarExemplo();
                 }
             }
@@ -1635,10 +1815,11 @@
                         descricao: "O equipamento não está a refrigerar adequadamente, temperatura ambiente acima de 28°C.",
                         status: "pendente",
                         data: new Date().toISOString(),
-                        solicitante: "João Solicitante",
-                        email: "solicitante@accord.com",
+                        solicitante: "Teodoro Tavare",
+                        email: "teodoro.tavare@accordgrouplda.com",
                         anexos: [],
-                        historico: [{ data: new Date().toISOString(), usuario: "João Solicitante", acao: "Requisição criada" }]
+                        historico: [{ data: new Date().toISOString(), usuario: "Teodoro Tavare", acao: "Requisição criada" }],
+                        notaDespesa: null
                     },
                     {
                         id: "2",
@@ -1650,45 +1831,21 @@
                         descricao: "Revisão anual programada - troca de baterias e lubrificação geral.",
                         status: "aguardando_consumiveis",
                         data: new Date().toISOString(),
-                        solicitante: "Carlos Logística",
-                        email: "solicitante@accord.com",
+                        solicitante: "Teodoro Tavare",
+                        email: "teodoro.tavare@accordgrouplda.com",
                         diagnostico: "Baterias com desgaste acentuado, necessita substituição.",
                         opcaoResolucao: "precisa_comprar",
                         descricaoCompra: "2 baterias de 48V para empilhador elétrico",
                         valorCompra: 450000,
                         anexos: [],
                         historico: [
-                            { data: new Date().toISOString(), usuario: "João Solicitante", acao: "Requisição criada" },
-                            { data: new Date().toISOString(), usuario: "Carlos Técnico", acao: "Diagnóstico realizado - necessita compra" }
-                        ]
-                    },
-                    {
-                        id: "3",
-                        codigo: "MAN-2026-0003",
-                        equipamento: "Compressor de Ar",
-                        local: "Sede",
-                        tipo: "corretiva",
-                        prioridade: "alta",
-                        descricao: "Compressor fazendo ruído excessivo e perdendo pressão.",
-                        status: "concluida",
-                        data: new Date().toISOString(),
-                        solicitante: "Maria Manutenção",
-                        email: "manutencao@accord.com",
-                        diagnostico: "Válvula de descarga danificada e correia desgastada.",
-                        opcaoResolucao: "com_material",
-                        relatorioExecucao: "Substituída válvula de descarga e correia. Compressor testado e operacional.",
-                        dataExecucao: new Date().toISOString(),
-                        tecnicoResponsavel: "Carlos Técnico",
-                        valorTotal: 85000,
-                        anexos: [],
-                        historico: [
-                            { data: new Date().toISOString(), usuario: "Maria Manutenção", acao: "Requisição criada" },
-                            { data: new Date().toISOString(), usuario: "Carlos Técnico", acao: "Diagnóstico - tem material" },
-                            { data: new Date().toISOString(), usuario: "Carlos Técnico", acao: "Execução concluída" }
-                        ]
+                            { data: new Date().toISOString(), usuario: "Teodoro Tavare", acao: "Requisição criada" },
+                            { data: new Date().toISOString(), usuario: "Francisco Sandramo", acao: "Diagnóstico realizado - necessita compra" }
+                        ],
+                        notaDespesa: null
                     }
                 ];
-                nextId = 4;
+                nextId = 3;
                 salvar();
             }
 
@@ -1735,6 +1892,7 @@
 
             function podeVer(req) {
                 if (usuario.role === 'Solicitante') return req.email === usuario.email;
+                if (usuario.role === 'Admin') return true;
                 return true;
             }
 
@@ -1809,41 +1967,48 @@
                     const search = filtroSearch.toLowerCase();
                     filtradas = filtradas.filter(r =>
                         r.codigo.toLowerCase().includes(search) ||
-                        r.equipamento.toLowerCase().includes(search)
+                        r.equipamento.toLowerCase().includes(search) ||
+                        (r.local && r.local.toLowerCase().includes(search))
                     );
                 }
+
+                filtradas.sort((a, b) => new Date(b.data) - new Date(a.data));
 
                 const start = (pagina - 1) * 10;
                 const itens = filtradas.slice(start, start + 10);
                 const totalPag = Math.ceil(filtradas.length / 10);
 
+                document.getElementById('requisicoesCount').textContent = `${filtradas.length} registos`;
+
                 const tbody = document.getElementById('corpoTabela');
                 tbody.innerHTML = '';
                 if (itens.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999; padding:30px;">Nenhuma requisição encontrada.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#999; padding:30px;">Nenhuma requisição encontrada.</td></tr>`;
                 } else {
                     itens.forEach(req => {
                         const row = tbody.insertRow();
-                        row.onclick = () => verDetalhes(req);
-                        row.insertCell(0).innerHTML = req.codigo;
+                        row.insertCell(0).innerHTML = `<strong>${req.codigo}</strong>`;
                         row.insertCell(1).innerHTML = req.equipamento;
                         row.insertCell(2).innerHTML = `<span class="type-badge type-${req.tipo}">${req.tipo === 'corretiva' ? 'Correctiva' : 'Preventiva'}</span>`;
                         row.insertCell(3).innerHTML = `<span class="status-badge status-${getStatusClass(req.status)}">${getStatusText(req.status)}</span>`;
                         row.insertCell(4).innerHTML = formatarMoeda(req.valorTotal);
-                        row.insertCell(5).innerHTML = getAcoes(req);
+                        row.insertCell(5).innerHTML = renderAnexos(req);
+                        row.insertCell(6).innerHTML = getAcoes(req);
                     });
                 }
 
                 const pagDiv = document.getElementById('paginacao');
                 pagDiv.innerHTML = '';
-                for (let i = 1; i <= totalPag; i++) {
-                    const btn = document.createElement('button');
-                    btn.className = 'pagina-btn';
-                    btn.innerText = i;
-                    if (i === pagina) btn.classList.add('active');
-                    btn.onclick = () => { pagina = i;
-                        renderizarRequisicoes(); };
-                    pagDiv.appendChild(btn);
+                if (totalPag > 1) {
+                    for (let i = 1; i <= totalPag; i++) {
+                        const btn = document.createElement('button');
+                        btn.className = 'pagina-btn';
+                        btn.innerText = i;
+                        if (i === pagina) btn.classList.add('active');
+                        btn.onclick = () => { pagina = i;
+                            renderizarRequisicoes(); };
+                        pagDiv.appendChild(btn);
+                    }
                 }
                 atualizarKPIs();
             }
@@ -1855,18 +2020,21 @@
                 else if (usuario.role === 'Controlo Gestão') pendentes = requisicoes.filter(r => r.status === 'aguardando_cg');
                 else if (usuario.role === 'Director Geral') pendentes = requisicoes.filter(r => r.status === 'aguardando_diretor');
                 else if (usuario.role === 'Finanças') pendentes = requisicoes.filter(r => r.status === 'aguardando_financas');
-                else if (usuario.role === 'Manutenção') pendentes = requisicoes.filter(r => r.status === 'em_execucao');
+                else if (usuario.role === 'Manutenção') pendentes = requisicoes.filter(r => r.status === 'em_execucao' || r.status === 'pendente');
                 else if (usuario.role === 'Solicitante') pendentes = requisicoes.filter(r => r.status === 'aguardando_material' || r.status === 'aguardando_execucao');
+                else if (usuario.role === 'Admin') pendentes = requisicoes.filter(r => r.status !== 'concluida' && r.status !== 'reprovada');
+
+                document.getElementById('aprovacoesCount').textContent = `${pendentes.length} pendências`;
 
                 const tbody = document.getElementById('corpoAprovacoes');
                 tbody.innerHTML = '';
                 if (pendentes.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999; padding:30px;">Nenhuma pendência para aprovação.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#999; padding:30px;">Nenhuma pendência para aprovação.</td></tr>`;
                     return;
                 }
                 pendentes.forEach(req => {
                     const row = tbody.insertRow();
-                    row.insertCell(0).innerHTML = req.codigo;
+                    row.insertCell(0).innerHTML = `<strong>${req.codigo}</strong>`;
                     row.insertCell(1).innerHTML = req.equipamento;
                     row.insertCell(2).innerHTML = req.solicitante;
                     let tipoSol = 'Serviço Interno';
@@ -1875,22 +2043,94 @@
                     else if (req.opcaoResolucao === 'precisa_comprar') tipoSol = 'Compra de Material';
                     row.insertCell(3).innerHTML = tipoSol;
                     row.insertCell(4).innerHTML = formatarMoeda(req.valorTransferencia || req.valorConsumo || req.valorTotal || 0);
-                    row.insertCell(5).innerHTML = getAcoes(req);
+                    row.insertCell(5).innerHTML = renderAnexos(req);
+                    row.insertCell(6).innerHTML = getAcoes(req);
                 });
                 atualizarBadges();
             }
 
+            // ========== RENDER ANEXOS ==========
+            function renderAnexos(req) {
+                let html = '';
+                if (req.anexos && req.anexos.length > 0) {
+                    html += `<div class="anexos-list">`;
+                    req.anexos.forEach((a, idx) => {
+                        html += `<span class="anexo-tag" onclick="app.visualizarAnexo('${req.id}', ${idx})"><i class="fas fa-paperclip"></i> ${a.nome}</span>`;
+                    });
+                    html += `</div>`;
+                }
+                if (req.notaDespesa) {
+                    html += `<span class="anexo-tag" style="background:#e8f5e9;border-color:#a5d6a7;" onclick="app.visualizarNotaDespesa('${req.id}')"><i class="fas fa-file-invoice"></i> Nota Despesa</span>`;
+                }
+                return html || '<span style="color:#ccc;font-size:12px;">-</span>';
+            }
+
+            // ========== VISUALIZAR ANEXO ==========
+            function visualizarAnexo(reqId, idx) {
+                const req = requisicoes.find(r => r.id === reqId);
+                if (!req || !req.anexos || !req.anexos[idx]) return;
+                const anexo = req.anexos[idx];
+                const win = window.open('', '_blank');
+                if (anexo.data.startsWith('data:application/pdf')) {
+                    win.document.write(`<iframe src="${anexo.data}" style="width:100%;height:100vh;border:none;"></iframe>`);
+                } else if (anexo.data.startsWith('data:image')) {
+                    win.document.write(`<img src="${anexo.data}" style="max-width:100%;max-height:100vh;display:block;margin:auto;">`);
+                } else {
+                    win.document.write(`<pre>${anexo.data}</pre>`);
+                }
+                win.document.title = anexo.nome;
+            }
+
+            // ========== VISUALIZAR NOTA DESPESA ==========
+            function visualizarNotaDespesa(reqId) {
+                const req = requisicoes.find(r => r.id === reqId);
+                if (!req || !req.notaDespesa) return;
+                const notaDiv = document.getElementById('notaConteudo');
+                const nd = req.notaDespesa;
+                const itensHtml = (nd.itens || []).map(i =>
+                    `<tr><td>${i.desc}</td><td style="text-align:center">${i.qtd}</td><td style="text-align:right">${formatarMoeda(i.preco)}</td><td style="text-align:right">${formatarMoeda(i.total)}</td></tr>`
+                ).join('');
+
+                const html = `
+                    <div class="nota-detalhes">
+                        <table style="width:100%">
+                            <tr><td style="width:140px"><strong>Nº Requisição:</strong></td><td>${req.codigo}</td></tr>
+                            <tr><td><strong>Data Emissão:</strong></td><td>${formatarData(nd.data || new Date())}</td></tr>
+                            <tr><td><strong>Solicitante:</strong></td><td>${req.solicitante}</td></tr>
+                            <tr><td><strong>Equipamento:</strong></td><td>${req.equipamento}</td></tr>
+                            <tr><td><strong>Fornecedor:</strong></td><td>${nd.fornecedor || 'N/A'}</td></tr>
+                            <tr><td><strong>Tipo Documento:</strong></td><td>${nd.tipoPagamento || 'N/A'}</td></tr>
+                        </table>
+                    </div>
+                    <h3>Detalhes da Despesa</h3>
+                    <table class="nota-itens">
+                        <thead><tr><th>Descrição</th><th style="width:60px">Qtd</th><th style="width:120px">Valor Unit.</th><th style="width:120px">Total</th></tr></thead>
+                        <tbody>${itensHtml || '<tr><td colspan="4">Nenhum item registado</td></tr>'}</tbody>
+                        <tfoot><tr style="background:#f0f0f0"><td colspan="3" style="text-align:right"><strong>TOTAL</strong></td><td style="text-align:right;font-size:18px"><strong>${formatarMoeda(nd.valorTotal)}</strong></td></tr></tfoot>
+                    </table>
+                    <div class="nota-detalhes">
+                        <p><strong>Motivo:</strong> ${nd.motivo || 'N/A'}</p>
+                        <p><strong>Parecer CG:</strong> ${req.parecerCG || 'N/A'}</p>
+                        <p><strong>Parecer Director:</strong> ${req.parecerDiretor || 'N/A'}</p>
+                        <p><strong>Pagamento:</strong> ${nd.pagamentoStatus || 'Pendente'}</p>
+                    </div>
+                `;
+                notaDiv.innerHTML = html;
+                document.getElementById('notaDespesa').style.display = 'block';
+            }
+
             // ========== AÇÕES DOS BOTÕES ==========
             function getAcoes(req) {
-                let btns = '';
+                let btns = `<button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();app.abrirDetalhes('${req.id}')"><i class="fas fa-eye"></i></button>`;
+                
                 if (usuario.role === 'Manutenção' && req.status === 'pendente') {
                     btns += `<button class="btn btn-success btn-sm" onclick="event.stopPropagation();app.abrirAvaliacao('${req.id}')"><i class="fas fa-clipboard-check"></i> Avaliar</button>`;
                 }
                 if (usuario.role === 'Consumíveis' && req.status === 'aguardando_consumiveis') {
                     if (req.opcaoResolucao === 'transferencia') {
-                        btns += `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();app.abrirConsumiveisAutorizacao('${req.id}')"><i class="fas fa-check-circle"></i> Autorizar Transferência</button>`;
+                        btns += `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();app.abrirConsumiveisAutorizacao('${req.id}')"><i class="fas fa-check-circle"></i> Autorizar</button>`;
                     } else if (req.opcaoResolucao === 'precisa_comprar') {
-                        btns += `<button class="btn btn-warning btn-sm" onclick="event.stopPropagation();app.abrirConsumiveisDespesas('${req.id}')"><i class="fas fa-file-invoice"></i> Registo Despesas</button>`;
+                        btns += `<button class="btn btn-warning btn-sm" onclick="event.stopPropagation();app.abrirConsumiveisDespesas('${req.id}')"><i class="fas fa-file-invoice"></i> Despesas</button>`;
                     }
                 }
                 if (usuario.role === 'Controlo Gestão' && req.status === 'aguardando_cg') {
@@ -1908,15 +2148,71 @@
                 if (usuario.role === 'Solicitante' && (req.status === 'aguardando_material' || req.status === 'aguardando_execucao')) {
                     btns += `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();app.abrirConfirmacao('${req.id}')"><i class="fas fa-check-double"></i> Confirmar</button>`;
                 }
-                return btns || '<span style="color:#999;font-size:12px;">-</span>';
+                if (usuario.role === 'Admin') {
+                    btns += `<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();app.excluirRequisicao('${req.id}')"><i class="fas fa-trash"></i></button>`;
+                }
+                return btns;
+            }
+
+            // ========== ABRIR DETALHES ==========
+            function abrirDetalhes(id) {
+                const req = requisicoes.find(r => r.id === id);
+                if (!req) return;
+                
+                let html = `
+                    <div class="req-detalhes-grid">
+                        <div><span class="label">Código</span><div class="value"><strong>${req.codigo}</strong></div></div>
+                        <div><span class="label">Estado</span><div class="value"><span class="status-badge status-${getStatusClass(req.status)}">${getStatusText(req.status)}</span></div></div>
+                        <div><span class="label">Equipamento</span><div class="value">${req.equipamento}</div></div>
+                        <div><span class="label">Local</span><div class="value">${req.local || 'N/A'}</div></div>
+                        <div><span class="label">Tipo</span><div class="value"><span class="type-badge type-${req.tipo}">${req.tipo === 'corretiva' ? 'Correctiva' : 'Preventiva'}</span></div></div>
+                        <div><span class="label">Prioridade</span><div class="value"><span class="priority-badge priority-${req.prioridade}">${req.prioridade || 'N/A'}</span></div></div>
+                        <div><span class="label">Solicitante</span><div class="value">${req.solicitante}</div></div>
+                        <div><span class="label">Data</span><div class="value">${formatarDataHora(req.data)}</div></div>
+                        <div style="grid-column:1/-1;"><span class="label">Descrição</span><div class="value">${req.descricao}</div></div>
+                        ${req.diagnostico ? `<div style="grid-column:1/-1;"><span class="label">Diagnóstico</span><div class="value">${req.diagnostico}</div></div>` : ''}
+                        ${req.valorTotal ? `<div><span class="label">Valor Total</span><div class="value"><strong>${formatarMoeda(req.valorTotal)}</strong></div></div>` : ''}
+                        ${req.relatorioExecucao ? `<div style="grid-column:1/-1;"><span class="label">Relatório de Execução</span><div class="value">${req.relatorioExecucao}</div></div>` : ''}
+                        ${req.tecnicoResponsavel ? `<div><span class="label">Técnico</span><div class="value">${req.tecnicoResponsavel}</div></div>` : ''}
+                    </div>
+                    <div style="margin-top:16px;">
+                        <span class="label">Anexos</span>
+                        <div style="margin-top:4px;">${renderAnexos(req)}</div>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <span class="label">Histórico</span>
+                        <div style="margin-top:4px;max-height:200px;overflow-y:auto;">
+                            ${(req.historico || []).slice().reverse().map(h => 
+                                `<div class="historico-item"><span class="h-data">${formatarDataHora(h.data)}</span> - <strong>${h.usuario}</strong>: ${h.acao}</div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+                        ${getAcoes(req)}
+                    </div>
+                `;
+                
+                document.getElementById('detalhesConteudo').innerHTML = html;
+                abrirModal('modalDetalhes');
+            }
+
+            // ========== EXCLUIR REQUISIÇÃO (ADMIN) ==========
+            function excluirRequisicao(id) {
+                if (!confirm('Tem certeza que deseja excluir esta requisição permanentemente?')) return;
+                requisicoes = requisicoes.filter(r => r.id !== id);
+                salvar();
+                renderizarRequisicoes();
+                renderizarAprovacoes();
+                carregarDashboard();
+                notificar('Requisição excluída com sucesso!', 'info');
             }
 
             // ========== DASHBOARD ==========
             function carregarDashboard() {
                 const div = document.getElementById('atividadesRecentes');
-                const recentes = [...requisicoes].reverse().slice(0, 8);
+                const recentes = [...requisicoes].sort((a, b) => new Date(b.data) - new Date(a.data)).slice(0, 8);
                 div.innerHTML = recentes.map(r => `
-                    <div class="activity-item">
+                    <div class="activity-item" onclick="app.abrirDetalhes('${r.id}')">
                         <div class="activity-icon"><i class="fas fa-clipboard-list"></i></div>
                         <div style="flex:1;">
                             <strong>${r.codigo}</strong> - ${r.equipamento}
@@ -1949,8 +2245,9 @@
                 else if (usuario.role === 'Controlo Gestão') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_cg').length;
                 else if (usuario.role === 'Director Geral') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_diretor').length;
                 else if (usuario.role === 'Finanças') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_financas').length;
-                else if (usuario.role === 'Manutenção') aprovPendentes = requisicoes.filter(r => r.status === 'em_execucao').length;
+                else if (usuario.role === 'Manutenção') aprovPendentes = requisicoes.filter(r => r.status === 'em_execucao' || r.status === 'pendente').length;
                 else if (usuario.role === 'Solicitante') aprovPendentes = requisicoes.filter(r => r.status === 'aguardando_material' || r.status === 'aguardando_execucao').length;
+                else if (usuario.role === 'Admin') aprovPendentes = requisicoes.filter(r => r.status !== 'concluida' && r.status !== 'reprovada').length;
                 document.getElementById('aprovacoesBadge').innerText = aprovPendentes;
             }
 
@@ -1964,50 +2261,38 @@
                 document.getElementById('relTotal').innerText = total;
                 document.getElementById('relConcluidas').innerText = concluidas;
                 document.getElementById('relPendentes').innerText = pendentes;
-                document.getElementById('relValorTotal').innerText = formatarMoeda(valorTotal);
-            }
-
-            // ========== VER DETALHES ==========
-            function verDetalhes(req) {
-                let msg = `📋 REQUISIÇÃO: ${req.codigo}\n`;
-                msg += `Equipamento: ${req.equipamento}\n`;
-                msg += `Local: ${req.local || 'N/A'}\n`;
-                msg += `Estado: ${getStatusText(req.status)}\n`;
-                msg += `Tipo: ${req.tipo === 'corretiva' ? 'Correctiva' : 'Preventiva'}\n`;
-                msg += `Prioridade: ${req.prioridade || 'N/A'}\n`;
-                msg += `Descrição: ${req.descricao}\n`;
-                if (req.anexos && req.anexos.length > 0) {
-                    msg += `\n📎 Anexos: ${req.anexos.length} ficheiro(s) anexado(s)`;
-                }
-                if (req.diagnostico) msg += `\n\nDiagnóstico: ${req.diagnostico}`;
-                if (req.valorTotal) msg += `\nValor Total: ${formatarMoeda(req.valorTotal)}`;
-                if (req.relatorioExecucao) msg += `\n\nRelatório de Execução: ${req.relatorioExecucao}`;
-                if (req.historico && req.historico.length > 0) {
-                    msg += `\n\n📜 Histórico:`;
-                    req.historico.slice(-5).forEach(h => {
-                        msg += `\n  ${formatarDataHora(h.data)} - ${h.usuario}: ${h.acao}`;
-                    });
-                }
-                alert(msg);
+                document.getElementById('relValorTotal').innerHTML = formatarMoeda(valorTotal);
             }
 
             // ========== CRUD: NOVA REQUISIÇÃO ==========
             function novaRequisicao(e) {
                 e.preventDefault();
+                
+                const tipo = document.getElementById('tipoManutencao').value;
+                const equipamento = document.getElementById('equipamento').value.trim();
+                const local = document.getElementById('local').value;
+                const descricao = document.getElementById('descricao').value.trim();
+
+                if (!tipo || !equipamento || !local || !descricao) {
+                    notificar('Preencha todos os campos obrigatórios!', 'error');
+                    return;
+                }
+
                 const nova = {
                     id: String(nextId++),
                     codigo: gerarCodigo(),
-                    tipo: document.getElementById('tipoManutencao').value,
-                    equipamento: document.getElementById('equipamento').value,
-                    local: document.getElementById('local').value,
+                    tipo: tipo,
+                    equipamento: equipamento,
+                    local: local,
                     prioridade: document.getElementById('prioridade').value,
-                    descricao: document.getElementById('descricao').value,
+                    descricao: descricao,
                     status: 'pendente',
                     data: new Date().toISOString(),
                     solicitante: usuario.nome,
                     email: usuario.email,
                     anexos: requisicaoAnexo ? [{ nome: requisicaoAnexo.name, data: requisicaoAnexo.data }] : [],
-                    historico: [{ data: new Date().toISOString(), usuario: usuario.nome, acao: 'Requisição criada' }]
+                    historico: [{ data: new Date().toISOString(), usuario: usuario.nome, acao: 'Requisição criada' }],
+                    notaDespesa: null
                 };
                 requisicoes.unshift(nova);
                 salvar();
@@ -2017,7 +2302,7 @@
                 document.getElementById('requisicaoFileList').innerHTML = '';
                 renderizarRequisicoes();
                 carregarDashboard();
-                notificar(`Requisição ${nova.codigo} criada com sucesso!`, 'success');
+                notificar(`✅ Requisição ${nova.codigo} criada com sucesso!`, 'success');
             }
 
             // ========== AVALIAÇÃO TÉCNICO ==========
@@ -2031,7 +2316,6 @@
                 document.getElementById('proformaList').innerHTML = '';
                 document.getElementById('avaliacaoFileList').innerHTML = '';
                 avaliacaoAnexo = null;
-                consumiveisProforma = null;
                 abrirModal('modalAvaliacao');
             }
 
@@ -2046,8 +2330,17 @@
                 const id = document.getElementById('avaliacaoId').value;
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
-                req.diagnostico = document.getElementById('diagnostico').value;
-                req.opcaoResolucao = document.getElementById('opcaoResolucao').value;
+                
+                const diagnostico = document.getElementById('diagnostico').value.trim();
+                const opcao = document.getElementById('opcaoResolucao').value;
+                
+                if (!diagnostico || !opcao) {
+                    notificar('Preencha o diagnóstico e selecione uma opção de resolução!', 'error');
+                    return;
+                }
+                
+                req.diagnostico = diagnostico;
+                req.opcaoResolucao = opcao;
                 
                 if (avaliacaoAnexo) {
                     if (!req.anexos) req.anexos = [];
@@ -2057,28 +2350,27 @@
                 if (req.opcaoResolucao === 'com_material') {
                     req.status = 'em_execucao';
                     adicionarHistorico(req, 'Técnico tem material, irá executar o serviço directamente');
-                    notificar('Técnico irá executar o serviço directamente.', 'info');
+                    notificar('✅ Técnico irá executar o serviço directamente.', 'info');
                 } else if (req.opcaoResolucao === 'transferencia') {
                     req.origemRecurso = document.getElementById('origemRecurso').value;
                     req.detalhesTransferencia = document.getElementById('detalhesTransferenciaTexto').value;
                     req.valorTransferencia = parseFloat(document.getElementById('valorTransferencia').value) || 0;
                     req.status = 'aguardando_consumiveis';
                     adicionarHistorico(req, 'Solicitação de transferência de recurso. Aguardando autorização dos Consumíveis.');
-                    notificar('Solicitação enviada para Consumíveis (gescps3@accordgrouplda.com) autorizar transferência.', 'info');
+                    notificar('📦 Solicitação enviada para Stephany Silva (stephany.silva@accordgrouplda.com) autorizar transferência.', 'info');
                 } else if (req.opcaoResolucao === 'consumo') {
                     req.detalhesConsumo = document.getElementById('detalhesConsumoTexto').value;
                     req.valorConsumo = parseFloat(document.getElementById('valorConsumo').value) || 0;
                     req.status = 'aguardando_cg';
                     adicionarHistorico(req, 'Solicitação de consumo de stock interno. Aguardando aprovação do Controlo Gestão.');
-                    notificar('Solicitação enviada para Controlo Gestão (dircg@accordgrouplda.com) aprovar consumo.', 'info');
+                    notificar('📊 Solicitação enviada para Erikson Madureira (erikson.madureira@accordgrouplda.com) aprovar consumo.', 'info');
                 } else if (req.opcaoResolucao === 'precisa_comprar') {
                     req.fornecedorCompra = document.getElementById('fornecedorCompra').value;
                     req.descricaoCompra = document.getElementById('descricaoCompra').value;
                     req.valorCompra = parseFloat(document.getElementById('valorCompra').value) || 0;
-                    req.proformaData = consumiveisProforma;
                     req.status = 'aguardando_consumiveis';
                     adicionarHistorico(req, 'Solicitação de compra. Aguardando Consumíveis registar despesas.');
-                    notificar('Requisição enviada para Consumíveis (gescps3@accordgrouplda.com) registar despesas.', 'info');
+                    notificar('📦 Requisição enviada para Stephany Silva (stephany.silva@accordgrouplda.com) registar despesas.', 'info');
                 }
                 salvar();
                 fecharModal('modalAvaliacao');
@@ -2087,7 +2379,7 @@
                 carregarDashboard();
             }
 
-            // ========== CONSUMÍVEIS - AUTORIZAÇÃO (Transferência) ==========
+            // ========== CONSUMÍVEIS - AUTORIZAÇÃO ==========
             function abrirConsumiveisAutorizacao(id) {
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
@@ -2113,16 +2405,23 @@
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
                 const decisao = document.getElementById('consumiveisDecisao').value;
-                const comentario = document.getElementById('consumiveisComentario').value;
+                const comentario = document.getElementById('consumiveisComentario').value.trim();
+                const assinatura = document.getElementById('consumiveisAutorizacaoAssinatura').value.trim();
+
+                if (!decisao || !comentario || !assinatura) {
+                    notificar('Preencha todos os campos!', 'error');
+                    return;
+                }
 
                 if (decisao === 'reprovar') {
                     req.status = 'reprovada';
                     adicionarHistorico(req, `Consumíveis reprovou: ${comentario}`);
-                    notificar('Requisição reprovada por Consumíveis.', 'error');
+                    notificar('❌ Requisição reprovada por Stephany Silva.', 'error');
                 } else {
                     req.status = 'em_execucao';
-                    adicionarHistorico(req, `Consumíveis autorizou transferência. Manutenção pode executar.`);
-                    notificar('Autorização concedida! Manutenção pode executar o serviço.', 'success');
+                    req.assinaturaConsumiveis = assinatura;
+                    adicionarHistorico(req, `Stephany Silva autorizou transferência. Manutenção pode executar.`);
+                    notificar('✅ Autorização concedida! Manutenção pode executar o serviço.', 'success');
                 }
                 salvar();
                 fecharModal('modalConsumiveisAutorizacao');
@@ -2131,16 +2430,16 @@
                 carregarDashboard();
             }
 
-            // ========== CONSUMÍVEIS - DESPESAS (Compra) ==========
+            // ========== CONSUMÍVEIS - DESPESAS ==========
             function adicionarItemConsumiveis() {
                 const idx = consumiveisItens.length;
                 const div = document.createElement('div');
                 div.className = 'item-row';
                 div.innerHTML = `
                     <input type="text" placeholder="Descrição" id="consumivelDesc_${idx}" style="flex:2">
-                    <input type="number" placeholder="Qtd" id="consumivelQtd_${idx}" style="flex:1" value="1">
-                    <input type="number" placeholder="Valor Unit." id="consumivelPreco_${idx}" style="flex:1" onchange="app.calcularTotalConsumiveis()">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove();app.calcularTotalConsumiveis()">✖</button>
+                    <input type="number" placeholder="Qtd" id="consumivelQtd_${idx}" style="flex:1" value="1" min="1">
+                    <input type="number" placeholder="Valor Unit." id="consumivelPreco_${idx}" style="flex:1" min="0" step="0.01" onchange="app.calcularTotalConsumiveis()" oninput="app.calcularTotalConsumiveis()">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove();app.calcularTotalConsumiveis();">✖</button>
                 `;
                 document.getElementById('consumiveisItensList').appendChild(div);
                 consumiveisItens.push(idx);
@@ -2180,11 +2479,11 @@
                 document.getElementById('consumiveisItensList').innerHTML = '';
                 document.getElementById('consumiveisFornecedor').value = '';
                 document.getElementById('consumiveisData').value = new Date().toISOString().slice(0, 10);
-                document.getElementById('consumiveisDocNum').value = '';
+                document.getElementById('consumiveisTipoPagamento').value = 'proforma';
                 document.getElementById('consumiveisMotivo').value = '';
                 document.getElementById('consumiveisTotal').value = '0';
                 document.getElementById('consumiveisAssinatura').value = usuario.nome;
-                consumiveisProforma = null;
+                consumiveisAnexo = null;
                 document.getElementById('consumiveisFileList').innerHTML = '';
                 document.getElementById('consumiveisDespesasInfo').innerHTML = `
                     <strong>Requisição:</strong> ${req.codigo}<br>
@@ -2201,16 +2500,45 @@
                 const id = document.getElementById('consumiveisDespesasReqId').value;
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
-                req.fornecedor = document.getElementById('consumiveisFornecedor').value;
+                
+                const fornecedor = document.getElementById('consumiveisFornecedor').value.trim();
+                const motivo = document.getElementById('consumiveisMotivo').value.trim();
+                const assinatura = document.getElementById('consumiveisAssinatura').value.trim();
+                const itens = getItensConsumiveis();
+                const total = parseFloat(document.getElementById('consumiveisTotal').value) || 0;
+                const tipoPagamento = document.getElementById('consumiveisTipoPagamento').value;
+
+                if (!fornecedor || !motivo || !assinatura || itens.length === 0) {
+                    notificar('Preencha todos os campos obrigatórios e adicione pelo menos um item!', 'error');
+                    return;
+                }
+
+                req.notaDespesa = {
+                    fornecedor: fornecedor,
+                    data: document.getElementById('consumiveisData').value,
+                    tipoPagamento: tipoPagamento,
+                    itens: itens,
+                    valorTotal: total,
+                    motivo: motivo,
+                    assinatura: assinatura,
+                    anexo: consumiveisAnexo,
+                    pagamentoStatus: 'Pendente'
+                };
+                
+                if (consumiveisAnexo) {
+                    if (!req.anexos) req.anexos = [];
+                    req.anexos.push({ nome: consumiveisAnexo.name, data: consumiveisAnexo.data, tipo: 'comprovativo' });
+                }
+                
+                req.fornecedor = fornecedor;
                 req.dataDespesa = document.getElementById('consumiveisData').value;
-                req.docNumero = document.getElementById('consumiveisDocNum').value;
-                req.itens = getItensConsumiveis();
-                req.valorTotal = parseFloat(document.getElementById('consumiveisTotal').value) || 0;
-                req.motivoDespesa = document.getElementById('consumiveisMotivo').value;
-                req.assinaturaConsumiveis = document.getElementById('consumiveisAssinatura').value;
+                req.itens = itens;
+                req.valorTotal = total;
+                req.motivoDespesa = motivo;
+                req.assinaturaConsumiveis = assinatura;
                 req.status = 'aguardando_cg';
-                adicionarHistorico(req, `Consumíveis registou despesas: Fornecedor ${req.fornecedor}, Valor ${formatarMoeda(req.valorTotal)}`);
-                notificar('Despesas registadas. Enviado para Controlo Gestão (dircg@accordgrouplda.com).', 'success');
+                adicionarHistorico(req, `Stephany Silva registou despesas: Fornecedor ${req.fornecedor}, Valor ${formatarMoeda(req.valorTotal)}`);
+                notificar('✅ Despesas registadas. Enviado para Erikson Madureira (erikson.madureira@accordgrouplda.com).', 'success');
                 salvar();
                 fecharModal('modalConsumiveisDespesas');
                 renderizarRequisicoes();
@@ -2247,18 +2575,27 @@
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
                 const decisao = document.getElementById('cgDecisao').value;
-                const parecer = document.getElementById('cgParecer').value;
-                req.assinaturaCG = document.getElementById('cgAssinatura').value;
+                const parecer = document.getElementById('cgParecer').value.trim();
+                const assinatura = document.getElementById('cgAssinatura').value.trim();
+
+                if (!decisao || !parecer || !assinatura) {
+                    notificar('Preencha todos os campos!', 'error');
+                    return;
+                }
+
+                req.assinaturaCG = assinatura;
 
                 if (decisao === 'reprovar') {
                     req.status = 'reprovada';
-                    adicionarHistorico(req, `Controlo Gestão reprovou: ${parecer}`);
-                    notificar('Requisição reprovada pelo Controlo Gestão.', 'error');
+                    if (req.notaDespesa) req.notaDespesa.pagamentoStatus = 'Reprovado CG';
+                    adicionarHistorico(req, `Erikson Madureira reprovou: ${parecer}`);
+                    notificar('❌ Requisição reprovada por Erikson Madureira.', 'error');
                 } else {
                     req.status = 'aguardando_diretor';
                     req.parecerCG = parecer;
-                    adicionarHistorico(req, 'Controlo Gestão aprovou. Enviado para Director Geral (paulo.silva@accordgrouplda.com).');
-                    notificar('Controlo Gestão aprovou. Enviado para o Director Geral.', 'success');
+                    if (req.notaDespesa) req.notaDespesa.pagamentoStatus = 'Aprovado CG';
+                    adicionarHistorico(req, 'Erikson Madureira aprovou. Enviado para Paulo Silva (paulo.silva@accordgrouplda.com).');
+                    notificar('✅ Erikson Madureira aprovou. Enviado para o Director Geral.', 'success');
                 }
                 salvar();
                 fecharModal('modalCG');
@@ -2290,18 +2627,27 @@
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
                 const decisao = document.getElementById('diretorDecisao').value;
-                const parecer = document.getElementById('diretorParecer').value;
-                req.assinaturaDiretor = document.getElementById('diretorAssinatura').value;
+                const parecer = document.getElementById('diretorParecer').value.trim();
+                const assinatura = document.getElementById('diretorAssinatura').value.trim();
+
+                if (!decisao || !parecer || !assinatura) {
+                    notificar('Preencha todos os campos!', 'error');
+                    return;
+                }
+
+                req.assinaturaDiretor = assinatura;
 
                 if (decisao === 'reprovar') {
                     req.status = 'reprovada';
-                    adicionarHistorico(req, `Director Geral reprovou: ${parecer}`);
-                    notificar('Requisição reprovada pelo Director Geral.', 'error');
+                    if (req.notaDespesa) req.notaDespesa.pagamentoStatus = 'Reprovado Director';
+                    adicionarHistorico(req, `Paulo Silva reprovou: ${parecer}`);
+                    notificar('❌ Requisição reprovada por Paulo Silva.', 'error');
                 } else {
                     req.status = 'aguardando_financas';
                     req.parecerDiretor = parecer;
-                    adicionarHistorico(req, 'Director Geral aprovou. Enviado para Finanças.');
-                    notificar('Director Geral aprovou. Aguardando pagamento.', 'success');
+                    if (req.notaDespesa) req.notaDespesa.pagamentoStatus = 'Aprovado Director';
+                    adicionarHistorico(req, 'Paulo Silva aprovou. Enviado para Liliana Borges.');
+                    notificar('✅ Paulo Silva aprovou. Aguardando pagamento.', 'success');
                 }
                 salvar();
                 fecharModal('modalDiretor');
@@ -2323,10 +2669,12 @@
                     <strong>Aprovado por:</strong> ${req.assinaturaDiretor || 'N/A'}
                 `;
                 document.getElementById('financasStatus').value = '';
-                document.getElementById('financasComprovativo').value = '';
+                document.getElementById('financasTipoPagamento').value = '';
                 document.getElementById('financasDataPagamento').value = new Date().toISOString().slice(0, 10);
                 document.getElementById('financasObs').value = '';
                 document.getElementById('financasAssinatura').value = usuario.nome;
+                financasAnexo = null;
+                document.getElementById('financasFileList').innerHTML = '';
                 abrirModal('modalFinancas');
             }
 
@@ -2336,20 +2684,36 @@
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
                 const status = document.getElementById('financasStatus').value;
-                const comprovativo = document.getElementById('financasComprovativo').value;
+                const tipoPagamento = document.getElementById('financasTipoPagamento').value;
                 const dataPagamento = document.getElementById('financasDataPagamento').value;
-                const obs = document.getElementById('financasObs').value;
-                req.assinaturaFinancas = document.getElementById('financasAssinatura').value;
+                const obs = document.getElementById('financasObs').value.trim();
+                const assinatura = document.getElementById('financasAssinatura').value.trim();
+
+                if (!status || !tipoPagamento || !obs || !assinatura) {
+                    notificar('Preencha todos os campos obrigatórios!', 'error');
+                    return;
+                }
 
                 if (status === 'pago') {
+                    if (financasAnexo) {
+                        if (!req.anexos) req.anexos = [];
+                        req.anexos.push({ nome: financasAnexo.name, data: financasAnexo.data, tipo: 'comprovativo_pagamento' });
+                    }
+                    
                     req.status = 'em_execucao';
+                    req.tipoPagamento = tipoPagamento;
                     req.dataPagamento = dataPagamento;
-                    req.comprovativo = comprovativo;
                     req.obsFinanceiras = obs;
-                    adicionarHistorico(req, `Pagamento confirmado. Comprovativo: ${comprovativo}`);
-                    notificar('Pagamento confirmado! Manutenção pode executar o serviço.', 'success');
+                    req.assinaturaFinancas = assinatura;
+                    if (req.notaDespesa) {
+                        req.notaDespesa.pagamentoStatus = 'Pago';
+                        req.notaDespesa.tipoPagamento = tipoPagamento;
+                        req.notaDespesa.dataPagamento = dataPagamento;
+                    }
+                    adicionarHistorico(req, `Pagamento confirmado por Liliana Borges. Tipo: ${tipoPagamento}`);
+                    notificar('✅ Pagamento confirmado! Francisco Sandramo pode executar o serviço.', 'success');
                 } else {
-                    notificar('Pagamento pendente.', 'warning');
+                    notificar('⏳ Pagamento pendente. Aguarde.', 'warning');
                     fecharModal('modalFinancas');
                     return;
                 }
@@ -2377,13 +2741,20 @@
                 const id = document.getElementById('execucaoReqId').value;
                 const req = requisicoes.find(r => r.id === id);
                 if (!req) return;
-                req.relatorioExecucao = document.getElementById('relatorioExecucao').value;
+                
+                const relatorio = document.getElementById('relatorioExecucao').value.trim();
+                if (!relatorio) {
+                    notificar('Preencha o relatório de execução!', 'error');
+                    return;
+                }
+                
+                req.relatorioExecucao = relatorio;
                 req.dataExecucao = document.getElementById('dataExecucao').value;
-                req.tecnicoResponsavel = document.getElementById('tecnicoResponsavel').value;
+                req.tecnicoResponsavel = document.getElementById('tecnicoResponsavel').value || usuario.nome;
                 req.obsExecucao = document.getElementById('obsExecucao').value;
                 req.status = 'aguardando_material';
-                adicionarHistorico(req, 'Manutenção executou o serviço. Aguardando confirmação do solicitante.');
-                notificar('Serviço executado! Aguardando confirmação do solicitante.', 'success');
+                adicionarHistorico(req, 'Francisco Sandramo executou o serviço. Aguardando confirmação de Teodoro Tavare.');
+                notificar('✅ Serviço executado! Aguardando confirmação de Teodoro Tavare.', 'success');
                 salvar();
                 fecharModal('modalExecucao');
                 renderizarRequisicoes();
@@ -2412,22 +2783,27 @@
                 const confirmMaterial = document.getElementById('confirmMaterial').value;
                 const confirmExecucao = document.getElementById('confirmExecucao').value;
                 const comentario = document.getElementById('confirmComentario').value;
-                const assinatura = document.getElementById('solicitanteAssinatura').value;
+                const assinatura = document.getElementById('solicitanteAssinatura').value.trim();
 
                 if (!confirmMaterial || !confirmExecucao) {
                     notificar('Confirme o MATERIAL e a EXECUÇÃO da manutenção.', 'error');
                     return;
                 }
+                if (!assinatura) {
+                    notificar('Por favor, assine o documento.', 'error');
+                    return;
+                }
+                
                 const req = requisicoes.find(r => r.id === confirmacaoId);
                 if (!req) return;
 
                 if (confirmMaterial === 'nao' || confirmExecucao === 'nao') {
                     req.status = 'reprovada';
-                    notificar('Requisição reprovada pelo solicitante.', 'error');
+                    notificar('❌ Requisição reprovada por Teodoro Tavare.', 'error');
                 } else {
                     if (req.status === 'aguardando_material') {
                         req.status = 'aguardando_execucao';
-                        notificar('Material confirmado! Aguardando confirmação da execução.', 'success');
+                        notificar('✅ Material confirmado por Teodoro Tavare! Aguardando confirmação da execução.', 'success');
                         salvar();
                         fecharModal('modalConfirmacao');
                         renderizarRequisicoes();
@@ -2436,12 +2812,13 @@
                     } else if (req.status === 'aguardando_execucao') {
                         req.status = 'concluida';
                         req.dataConclusao = new Date().toISOString();
-                        notificar('🎉 REQUISIÇÃO CONCLUÍDA COM SUCESSO!', 'success');
+                        if (req.notaDespesa) req.notaDespesa.pagamentoStatus = 'Concluído';
+                        notificar('🎉 REQUISIÇÃO CONCLUÍDA COM SUCESSO por Teodoro Tavare!', 'success');
                     }
                 }
                 req.comentarioFinal = comentario;
                 req.assinaturaSolicitante = assinatura;
-                adicionarHistorico(req, `Solicitante confirmou: Material=${confirmMaterial}, Execução=${confirmExecucao}`);
+                adicionarHistorico(req, `Teodoro Tavare confirmou: Material=${confirmMaterial}, Execução=${confirmExecucao}`);
                 salvar();
                 fecharModal('modalConfirmacao');
                 renderizarRequisicoes();
@@ -2453,6 +2830,15 @@
             function filtrarRequisicoes() {
                 filtroStatus = document.getElementById('filterStatus').value;
                 filtroSearch = document.getElementById('filterSearch').value;
+                pagina = 1;
+                renderizarRequisicoes();
+            }
+
+            function limparFiltros() {
+                document.getElementById('filterStatus').value = 'all';
+                document.getElementById('filterSearch').value = '';
+                filtroStatus = 'all';
+                filtroSearch = '';
                 pagina = 1;
                 renderizarRequisicoes();
             }
@@ -2472,10 +2858,14 @@
             function imprimirNotaDespesa() {
                 const id = document.getElementById('financasReqId').value;
                 const req = requisicoes.find(r => r.id === id);
-                if (!req) return;
-
+                if (!req || !req.notaDespesa) {
+                    notificar('Nenhuma nota de despesa encontrada!', 'warning');
+                    return;
+                }
+                
                 const notaDiv = document.getElementById('notaConteudo');
-                const itensHtml = (req.itens || []).map(i =>
+                const nd = req.notaDespesa;
+                const itensHtml = (nd.itens || []).map(i =>
                     `<tr><td>${i.desc}</td><td style="text-align:center">${i.qtd}</td><td style="text-align:right">${formatarMoeda(i.preco)}</td><td style="text-align:right">${formatarMoeda(i.total)}</td></tr>`
                 ).join('');
 
@@ -2483,25 +2873,26 @@
                     <div class="nota-detalhes">
                         <table style="width:100%">
                             <tr><td style="width:140px"><strong>Nº Requisição:</strong></td><td>${req.codigo}</td></tr>
-                            <tr><td><strong>Data Emissão:</strong></td><td>${formatarData(new Date())}</td></tr>
+                            <tr><td><strong>Data Emissão:</strong></td><td>${formatarData(nd.data || new Date())}</td></tr>
                             <tr><td><strong>Solicitante:</strong></td><td>${req.solicitante}</td></tr>
                             <tr><td><strong>Equipamento:</strong></td><td>${req.equipamento}</td></tr>
-                            <tr><td><strong>Local:</strong></td><td>${req.local}</td></tr>
-                            <tr><td><strong>Fornecedor:</strong></td><td>${req.fornecedor || 'N/A'}</td></tr>
-                            <tr><td><strong>Nº Documento:</strong></td><td>${req.docNumero || 'N/A'}</td></tr>
+                            <tr><td><strong>Fornecedor:</strong></td><td>${nd.fornecedor || 'N/A'}</td></tr>
+                            <tr><td><strong>Tipo Documento:</strong></td><td>${nd.tipoPagamento || 'N/A'}</td></tr>
                         </table>
                     </div>
                     <h3>Detalhes da Despesa</h3>
                     <table class="nota-itens">
                         <thead><tr><th>Descrição</th><th style="width:60px">Qtd</th><th style="width:120px">Valor Unit.</th><th style="width:120px">Total</th></tr></thead>
                         <tbody>${itensHtml || '<tr><td colspan="4">Nenhum item registado</td></tr>'}</tbody>
-                        <tfoot><tr style="background:#f0f0f0"><td colspan="3" style="text-align:right"><strong>TOTAL</strong></td><td style="text-align:right;font-size:18px"><strong>${formatarMoeda(req.valorTotal)}</strong></td></tr></tfoot>
+                        <tfoot><tr style="background:#f0f0f0"><td colspan="3" style="text-align:right"><strong>TOTAL</strong></td><td style="text-align:right;font-size:18px"><strong>${formatarMoeda(nd.valorTotal)}</strong></td></tr></tfoot>
                     </table>
                     <div class="nota-detalhes">
-                        <p><strong>Motivo:</strong> ${req.motivoDespesa || 'N/A'}</p>
+                        <p><strong>Motivo:</strong> ${nd.motivo || 'N/A'}</p>
                         <p><strong>Parecer CG:</strong> ${req.parecerCG || 'N/A'}</p>
                         <p><strong>Parecer Director:</strong> ${req.parecerDiretor || 'N/A'}</p>
-                        <p><strong>Pagamento:</strong> Comprovativo ${req.comprovativo || 'N/A'} - ${req.dataPagamento ? formatarData(req.dataPagamento) : 'N/A'}</p>
+                        <p><strong>Status Pagamento:</strong> ${nd.pagamentoStatus || 'Pendente'}</p>
+                        ${nd.comprovativo ? `<p><strong>Comprovativo:</strong> ${nd.comprovativo}</p>` : ''}
+                        ${nd.dataPagamento ? `<p><strong>Data Pagamento:</strong> ${formatarData(nd.dataPagamento)}</p>` : ''}
                     </div>
                 `;
                 notaDiv.innerHTML = html;
@@ -2513,7 +2904,7 @@
                 const data = {
                     requisicoes,
                     exportedAt: new Date().toISOString(),
-                    version: '7.0'
+                    version: '8.0'
                 };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -2522,20 +2913,30 @@
                 a.download = `kero_backup_${new Date().toISOString().slice(0,10)}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
-                notificar('Dados exportados com sucesso!', 'success');
+                notificar('✅ Dados exportados com sucesso!', 'success');
             }
 
-            function exportarPDF() { notificar('Relatório PDF gerado com sucesso!', 'success'); }
-            function exportarExcel() { notificar('Relatório Excel gerado com sucesso!', 'success'); }
+            function exportarPDF() { 
+                notificar('📄 Relatório PDF gerado com sucesso!', 'success'); 
+            }
+            
+            function exportarExcel() { 
+                notificar('📊 Relatório Excel gerado com sucesso!', 'success'); 
+            }
 
             // ========== LOGIN / LOGOUT ==========
             function login(tipo) {
                 usuario = perfis[tipo];
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainSystem').style.display = 'block';
+                
                 document.getElementById('sidebarUserName').innerText = usuario.nome;
                 document.getElementById('sidebarUserRole').innerText = usuario.role;
                 document.getElementById('sidebarUserEmail').innerText = usuario.email;
+                document.getElementById('headerUserName').innerText = usuario.nome;
+                document.getElementById('headerUserEmail').innerText = usuario.email;
+                const avatar = usuario.nome.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.getElementById('headerUserAvatar').innerText = avatar;
 
                 carregar();
                 renderizarRequisicoes();
@@ -2547,7 +2948,7 @@
                 document.getElementById('currentDate').textContent =
                     new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
-                notificar(`Bem-vindo(a), ${usuario.nome}! (${usuario.email})`, 'success');
+                notificar(`👋 Bem-vindo(a), ${usuario.nome}!`, 'success');
             }
 
             function logout() {
@@ -2627,7 +3028,7 @@
                                 requisicaoAnexo = { name: file.name, data: ev.target.result };
                                 document.getElementById('requisicaoFileList').innerHTML =
                                     `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${file.name}</span><span class="file-remove" onclick="this.parentElement.remove();requisicaoAnexo=null;">✕</span></div>`;
-                                notificar(`Ficheiro "${file.name}" anexado!`, 'success');
+                                notificar(`📎 Ficheiro "${file.name}" anexado!`, 'success');
                             };
                             reader.readAsDataURL(file);
                         }
@@ -2639,7 +3040,7 @@
                                 requisicaoAnexo = { name: e.target.files[0].name, data: ev.target.result };
                                 document.getElementById('requisicaoFileList').innerHTML =
                                     `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${e.target.files[0].name}</span><span class="file-remove" onclick="this.parentElement.remove();requisicaoAnexo=null;">✕</span></div>`;
-                                notificar('Ficheiro anexado!', 'success');
+                                notificar('📎 Ficheiro anexado!', 'success');
                             };
                             reader.readAsDataURL(e.target.files[0]);
                         }
@@ -2671,7 +3072,7 @@
                                 avaliacaoAnexo = { name: file.name, data: ev.target.result };
                                 document.getElementById('avaliacaoFileList').innerHTML =
                                     `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${file.name}</span><span class="file-remove" onclick="this.parentElement.remove();avaliacaoAnexo=null;">✕</span></div>`;
-                                notificar(`Ficheiro "${file.name}" anexado!`, 'success');
+                                notificar(`📎 Ficheiro "${file.name}" anexado!`, 'success');
                             };
                             reader.readAsDataURL(file);
                         }
@@ -2683,7 +3084,7 @@
                                 avaliacaoAnexo = { name: e.target.files[0].name, data: ev.target.result };
                                 document.getElementById('avaliacaoFileList').innerHTML =
                                     `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${e.target.files[0].name}</span><span class="file-remove" onclick="this.parentElement.remove();avaliacaoAnexo=null;">✕</span></div>`;
-                                notificar('Ficheiro anexado!', 'success');
+                                notificar('📎 Ficheiro anexado!', 'success');
                             };
                             reader.readAsDataURL(e.target.files[0]);
                         }
@@ -2712,10 +3113,10 @@
                         if (file) {
                             const reader = new FileReader();
                             reader.onload = ev => {
-                                consumiveisProforma = { name: file.name, data: ev.target.result };
+                                consumiveisAnexo = { name: file.name, data: ev.target.result };
                                 document.getElementById('consumiveisFileList').innerHTML =
-                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${file.name}</span><span class="file-remove" onclick="this.parentElement.remove();consumiveisProforma=null;">✕</span></div>`;
-                                notificar(`Ficheiro "${file.name}" anexado!`, 'success');
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${file.name}</span><span class="file-remove" onclick="this.parentElement.remove();consumiveisAnexo=null;">✕</span></div>`;
+                                notificar(`📎 Ficheiro "${file.name}" anexado!`, 'success');
                             };
                             reader.readAsDataURL(file);
                         }
@@ -2724,10 +3125,54 @@
                         if (e.target.files[0]) {
                             const reader = new FileReader();
                             reader.onload = ev => {
-                                consumiveisProforma = { name: e.target.files[0].name, data: ev.target.result };
+                                consumiveisAnexo = { name: e.target.files[0].name, data: ev.target.result };
                                 document.getElementById('consumiveisFileList').innerHTML =
-                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${e.target.files[0].name}</span><span class="file-remove" onclick="this.parentElement.remove();consumiveisProforma=null;">✕</span></div>`;
-                                notificar('Proforma anexada!', 'success');
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${e.target.files[0].name}</span><span class="file-remove" onclick="this.parentElement.remove();consumiveisAnexo=null;">✕</span></div>`;
+                                notificar('📎 Comprovativo anexado!', 'success');
+                            };
+                            reader.readAsDataURL(e.target.files[0]);
+                        }
+                    });
+                }
+
+                // ===== DROPZONE: Finanças =====
+                const dropFin = document.getElementById('financasDropzone');
+                const fileFin = document.getElementById('financasFileInput');
+                if (dropFin && fileFin) {
+                    dropFin.addEventListener('click', () => fileFin.click());
+                    dropFin.addEventListener('dragover', e => {
+                        e.preventDefault();
+                        dropFin.style.borderColor = 'var(--primary)';
+                        dropFin.style.background = 'var(--primary-light)';
+                    });
+                    dropFin.addEventListener('dragleave', () => {
+                        dropFin.style.borderColor = '#ffe0b2';
+                        dropFin.style.background = '#fffcf8';
+                    });
+                    dropFin.addEventListener('drop', e => {
+                        e.preventDefault();
+                        dropFin.style.borderColor = '#ffe0b2';
+                        dropFin.style.background = '#fffcf8';
+                        const file = e.dataTransfer.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = ev => {
+                                financasAnexo = { name: file.name, data: ev.target.result };
+                                document.getElementById('financasFileList').innerHTML =
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${file.name}</span><span class="file-remove" onclick="this.parentElement.remove();financasAnexo=null;">✕</span></div>`;
+                                notificar(`📎 Comprovativo "${file.name}" anexado!`, 'success');
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                    fileFin.addEventListener('change', e => {
+                        if (e.target.files[0]) {
+                            const reader = new FileReader();
+                            reader.onload = ev => {
+                                financasAnexo = { name: e.target.files[0].name, data: ev.target.result };
+                                document.getElementById('financasFileList').innerHTML =
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${e.target.files[0].name}</span><span class="file-remove" onclick="this.parentElement.remove();financasAnexo=null;">✕</span></div>`;
+                                notificar('📎 Comprovativo anexado!', 'success');
                             };
                             reader.readAsDataURL(e.target.files[0]);
                         }
@@ -2749,9 +3194,11 @@
                         if (file) {
                             const reader = new FileReader();
                             reader.onload = ev => {
-                                consumiveisProforma = { name: file.name, data: ev.target.result };
+                                if (!avaliacaoAnexo) {
+                                    avaliacaoAnexo = { name: file.name, data: ev.target.result };
+                                }
                                 document.getElementById('proformaList').innerHTML =
-                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${file.name}</span><span class="file-remove" onclick="this.parentElement.remove();consumiveisProforma=null;">✕</span></div>`;
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${file.name}</span><span class="file-remove" onclick="this.parentElement.remove();avaliacaoAnexo=null;">✕</span></div>`;
                             };
                             reader.readAsDataURL(file);
                         }
@@ -2760,9 +3207,11 @@
                         if (e.target.files[0]) {
                             const reader = new FileReader();
                             reader.onload = ev => {
-                                consumiveisProforma = { name: e.target.files[0].name, data: ev.target.result };
+                                if (!avaliacaoAnexo) {
+                                    avaliacaoAnexo = { name: e.target.files[0].name, data: ev.target.result };
+                                }
                                 document.getElementById('proformaList').innerHTML =
-                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${e.target.files[0].name}</span><span class="file-remove" onclick="this.parentElement.remove();consumiveisProforma=null;">✕</span></div>`;
+                                    `<div class="file-item"><span class="file-name"><i class="fas fa-file"></i> ${e.target.files[0].name}</span><span class="file-remove" onclick="this.parentElement.remove();avaliacaoAnexo=null;">✕</span></div>`;
                             };
                             reader.readAsDataURL(e.target.files[0]);
                         }
@@ -2782,10 +3231,14 @@
                 abrirFinancas,
                 abrirExecucao,
                 abrirConfirmacao,
+                abrirDetalhes,
+                visualizarAnexo,
+                visualizarNotaDespesa,
                 enviarConfirmacao,
                 adicionarItemConsumiveis,
                 calcularTotalConsumiveis,
                 filtrarRequisicoes,
+                limparFiltros,
                 filtrarPorStatus,
                 fecharModal,
                 abrirModal,
@@ -2793,6 +3246,7 @@
                 exportarExcel,
                 exportarDados,
                 imprimirNotaDespesa,
+                excluirRequisicao,
                 configurarEventos
             };
         })();
