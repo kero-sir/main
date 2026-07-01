@@ -1729,9 +1729,9 @@
             // ========== PERFIS COM NOMES CORRETOS ==========
             const perfis = {
                 solicitante: { 
-                    nome: "Teodoro Tavare", 
+                    nome: "Teodoro Tavaress", 
                     role: "Solicitante", 
-                    email: "teodoro.tavare@accordgrouplda.com" 
+                    email: "teodoro.Tavaress@accordgrouplda.com" 
                 },
                 manutencao: { 
                     nome: "Francisco Sandramo", 
@@ -1823,10 +1823,10 @@
                         descricao: "O equipamento não está a refrigerar adequadamente, temperatura ambiente acima de 28°C.",
                         status: "pendente",
                         data: new Date().toISOString(),
-                        solicitante: "Teodoro Tavare",
-                        email: "teodoro.tavare@accordgrouplda.com",
+                        solicitante: "Teodoro Tavaress",
+                        email: "teodoro.tavaress@accordgrouplda.com",
                         anexos: [],
-                        historico: [{ data: new Date().toISOString(), usuario: "Teodoro Tavare", acao: "Requisição criada" }],
+                        historico: [{ data: new Date().toISOString(), usuario: "Teodoro Tavares", acao: "Requisição criada" }],
                         notaDespesa: null
                     },
                     {
@@ -1839,15 +1839,15 @@
                         descricao: "Revisão anual programada - troca de baterias e lubrificação geral.",
                         status: "aguardando_consumiveis",
                         data: new Date().toISOString(),
-                        solicitante: "Teodoro Tavare",
-                        email: "teodoro.tavare@accordgrouplda.com",
+                        solicitante: "Teodoro Tavares",
+                        email: "teodoro.Tavares@accordgrouplda.com",
                         diagnostico: "Baterias com desgaste acentuado, necessita substituição.",
                         opcaoResolucao: "precisa_comprar",
                         descricaoCompra: "2 baterias de 48V para empilhador elétrico",
                         valorCompra: 450000,
                         anexos: [],
                         historico: [
-                            { data: new Date().toISOString(), usuario: "Teodoro Tavare", acao: "Requisição criada" },
+                            { data: new Date().toISOString(), usuario: "Teodoro Tavares", acao: "Requisição criada" },
                             { data: new Date().toISOString(), usuario: "Francisco Sandramo", acao: "Diagnóstico realizado - necessita compra" }
                         ],
                         notaDespesa: null
@@ -2795,8 +2795,8 @@
                 req.tecnicoResponsavel = document.getElementById('tecnicoResponsavel').value || usuario.nome;
                 req.obsExecucao = document.getElementById('obsExecucao').value;
                 req.status = 'aguardando_material';
-                adicionarHistorico(req, 'Francisco Sandramo executou o serviço. Aguardando confirmação de Teodoro Tavare.');
-                notificar('✅ Serviço executado! Aguardando confirmação de Teodoro Tavare.', 'success');
+                adicionarHistorico(req, 'Francisco Sandramo executou o serviço. Aguardando confirmação de Teodoro Tavares.');
+                notificar('✅ Serviço executado! Aguardando confirmação de Teodoro Tavares.', 'success');
                 salvar();
                 fecharModal('modalExecucao');
                 renderizarRequisicoes();
@@ -2841,11 +2841,11 @@
 
                 if (confirmMaterial === 'nao' || confirmExecucao === 'nao') {
                     req.status = 'reprovada';
-                    notificar('❌ Requisição reprovada por Teodoro Tavare.', 'error');
+                    notificar('❌ Requisição reprovada por Teodoro Tavares.', 'error');
                 } else {
                     if (req.status === 'aguardando_material') {
                         req.status = 'aguardando_execucao';
-                        notificar('✅ Material confirmado por Teodoro Tavare! Aguardando confirmação da execução.', 'success');
+                        notificar('✅ Material confirmado por Teodoro Tavares! Aguardando confirmação da execução.', 'success');
                         salvar();
                         fecharModal('modalConfirmacao');
                         renderizarRequisicoes();
@@ -2855,12 +2855,12 @@
                         req.status = 'concluida';
                         req.dataConclusao = new Date().toISOString();
                         if (req.notaDespesa) req.notaDespesa.pagamentoStatus = 'Concluído';
-                        notificar('🎉 REQUISIÇÃO CONCLUÍDA COM SUCESSO por Teodoro Tavare!', 'success');
+                        notificar('🎉 REQUISIÇÃO CONCLUÍDA COM SUCESSO por Teodoro Tavares!', 'success');
                     }
                 }
                 req.comentarioFinal = comentario;
                 req.assinaturaSolicitante = assinatura;
-                adicionarHistorico(req, `Teodoro Tavare confirmou: Material=${confirmMaterial}, Execução=${confirmExecucao}`);
+                adicionarHistorico(req, `Teodoro Tavares confirmou: Material=${confirmMaterial}, Execução=${confirmExecucao}`);
                 salvar();
                 fecharModal('modalConfirmacao');
                 renderizarRequisicoes();
