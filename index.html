@@ -1773,16 +1773,16 @@
 
     <script>
         // ============================================================
-        //  APP - CONFIGURAÇÃO COMPLETA COM OS DADOS FORNECIDOS
+        //  APP - CONFIGURAÇÃO COMPLETA
         // ============================================================
         const app = (function() {
-            // ========== 🔴 CONFIGURAÇÕES ==========
+            // ========== CONFIGURAÇÕES ==========
             const CONFIG = {
                 // ID de aplicação (cliente)
                 clientId: "3df93492-9d7b-4fa0-bbb3-cbe17aa86096",
                 // ID do diretório (inquilino)
                 tenantId: "917dfbfd-7aa2-40f8-ba23-b5b213b322f7",
-                // URL do SharePoint (fornecido)
+                // URL do SharePoint
                 sharepointSite: "https://accordgroupslda.sharepoint.com/sites/SIR",
                 // Nome da lista no SharePoint
                 sharepointList: "RequisicoesManutencao"
@@ -1952,7 +1952,6 @@
                 const token = await getAccessToken();
                 if (!token) throw new Error('Não foi possível obter token de acesso');
 
-                // Obter site ID
                 const siteId = await getSiteId();
 
                 let url;
@@ -2007,7 +2006,6 @@
                         listaId = list.id;
                         return list.id;
                     }
-                    // Criar lista
                     return await criarLista();
                 } catch (e) {
                     console.error('Erro ao obter lista:', e);
@@ -2102,12 +2100,10 @@
                         setStatusSync('sync', `${requisicoes.length} registos`);
                         notificar(`✅ ${requisicoes.length} requisições carregadas do SharePoint`, 'success');
                     } else {
-                        // Carregar exemplos
                         await carregarExemploSharePoint();
                     }
                 } catch (error) {
                     console.error('Erro ao carregar do SharePoint:', error);
-                    // Fallback para localStorage
                     carregarLocalStorage();
                     setStatusSync('error', 'Offline - dados locais');
                     notificar('⚠️ A usar dados locais. Não foi possível conectar ao SharePoint.', 'warning');
@@ -2169,7 +2165,6 @@
                     }
                 }
                 
-                // Recarregar dados
                 await carregarDadosSharePoint();
             }
 
