@@ -4,9 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kero SIR - Gestão de Manutenção</title>
+    
+    <!-- MSAL.js -->
+    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* ========== RESET & BASE - TONS DE LARANJA ========== */
+        /* ========== RESET & BASE ========== */
         * {
             margin: 0;
             padding: 0;
@@ -88,24 +94,55 @@
             justify-content: center;
         }
         .kero-logo i { font-size: 40px; color: white; }
-        .demo-btn {
-            background: var(--primary-light);
-            padding: 8px 16px;
-            border: 2px solid var(--primary-100);
-            border-radius: 8px;
-            margin: 5px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--primary-dark);
-        }
-        .demo-btn:hover {
+        
+        .login-btn {
             background: var(--primary);
             color: white;
-            border-color: var(--primary);
+            border: none;
+            padding: 14px 40px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .login-btn:hover {
+            background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+            box-shadow: 0 8px 25px rgba(230, 81, 0, 0.3);
+        }
+        .login-btn i { font-size: 20px; }
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .login-loading {
+            display: none;
+            margin: 10px 0;
+        }
+        .login-loading .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-error {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
         }
 
         /* ========== MAIN LAYOUT ========== */
@@ -333,6 +370,14 @@
             background: var(--primary);
             color: white;
         }
+        .btn-sincronizar {
+            background: #1976d2;
+            color: white;
+        }
+        .btn-sincronizar:hover {
+            background: #1565c0;
+            transform: translateY(-2px);
+        }
 
         .menu-toggle {
             display: none;
@@ -369,16 +414,6 @@
             box-shadow: var(--card-shadow);
             position: relative;
             overflow: hidden;
-        }
-        .kpi-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, transparent 50%, rgba(255,152,0,0.05));
-            pointer-events: none;
         }
         .kpi-card:hover {
             transform: translateY(-4px) scale(1.02);
@@ -442,13 +477,13 @@
             display: inline-block;
         }
         .status-pendente { background: #fff3e0; color: #E65100; }
-        .status-aguardando-consumiveis { background: #fce4ec; color: #c62828; }
-        .status-aguardando-cg { background: #fff8e1; color: #F57F17; }
-        .status-aguardando-diretor { background: #e3f2fd; color: #1565c0; }
-        .status-aguardando-financas { background: #f3e5f5; color: #7B1FA2; }
-        .status-em-execucao { background: #e8f5e9; color: #2E7D32; }
-        .status-aguardando-material { background: #fff3e0; color: #E65100; }
-        .status-aguardando-execucao { background: #e8f5e9; color: #2E7D32; }
+        .status-aguardando_consumiveis { background: #fce4ec; color: #c62828; }
+        .status-aguardando_cg { background: #fff8e1; color: #F57F17; }
+        .status-aguardando_diretor { background: #e3f2fd; color: #1565c0; }
+        .status-aguardando_financas { background: #f3e5f5; color: #7B1FA2; }
+        .status-em_execucao { background: #e8f5e9; color: #2E7D32; }
+        .status-aguardando_material { background: #fff3e0; color: #E65100; }
+        .status-aguardando_execucao { background: #e8f5e9; color: #2E7D32; }
         .status-concluida { background: var(--primary); color: white; }
         .status-reprovada { background: #ef9a9a; color: #c62828; }
         .status-aberta { background: #d4edda; color: #155724; }
@@ -934,22 +969,6 @@
             color: #555;
         }
 
-        /* ========== LOADING ========== */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ========== ANEXOS ========== */
         .anexos-list {
             display: flex;
             gap: 8px;
@@ -971,7 +990,6 @@
             background: var(--primary-100);
         }
 
-        /* ========== DETALHES REQ ========== */
         .req-detalhes-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1001,6 +1019,30 @@
             font-size: 11px;
             color: #999;
         }
+
+        .sharepoint-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #666;
+            padding: 4px 12px;
+            background: #f0f0f0;
+            border-radius: 12px;
+        }
+        .sharepoint-status.sync { background: #e8f5e9; color: #2e7d32; }
+        .sharepoint-status.sync i { color: #2e7d32; }
+        .sharepoint-status.error { background: #ffebee; color: #c62828; }
+        .sharepoint-status.error i { color: #c62828; }
+        .sharepoint-status .spinner-small {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
     </style>
 </head>
 <body>
@@ -1012,22 +1054,24 @@
             <h2 style="color: var(--primary-dark);">Kero Manutenção</h2>
             <p style="margin: 8px 0; color: #666;">Sistema de Gestão de Manutenção</p>
             <p style="font-size: 12px; color: #999; margin-bottom: 20px;">ACCORD GROUP</p>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
-                <button class="demo-btn" onclick="app.login('solicitante')">👤 Solicitante</button>
-                <button class="demo-btn" onclick="app.login('manutencao')">🔧 Manutenção</button>
-                <button class="demo-btn" onclick="app.login('consumiveis')">📦 Consumíveis / Compra</button>
-                <button class="demo-btn" onclick="app.login('cg')">📊 Controlo Gestão</button>
-                <button class="demo-btn" onclick="app.login('diretor')">👔 Director Geral</button>
-                <button class="demo-btn" onclick="app.login('financas')">💰 Finanças</button>
-                <button class="demo-btn" onclick="app.login('admin')">👑 Admin</button>
+            
+            <button class="login-btn" id="loginBtn" onclick="app.login()">
+                <i class="fab fa-microsoft"></i> Entrar com Microsoft
+            </button>
+            
+            <div class="login-loading" id="loginLoading">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; color: #666;">A autenticar...</p>
             </div>
-            <div style="margin-top: 12px; font-size: 11px; color: #999; border-top: 1px solid #eee; padding-top: 12px;">
-                <p><strong>Emails:</strong></p>
-                <p>Consumíveis/Compra: stephany.silva@accordgrouplda.com</p>
-                <p>Controlo Gestão: erikson.madureira@accordgrouplda.com</p>
-                <p>Director Geral: paulo.silva@accordgrouplda.com</p>
-                <p>Manutenção: francisco.sandramo@accordgrouplda.com / tiago.miranda@accordgrouplda.com</p>
-                <p>Finanças: liliana.borges@accordgrouplda.com</p>
+            
+            <div class="login-error" id="loginError">
+                <i class="fas fa-exclamation-circle"></i> <span id="loginErrorMsg">Erro ao autenticar</span>
+            </div>
+            
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee; font-size: 11px; color: #999; text-align: left;">
+                <p><strong>🔐 Acesso seguro com Microsoft</strong></p>
+                <p style="margin: 4px 0;">Apenas utilizadores autorizados da Accord Group</p>
+                <p style="margin: 4px 0; font-size: 10px;">SharePoint: accordgroupslda.sharepoint.com/sites/SIR</p>
             </div>
         </div>
     </div>
@@ -1072,9 +1116,15 @@
                         <h1 id="pageTitle">📊 Dashboard</h1>
                     </div>
                     <div class="header-actions">
+                        <span class="sharepoint-status" id="spStatus">
+                            <i class="fas fa-cloud"></i> <span id="spStatusText">A carregar...</span>
+                        </span>
+                        <button class="btn btn-sincronizar btn-sm" onclick="app.sincronizarSharePoint()">
+                            <i class="fas fa-sync-alt"></i> Sincronizar
+                        </button>
                         <span class="date" id="currentDate"></span>
                         <div class="header-user">
-                            <div class="user-avatar" id="headerUserAvatar">JS</div>
+                            <div class="user-avatar" id="headerUserAvatar">U</div>
                             <div class="user-info">
                                 <span class="name" id="headerUserName">Usuário</span>
                                 <span class="email" id="headerUserEmail">email@accordgrouplda.com</span>
@@ -1243,7 +1293,7 @@
         </div>
     </div>
 
-    <!-- ===== MODALS ===== -->
+    <!-- ===== MODAIS ===== -->
 
     <!-- MODAL NOVA REQUISIÇÃO -->
     <div class="modal" id="modalNovaRequisicao">
@@ -1395,11 +1445,11 @@
         </div>
     </div>
 
-    <!-- MODAL CONSUMÍVEIS - AUTORIZAÇÃO (Transferência) -->
+    <!-- MODAL CONSUMÍVEIS - AUTORIZAÇÃO -->
     <div class="modal" id="modalConsumiveisAutorizacao">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-check-circle"></i> Consumíveis / Compra - Autorização de Transferência</h2>
+                <h2><i class="fas fa-check-circle"></i> Consumíveis / Compra - Autorização</h2>
                 <span class="close-btn" onclick="app.fecharModal('modalConsumiveisAutorizacao')">&times;</span>
             </div>
             <div class="modal-body">
@@ -1431,11 +1481,11 @@
         </div>
     </div>
 
-    <!-- MODAL CONSUMÍVEIS - DESPESAS (Compra) -->
+    <!-- MODAL CONSUMÍVEIS - DESPESAS -->
     <div class="modal" id="modalConsumiveisDespesas">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-file-invoice"></i> Nota de Despesa / Requisição de Compra</h2>
+                <h2><i class="fas fa-file-invoice"></i> Nota de Despesa / Compra</h2>
                 <span class="close-btn" onclick="app.fecharModal('modalConsumiveisDespesas')">&times;</span>
             </div>
             <div class="modal-body">
@@ -1473,7 +1523,7 @@
                         <textarea id="consumiveisMotivo" class="form-control" rows="2" required placeholder="Descreva o motivo da despesa..."></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Anexar Comprovativo (Factura/Proforma)</label>
+                        <label>Anexar Comprovativo</label>
                         <div class="dropzone" id="consumiveisDropzone"><i class="fas fa-cloud-upload-alt"></i> Clique ou arraste o ficheiro (PDF, JPG, PNG)<input type="file" id="consumiveisFileInput" style="display:none" accept=".pdf,.jpg,.png"></div>
                         <div id="consumiveisFileList"></div>
                     </div>
@@ -1530,7 +1580,7 @@
     <div class="modal" id="modalDiretor">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-user-tie"></i> Director Geral - Aprovação Final</h2>
+                <h2><i class="fas fa-user-tie"></i> Director Geral - Aprovação</h2>
                 <span class="close-btn" onclick="app.fecharModal('modalDiretor')">&times;</span>
             </div>
             <div class="modal-body">
@@ -1622,7 +1672,7 @@
     <div class="modal" id="modalExecucao">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-tools"></i> Manutenção - Execução do Serviço</h2>
+                <h2><i class="fas fa-tools"></i> Manutenção - Execução</h2>
                 <span class="close-btn" onclick="app.fecharModal('modalExecucao')">&times;</span>
             </div>
             <div class="modal-body">
@@ -1659,7 +1709,7 @@
     <div class="modal" id="modalConfirmacao">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-check-double"></i> Confirmação Final do Solicitante</h2>
+                <h2><i class="fas fa-check-double"></i> Confirmação Final</h2>
                 <span class="close-btn" onclick="app.fecharModal('modalConfirmacao')">&times;</span>
             </div>
             <div class="modal-body">
@@ -1693,7 +1743,7 @@
         </div>
     </div>
 
-    <!-- NOTA DE DESPESA / COMPRA -->
+    <!-- NOTA DE DESPESA -->
     <div id="notaDespesa">
         <div style="max-width:800px; margin:0 auto;">
             <div style="text-align:right; margin-bottom:20px;">
@@ -1723,48 +1773,61 @@
 
     <script>
         // ============================================================
-        //  APP - SISTEMA COMPLETO DE MANUTENÇÃO
+        //  APP - CONFIGURAÇÃO COMPLETA COM OS DADOS FORNECIDOS
         // ============================================================
         const app = (function() {
-            // ========== PERFIS COM NOMES CORRETOS ==========
-            const perfis = {
-                solicitante: { 
-                    nome: "Teodoro Tavares", 
-                    role: "Solicitante", 
-                    email: "teodoro.tavares@accordgrouplda.com" 
+            // ========== 🔴 CONFIGURAÇÕES ==========
+            const CONFIG = {
+                // ID de aplicação (cliente)
+                clientId: "3df93492-9d7b-4fa0-bbb3-cbe17aa86096",
+                // ID do diretório (inquilino)
+                tenantId: "917dfbfd-7aa2-40f8-ba23-b5b213b322f7",
+                // URL do SharePoint (fornecido)
+                sharepointSite: "https://accordgroupslda.sharepoint.com/sites/SIR",
+                // Nome da lista no SharePoint
+                sharepointList: "RequisicoesManutencao"
+            };
+
+            // ========== CONFIGURAÇÃO MSAL ==========
+            const msalConfig = {
+                auth: {
+                    clientId: CONFIG.clientId,
+                    authority: `https://login.microsoftonline.com/${CONFIG.tenantId}`,
+                    redirectUri: "https://kero-sir.github.io/main/",
                 },
-                manutencao: { 
-                    nome: "Francisco Sandramo", 
-                    role: "Manutenção", 
-                    email: "francisco.sandramo@accordgrouplda.com" 
-                },
-                consumiveis: { 
-                    nome: "Stephany Silva", 
-                    role: "Consumíveis / Compra", 
-                    email: "stephany.silva@accordgrouplda.com" 
-                },
-                cg: { 
-                    nome: "Erikson Madureira", 
-                    role: "Controlo Gestão", 
-                    email: "erikson.madureira@accordgrouplda.com" 
-                },
-                diretor: { 
-                    nome: "Paulo Silva", 
-                    role: "Director Geral", 
-                    email: "paulo.silva@accordgrouplda.com" 
-                },
-                financas: { 
-                    nome: "Liliana Borges", 
-                    role: "Finanças", 
-                    email: "liliana.borges@accordgrouplda.com" 
-                },
-                admin: { 
-                    nome: "Administrador", 
-                    role: "Admin", 
-                    email: "admin@accordgrouplda.com" 
+                cache: {
+                    cacheLocation: "localStorage",
+                    storeAuthStateInCookie: false,
                 }
             };
 
+            // ========== CONFIGURAÇÃO SHAREPOINT ==========
+            const SP_CONFIG = {
+                siteUrl: CONFIG.sharepointSite,
+                listName: CONFIG.sharepointList
+            };
+
+            // ========== PERFIS ACCORD GROUP ==========
+            const perfis = {
+                'teodoro.tavares@accordgrouplda.com': { nome: "Teodoro Tavares", role: "Solicitante" },
+                'francisco.sandramo@accordgrouplda.com': { nome: "Francisco Sandramo", role: "Manutenção" },
+                'tiago.miranda@accordgrouplda.com': { nome: "Tiago Miranda", role: "Manutenção" },
+                'stephany.silva@accordgrouplda.com': { nome: "Stephany Silva", role: "Consumíveis / Compra" },
+                'erikson.madureira@accordgrouplda.com': { nome: "Erikson Madureira", role: "Controlo Gestão" },
+                'paulo.silva@accordgrouplda.com': { nome: "Paulo Silva", role: "Director Geral" },
+                'liliana.borges@accordgrouplda.com': { nome: "Liliana Borges", role: "Finanças" }
+            };
+
+            function getPerfil(email) {
+                const emailLower = email ? email.toLowerCase() : '';
+                for (const [key, value] of Object.entries(perfis)) {
+                    if (emailLower === key.toLowerCase()) return value;
+                }
+                return { nome: email.split('@')[0] || 'Usuário', role: 'Colaborador' };
+            }
+
+            // ========== ESTADO ==========
+            let msalInstance = null;
             let usuario = null;
             let requisicoes = [];
             let pagina = 1;
@@ -1778,40 +1841,354 @@
             let requisicaoAnexo = null;
             let avaliacaoAnexo = null;
             let dadosCarregados = false;
+            let sincronizando = false;
+            let listaId = null;
 
-            // ========== PERSISTÊNCIA ==========
-            function salvar() {
+            // ========== MSAL ==========
+            function initMsal() {
                 try {
-                    localStorage.setItem('kero_manutencao_v8', JSON.stringify(requisicoes));
-                    console.log('✅ Dados salvos com sucesso! Total de requisições:', requisicoes.length);
+                    msalInstance = new msal.PublicClientApplication(msalConfig);
+                    return true;
                 } catch (e) {
-                    console.error('❌ Erro ao salvar dados:', e);
-                    notificar('Erro ao salvar dados!', 'error');
+                    console.error('Erro ao inicializar MSAL:', e);
+                    return false;
                 }
             }
 
-            function carregar() {
+            // ========== LOGIN ==========
+            async function login() {
+                const loginBtn = document.getElementById('loginBtn');
+                const loading = document.getElementById('loginLoading');
+                const errorDiv = document.getElementById('loginError');
+                const errorMsg = document.getElementById('loginErrorMsg');
+
+                loginBtn.disabled = true;
+                loading.style.display = 'block';
+                errorDiv.style.display = 'none';
+
                 try {
-                    const data = localStorage.getItem('kero_manutencao_v8');
-                    if (data) {
-                        requisicoes = JSON.parse(data);
-                        requisicoes.forEach(r => {
-                            if (parseInt(r.id) >= nextId) nextId = parseInt(r.id) + 1;
+                    if (!msalInstance) {
+                        if (!initMsal()) throw new Error('Não foi possível inicializar o MSAL');
+                    }
+
+                    const accounts = msalInstance.getAllAccounts();
+                    let account = accounts.length > 0 ? accounts[0] : null;
+
+                    if (!account) {
+                        const response = await msalInstance.loginPopup({
+                            scopes: ['User.Read', 'Sites.ReadWrite.All', 'Files.ReadWrite.All']
+                        });
+                        account = response.account;
+                    }
+
+                    if (!account) throw new Error('Não foi possível obter a conta do utilizador');
+
+                    const profile = getPerfil(account.username);
+                    
+                    usuario = {
+                        email: account.username,
+                        nome: profile.nome,
+                        role: profile.role,
+                        idToken: account.idToken,
+                        account: account
+                    };
+
+                    iniciarApp();
+
+                } catch (error) {
+                    console.error('Erro no login:', error);
+                    errorMsg.textContent = error.message || 'Erro ao autenticar com Microsoft';
+                    errorDiv.style.display = 'block';
+                } finally {
+                    loginBtn.disabled = false;
+                    loading.style.display = 'none';
+                }
+            }
+
+            // ========== INICIAR APP ==========
+            function iniciarApp() {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainSystem').style.display = 'block';
+                
+                document.getElementById('headerUserName').innerText = usuario.nome;
+                document.getElementById('headerUserEmail').innerText = usuario.email;
+                const avatar = usuario.nome.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.getElementById('headerUserAvatar').innerText = avatar;
+
+                document.getElementById('currentDate').textContent =
+                    new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+
+                carregarDadosSharePoint();
+                notificar(`👋 Bem-vindo(a), ${usuario.nome}!`, 'success');
+            }
+
+            // ========== SHAREPOINT - GRAPH API ==========
+            async function getAccessToken() {
+                if (!msalInstance) return null;
+                try {
+                    const account = msalInstance.getAllAccounts()[0];
+                    if (!account) throw new Error('Sem conta ativa');
+                    
+                    const response = await msalInstance.acquireTokenSilent({
+                        scopes: ['Sites.ReadWrite.All', 'Files.ReadWrite.All'],
+                        account: account
+                    });
+                    return response.accessToken;
+                } catch (error) {
+                    console.error('Erro ao obter token:', error);
+                    try {
+                        const response = await msalInstance.acquireTokenPopup({
+                            scopes: ['Sites.ReadWrite.All', 'Files.ReadWrite.All']
+                        });
+                        return response.accessToken;
+                    } catch (e) {
+                        console.error('Erro ao obter token via popup:', e);
+                        return null;
+                    }
+                }
+            }
+
+            async function graphRequest(endpoint, options = {}) {
+                const token = await getAccessToken();
+                if (!token) throw new Error('Não foi possível obter token de acesso');
+
+                // Obter site ID
+                const siteId = await getSiteId();
+
+                let url;
+                if (endpoint.startsWith('/')) {
+                    url = `https://graph.microsoft.com/v1.0/sites/${siteId}${endpoint}`;
+                } else {
+                    url = `https://graph.microsoft.com/v1.0/sites/${siteId}/${endpoint}`;
+                }
+
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(`Graph API error ${response.status}: ${error}`);
+                }
+
+                return response.json();
+            }
+
+            async function getSiteId() {
+                try {
+                    const site = await fetch(
+                        `https://graph.microsoft.com/v1.0/sites/${SP_CONFIG.siteUrl}?$select=id`,
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${await getAccessToken()}`
+                            }
+                        }
+                    );
+                    if (!site.ok) throw new Error('Site não encontrado');
+                    const data = await site.json();
+                    return data.id;
+                } catch (e) {
+                    console.error('Erro ao obter Site ID:', e);
+                    throw e;
+                }
+            }
+
+            async function getListId() {
+                if (listaId) return listaId;
+                try {
+                    const lists = await graphRequest('/lists', { method: 'GET' });
+                    const list = lists.value.find(l => l.displayName === SP_CONFIG.listName);
+                    if (list) {
+                        listaId = list.id;
+                        return list.id;
+                    }
+                    // Criar lista
+                    return await criarLista();
+                } catch (e) {
+                    console.error('Erro ao obter lista:', e);
+                    throw e;
+                }
+            }
+
+            async function criarLista() {
+                try {
+                    const listDef = {
+                        displayName: SP_CONFIG.listName,
+                        description: 'Requisições de Manutenção - Kero SIR',
+                        columns: [
+                            { name: 'Codigo', text: { } },
+                            { name: 'Equipamento', text: { } },
+                            { name: 'Local', text: { } },
+                            { name: 'Tipo', choice: { choices: ['corretiva', 'preventiva'] } },
+                            { name: 'Prioridade', choice: { choices: ['baixa', 'media', 'alta'] } },
+                            { name: 'Descricao', text: { } },
+                            { name: 'Status', choice: { choices: ['pendente', 'aguardando_consumiveis', 'aguardando_cg', 'aguardando_diretor', 'aguardando_financas', 'em_execucao', 'aguardando_material', 'aguardando_execucao', 'concluida', 'reprovada'] } },
+                            { name: 'Solicitante', text: { } },
+                            { name: 'SolicitanteEmail', text: { } },
+                            { name: 'Data', dateTime: { } },
+                            { name: 'Diagnostico', text: { } },
+                            { name: 'OpcaoResolucao', choice: { choices: ['com_material', 'transferencia', 'consumo', 'precisa_comprar'] } },
+                            { name: 'ValorTotal', number: { } },
+                            { name: 'Fornecedor', text: { } },
+                            { name: 'MotivoDespesa', text: { } },
+                            { name: 'ParecerCG', text: { } },
+                            { name: 'ParecerDiretor', text: { } },
+                            { name: 'RelatorioExecucao', text: { } },
+                            { name: 'TecnicoResponsavel', text: { } },
+                            { name: 'DataConclusao', dateTime: { } },
+                            { name: 'Historico', text: { } },
+                            { name: 'NotaDespesa', text: { } },
+                            { name: 'Anexos', text: { } }
+                        ]
+                    };
+
+                    const result = await graphRequest('/lists', {
+                        method: 'POST',
+                        body: JSON.stringify(listDef)
+                    });
+                    listaId = result.id;
+                    return result.id;
+                } catch (e) {
+                    console.error('Erro ao criar lista:', e);
+                    throw e;
+                }
+            }
+
+            // ========== CARREGAR DADOS ==========
+            async function carregarDadosSharePoint() {
+                try {
+                    setStatusSync('sync', 'A carregar do SharePoint...');
+                    
+                    const listId = await getListId();
+                    const items = await graphRequest(`/lists/${listId}/items?expand=fields`, { method: 'GET' });
+                    
+                    if (items.value && items.value.length > 0) {
+                        requisicoes = items.value.map(item => {
+                            const fields = item.fields;
+                            return {
+                                id: String(item.id),
+                                codigo: fields.Codigo || fields.Title || `MAN-${String(item.id).padStart(4, '0')}`,
+                                equipamento: fields.Equipamento || '',
+                                local: fields.Local || '',
+                                tipo: fields.Tipo || 'corretiva',
+                                prioridade: fields.Prioridade || 'media',
+                                descricao: fields.Descricao || '',
+                                status: fields.Status || 'pendente',
+                                data: fields.Data || item.createdDateTime || new Date().toISOString(),
+                                solicitante: fields.Solicitante || '',
+                                email: fields.SolicitanteEmail || '',
+                                diagnostico: fields.Diagnostico || '',
+                                opcaoResolucao: fields.OpcaoResolucao || '',
+                                valorTotal: parseFloat(fields.ValorTotal) || 0,
+                                fornecedor: fields.Fornecedor || '',
+                                motivoDespesa: fields.MotivoDespesa || '',
+                                parecerCG: fields.ParecerCG || '',
+                                parecerDiretor: fields.ParecerDiretor || '',
+                                relatorioExecucao: fields.RelatorioExecucao || '',
+                                tecnicoResponsavel: fields.TecnicoResponsavel || '',
+                                dataConclusao: fields.DataConclusao || '',
+                                historico: JSON.parse(fields.Historico || '[]'),
+                                notaDespesa: JSON.parse(fields.NotaDespesa || 'null'),
+                                anexos: JSON.parse(fields.Anexos || '[]'),
+                                _sharepointId: item.id
+                            };
                         });
                         dadosCarregados = true;
-                        console.log('✅ Dados carregados do localStorage! Total:', requisicoes.length);
-                        return;
+                        setStatusSync('sync', `${requisicoes.length} registos`);
+                        notificar(`✅ ${requisicoes.length} requisições carregadas do SharePoint`, 'success');
+                    } else {
+                        // Carregar exemplos
+                        await carregarExemploSharePoint();
                     }
-                } catch (e) {
-                    console.error('❌ Erro ao carregar dados:', e);
+                } catch (error) {
+                    console.error('Erro ao carregar do SharePoint:', error);
+                    // Fallback para localStorage
+                    carregarLocalStorage();
+                    setStatusSync('error', 'Offline - dados locais');
+                    notificar('⚠️ A usar dados locais. Não foi possível conectar ao SharePoint.', 'warning');
                 }
-                
-                // Se não houver dados salvos, carrega exemplo
-                carregarExemplo();
+
+                carregarDashboard();
+                renderizarRequisicoes();
+                renderizarAprovacoes();
+                atualizarRelatorios();
+                atualizarBadges();
             }
 
-            function carregarExemplo() {
-                console.log('📂 Carregando dados de exemplo...');
+            // ========== CARREGAR EXEMPLO ==========
+            async function carregarExemploSharePoint() {
+                const exemplos = [
+                    {
+                        Codigo: "MAN-2026-0001",
+                        Equipamento: "Ar Condicionado",
+                        Local: "Direcção Geral",
+                        Tipo: "corretiva",
+                        Prioridade: "alta",
+                        Descricao: "O equipamento não está a refrigerar adequadamente, temperatura ambiente acima de 28°C.",
+                        Status: "pendente",
+                        Solicitante: "Teodoro Tavares",
+                        SolicitanteEmail: "teodoro.tavares@accordgrouplda.com",
+                        Data: new Date().toISOString(),
+                        Historico: JSON.stringify([{ data: new Date().toISOString(), usuario: "Teodoro Tavares", acao: "Requisição criada" }])
+                    },
+                    {
+                        Codigo: "MAN-2026-0002",
+                        Equipamento: "Empilhador Elétrico",
+                        Local: "Armazém ZEE",
+                        Tipo: "preventiva",
+                        Prioridade: "media",
+                        Descricao: "Revisão anual programada - troca de baterias e lubrificação geral.",
+                        Status: "aguardando_consumiveis",
+                        Solicitante: "Teodoro Tavares",
+                        SolicitanteEmail: "teodoro.tavares@accordgrouplda.com",
+                        Data: new Date().toISOString(),
+                        Diagnostico: "Baterias com desgaste acentuado, necessita substituição.",
+                        OpcaoResolucao: "precisa_comprar",
+                        ValorTotal: 450000,
+                        Historico: JSON.stringify([
+                            { data: new Date().toISOString(), usuario: "Teodoro Tavares", acao: "Requisição criada" },
+                            { data: new Date().toISOString(), usuario: "Francisco Sandramo", acao: "Diagnóstico realizado - necessita compra" }
+                        ])
+                    }
+                ];
+
+                const listId = await getListId();
+                for (const item of exemplos) {
+                    try {
+                        await graphRequest(`/lists/${listId}/items`, {
+                            method: 'POST',
+                            body: JSON.stringify({ fields: { ...item, Title: item.Codigo } })
+                        });
+                    } catch (e) {
+                        console.error('Erro ao criar exemplo:', e);
+                    }
+                }
+                
+                // Recarregar dados
+                await carregarDadosSharePoint();
+            }
+
+            // ========== CARREGAR LOCAL ==========
+            function carregarLocalStorage() {
+                try {
+                    const data = localStorage.getItem('kero_manutencao_v9');
+                    if (data) {
+                        requisicoes = JSON.parse(data);
+                        dadosCarregados = true;
+                    } else {
+                        carregarExemploLocal();
+                    }
+                } catch (e) {
+                    carregarExemploLocal();
+                }
+            }
+
+            function carregarExemploLocal() {
                 requisicoes = [
                     {
                         id: "1",
@@ -1820,42 +2197,102 @@
                         local: "Direcção Geral",
                         tipo: "corretiva",
                         prioridade: "alta",
-                        descricao: "O equipamento não está a refrigerar adequadamente, temperatura ambiente acima de 28°C.",
+                        descricao: "O equipamento não está a refrigerar adequadamente.",
                         status: "pendente",
                         data: new Date().toISOString(),
                         solicitante: "Teodoro Tavares",
-                        email: "teodoro.Tavares@accordgrouplda.com",
+                        email: "teodoro.tavares@accordgrouplda.com",
                         anexos: [],
                         historico: [{ data: new Date().toISOString(), usuario: "Teodoro Tavares", acao: "Requisição criada" }],
                         notaDespesa: null
-                    },
-                    {
-                        id: "2",
-                        codigo: "MAN-2026-0002",
-                        equipamento: "Empilhador Elétrico",
-                        local: "Armazém ZEE",
-                        tipo: "preventiva",
-                        prioridade: "media",
-                        descricao: "Revisão anual programada - troca de baterias e lubrificação geral.",
-                        status: "aguardando_consumiveis",
-                        data: new Date().toISOString(),
-                        solicitante: "Teodoro Tavares",
-                        email: "teodoro.Tavares@accordgrouplda.com",
-                        diagnostico: "Baterias com desgaste acentuado, necessita substituição.",
-                        opcaoResolucao: "precisa_comprar",
-                        descricaoCompra: "2 baterias de 48V para empilhador elétrico",
-                        valorCompra: 450000,
-                        anexos: [],
-                        historico: [
-                            { data: new Date().toISOString(), usuario: "Teodoro Tavares", acao: "Requisição criada" },
-                            { data: new Date().toISOString(), usuario: "Francisco Sandramo", acao: "Diagnóstico realizado - necessita compra" }
-                        ],
-                        notaDespesa: null
                     }
                 ];
-                nextId = 3;
-                salvar();
+                nextId = 2;
                 dadosCarregados = true;
+            }
+
+            // ========== SALVAR LOCAL ==========
+            function salvarLocal() {
+                try {
+                    localStorage.setItem('kero_manutencao_v9', JSON.stringify(requisicoes));
+                } catch (e) {
+                    console.error('Erro ao salvar local:', e);
+                }
+            }
+
+            // ========== SINCRONIZAR ==========
+            async function sincronizarSharePoint() {
+                if (sincronizando) return;
+                sincronizando = true;
+                setStatusSync('sync', 'A sincronizar...');
+                
+                try {
+                    salvarLocal();
+                    
+                    const listId = await getListId();
+                    
+                    for (const req of requisicoes) {
+                        const fields = {
+                            Title: req.codigo,
+                            Codigo: req.codigo,
+                            Equipamento: req.equipamento,
+                            Local: req.local || '',
+                            Tipo: req.tipo || 'corretiva',
+                            Prioridade: req.prioridade || 'media',
+                            Descricao: req.descricao || '',
+                            Status: req.status || 'pendente',
+                            Solicitante: req.solicitante || '',
+                            SolicitanteEmail: req.email || '',
+                            Data: req.data || new Date().toISOString(),
+                            Diagnostico: req.diagnostico || '',
+                            OpcaoResolucao: req.opcaoResolucao || '',
+                            ValorTotal: req.valorTotal || 0,
+                            Fornecedor: req.fornecedor || '',
+                            MotivoDespesa: req.motivoDespesa || '',
+                            ParecerCG: req.parecerCG || '',
+                            ParecerDiretor: req.parecerDiretor || '',
+                            RelatorioExecucao: req.relatorioExecucao || '',
+                            TecnicoResponsavel: req.tecnicoResponsavel || '',
+                            DataConclusao: req.dataConclusao || '',
+                            Historico: JSON.stringify(req.historico || []),
+                            NotaDespesa: JSON.stringify(req.notaDespesa || null),
+                            Anexos: JSON.stringify(req.anexos || [])
+                        };
+
+                        if (req._sharepointId) {
+                            await graphRequest(`/lists/${listId}/items/${req._sharepointId}`, {
+                                method: 'PATCH',
+                                body: JSON.stringify({ fields })
+                            });
+                        } else {
+                            const result = await graphRequest(`/lists/${listId}/items`, {
+                                method: 'POST',
+                                body: JSON.stringify({ fields })
+                            });
+                            req._sharepointId = result.id;
+                        }
+                    }
+                    
+                    setStatusSync('sync', 'Sincronizado ✓');
+                    notificar('✅ Dados sincronizados com SharePoint!', 'success');
+                } catch (error) {
+                    console.error('Erro na sincronização:', error);
+                    setStatusSync('error', 'Erro na sincronização');
+                    notificar('⚠️ Erro ao sincronizar com SharePoint. Dados salvos localmente.', 'error');
+                } finally {
+                    sincronizando = false;
+                }
+            }
+
+            function setStatusSync(type, text) {
+                const el = document.getElementById('spStatus');
+                const textEl = document.getElementById('spStatusText');
+                el.className = 'sharepoint-status ' + (type === 'sync' ? 'sync' : type === 'error' ? 'error' : '');
+                if (type === 'sync' && (text.includes('A carregar') || text.includes('A sincronizar'))) {
+                    textEl.innerHTML = text + ' <span class="spinner-small"></span>';
+                } else {
+                    textEl.textContent = text;
+                }
             }
 
             // ========== HELPERS ==========
@@ -1900,7 +2337,7 @@
             }
 
             function podeVer(req) {
-                if (usuario.role === 'Solicitante') return req.email === usuario.email;
+                if (usuario.role === 'Solicitante') return req.email?.toLowerCase() === usuario.email?.toLowerCase();
                 if (usuario.role === 'Admin') return true;
                 return true;
             }
@@ -1908,7 +2345,6 @@
             function adicionarHistorico(req, acao) {
                 if (!req.historico) req.historico = [];
                 req.historico.push({ data: new Date().toISOString(), usuario: usuario.nome, acao: acao });
-                salvar();
             }
 
             function notificar(msg, tipo = 'success') {
@@ -1950,7 +2386,6 @@
 
                 document.getElementById('sidebar').classList.remove('open');
 
-                // Renderizar a seção correta
                 if (section === 'requisicoes') renderizarRequisicoes();
                 else if (section === 'aprovacoes') renderizarAprovacoes();
                 else if (section === 'dashboard') carregarDashboard();
@@ -1972,10 +2407,7 @@
 
             // ========== RENDER: REQUISIÇÕES ==========
             function renderizarRequisicoes() {
-                if (!dadosCarregados) {
-                    console.log('⏳ Aguardando dados carregados...');
-                    return;
-                }
+                if (!dadosCarregados) return;
                 
                 let filtradas = requisicoes.filter(podeVer);
                 if (filtroStatus !== 'all') filtradas = filtradas.filter(r => r.status === filtroStatus);
@@ -2031,10 +2463,7 @@
 
             // ========== RENDER: APROVAÇÕES ==========
             function renderizarAprovacoes() {
-                if (!dadosCarregados) {
-                    console.log('⏳ Aguardando dados carregados...');
-                    return;
-                }
+                if (!dadosCarregados) return;
                 
                 let pendentes = [];
                 if (usuario.role === 'Consumíveis / Compra') pendentes = requisicoes.filter(r => r.status === 'aguardando_consumiveis');
@@ -2063,7 +2492,7 @@
                     else if (req.opcaoResolucao === 'consumo') tipoSol = 'Consumo (Stock Interno)';
                     else if (req.opcaoResolucao === 'precisa_comprar') tipoSol = 'Compra de Material';
                     row.insertCell(3).innerHTML = tipoSol;
-                    row.insertCell(4).innerHTML = formatarMoeda(req.valorTransferencia || req.valorConsumo || req.valorTotal || 0);
+                    row.insertCell(4).innerHTML = formatarMoeda(req.valorTotal || 0);
                     row.insertCell(5).innerHTML = renderAnexos(req);
                     row.insertCell(6).innerHTML = getAcoes(req);
                 });
@@ -2088,23 +2517,27 @@
 
             // ========== VISUALIZAR ANEXO ==========
             function visualizarAnexo(reqId, idx) {
-                const req = requisicoes.find(r => r.id === reqId);
+                const req = requisicoes.find(r => r.id === reqId || r._sharepointId === reqId);
                 if (!req || !req.anexos || !req.anexos[idx]) return;
                 const anexo = req.anexos[idx];
                 const win = window.open('', '_blank');
-                if (anexo.data.startsWith('data:application/pdf')) {
-                    win.document.write(`<iframe src="${anexo.data}" style="width:100%;height:100vh;border:none;"></iframe>`);
-                } else if (anexo.data.startsWith('data:image')) {
-                    win.document.write(`<img src="${anexo.data}" style="max-width:100%;max-height:100vh;display:block;margin:auto;">`);
+                if (anexo.data && anexo.data.startsWith('data:')) {
+                    if (anexo.data.startsWith('data:application/pdf')) {
+                        win.document.write(`<iframe src="${anexo.data}" style="width:100%;height:100vh;border:none;"></iframe>`);
+                    } else if (anexo.data.startsWith('data:image')) {
+                        win.document.write(`<img src="${anexo.data}" style="max-width:100%;max-height:100vh;display:block;margin:auto;">`);
+                    } else {
+                        win.document.write(`<pre>${anexo.data}</pre>`);
+                    }
                 } else {
-                    win.document.write(`<pre>${anexo.data}</pre>`);
+                    win.document.write(`<p>Ficheiro: ${anexo.nome}</p>`);
                 }
                 win.document.title = anexo.nome;
             }
 
             // ========== VISUALIZAR NOTA DESPESA ==========
             function visualizarNotaDespesa(reqId) {
-                const req = requisicoes.find(r => r.id === reqId);
+                const req = requisicoes.find(r => r.id === reqId || r._sharepointId === reqId);
                 if (!req || !req.notaDespesa) return;
                 const notaDiv = document.getElementById('notaConteudo');
                 const nd = req.notaDespesa;
@@ -2177,7 +2610,7 @@
 
             // ========== ABRIR DETALHES ==========
             function abrirDetalhes(id) {
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 
                 let html = `
@@ -2217,23 +2650,24 @@
                 abrirModal('modalDetalhes');
             }
 
-            // ========== EXCLUIR REQUISIÇÃO (ADMIN) ==========
+            // ========== EXCLUIR REQUISIÇÃO ==========
             function excluirRequisicao(id) {
                 if (!confirm('Tem certeza que deseja excluir esta requisição permanentemente?')) return;
-                requisicoes = requisicoes.filter(r => r.id !== id);
-                salvar();
-                renderizarRequisicoes();
-                renderizarAprovacoes();
-                carregarDashboard();
-                notificar('Requisição excluída com sucesso!', 'info');
+                const req = requisicoes.find(r => r.id === id);
+                if (req) {
+                    requisicoes = requisicoes.filter(r => r.id !== id);
+                    salvarLocal();
+                    sincronizarSharePoint();
+                    renderizarRequisicoes();
+                    renderizarAprovacoes();
+                    carregarDashboard();
+                    notificar('Requisição excluída com sucesso!', 'info');
+                }
             }
 
             // ========== DASHBOARD ==========
             function carregarDashboard() {
-                if (!dadosCarregados) {
-                    console.log('⏳ Aguardando dados carregados...');
-                    return;
-                }
+                if (!dadosCarregados) return;
                 
                 const div = document.getElementById('atividadesRecentes');
                 const recentes = [...requisicoes].sort((a, b) => new Date(b.data) - new Date(a.data)).slice(0, 8);
@@ -2251,9 +2685,7 @@
             }
 
             function atualizarKPIs() {
-                if (!dadosCarregados) {
-                    return;
-                }
+                if (!dadosCarregados) return;
                 
                 document.getElementById('totalReq').innerText = requisicoes.length;
                 document.getElementById('totalPendente').innerText = requisicoes.filter(r => r.status === 'pendente').length;
@@ -2267,9 +2699,7 @@
             }
 
             function atualizarBadges() {
-                if (!dadosCarregados) {
-                    return;
-                }
+                if (!dadosCarregados) return;
                 
                 const pendentes = requisicoes.filter(r => r.status !== 'concluida' && r.status !== 'reprovada').length;
                 document.getElementById('totalBadge').innerText = pendentes;
@@ -2301,7 +2731,7 @@
             }
 
             // ========== CRUD: NOVA REQUISIÇÃO ==========
-            function novaRequisicao(e) {
+            async function novaRequisicao(e) {
                 e.preventDefault();
                 
                 const tipo = document.getElementById('tipoManutencao').value;
@@ -2328,16 +2758,19 @@
                     email: usuario.email,
                     anexos: requisicaoAnexo ? [{ nome: requisicaoAnexo.name, data: requisicaoAnexo.data }] : [],
                     historico: [{ data: new Date().toISOString(), usuario: usuario.nome, acao: 'Requisição criada' }],
-                    notaDespesa: null
+                    notaDespesa: null,
+                    _sharepointId: null
                 };
+
                 requisicoes.unshift(nova);
-                salvar();
+                salvarLocal();
                 fecharModal('modalNovaRequisicao');
                 document.getElementById('formNovaRequisicao').reset();
                 requisicaoAnexo = null;
                 document.getElementById('requisicaoFileList').innerHTML = '';
                 
-                // Forçar atualização de todas as visualizações
+                await sincronizarSharePoint();
+                
                 renderizarRequisicoes();
                 renderizarAprovacoes();
                 carregarDashboard();
@@ -2367,7 +2800,7 @@
                 document.getElementById('detalhesCompra').style.display = valor === 'precisa_comprar' ? 'block' : 'none';
             }
 
-            function salvarAvaliacao(e) {
+            async function salvarAvaliacao(e) {
                 e.preventDefault();
                 const id = document.getElementById('avaliacaoId').value;
                 const req = requisicoes.find(r => r.id === id);
@@ -2396,25 +2829,26 @@
                 } else if (req.opcaoResolucao === 'transferencia') {
                     req.origemRecurso = document.getElementById('origemRecurso').value;
                     req.detalhesTransferencia = document.getElementById('detalhesTransferenciaTexto').value;
-                    req.valorTransferencia = parseFloat(document.getElementById('valorTransferencia').value) || 0;
+                    req.valorTotal = parseFloat(document.getElementById('valorTransferencia').value) || 0;
                     req.status = 'aguardando_consumiveis';
                     adicionarHistorico(req, 'Solicitação de transferência de recurso. Aguardando autorização da Stephany Silva (Consumíveis/Compra).');
                     notificar('📦 Solicitação enviada para Stephany Silva (stephany.silva@accordgrouplda.com) autorizar transferência.', 'info');
                 } else if (req.opcaoResolucao === 'consumo') {
                     req.detalhesConsumo = document.getElementById('detalhesConsumoTexto').value;
-                    req.valorConsumo = parseFloat(document.getElementById('valorConsumo').value) || 0;
+                    req.valorTotal = parseFloat(document.getElementById('valorConsumo').value) || 0;
                     req.status = 'aguardando_cg';
                     adicionarHistorico(req, 'Solicitação de consumo de stock interno. Aguardando aprovação do Controlo Gestão.');
                     notificar('📊 Solicitação enviada para Erikson Madureira (erikson.madureira@accordgrouplda.com) aprovar consumo.', 'info');
                 } else if (req.opcaoResolucao === 'precisa_comprar') {
-                    req.fornecedorCompra = document.getElementById('fornecedorCompra').value;
+                    req.fornecedor = document.getElementById('fornecedorCompra').value;
                     req.descricaoCompra = document.getElementById('descricaoCompra').value;
-                    req.valorCompra = parseFloat(document.getElementById('valorCompra').value) || 0;
+                    req.valorTotal = parseFloat(document.getElementById('valorCompra').value) || 0;
                     req.status = 'aguardando_consumiveis';
                     adicionarHistorico(req, 'Solicitação de compra. Aguardando Stephany Silva (Consumíveis/Compra) registar despesas.');
                     notificar('📦 Requisição enviada para Stephany Silva (stephany.silva@accordgrouplda.com) registar despesas.', 'info');
                 }
-                salvar();
+                salvarLocal();
+                await sincronizarSharePoint();
                 fecharModal('modalAvaliacao');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
@@ -2423,7 +2857,7 @@
 
             // ========== CONSUMÍVEIS - AUTORIZAÇÃO ==========
             function abrirConsumiveisAutorizacao(id) {
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 document.getElementById('consumiveisAutorizacaoReqId').value = id;
                 document.getElementById('consumiveisAutorizacaoInfo').innerHTML = `
@@ -2431,8 +2865,8 @@
                     <strong>Equipamento:</strong> ${req.equipamento}<br>
                     <strong>Tipo:</strong> Transferência de Recurso<br>
                     <strong>Origem:</strong> ${req.origemRecurso || 'N/A'}<br>
-                    <strong>Detalhes:</strong> ${req.detalhesTransferencia}<br>
-                    <strong>Valor Estimado:</strong> ${formatarMoeda(req.valorTransferencia)}<br>
+                    <strong>Detalhes:</strong> ${req.detalhesTransferencia || req.descricaoCompra}<br>
+                    <strong>Valor Estimado:</strong> ${formatarMoeda(req.valorTotal)}<br>
                     <strong>Diagnóstico:</strong> ${req.diagnostico}
                 `;
                 document.getElementById('consumiveisDecisao').value = '';
@@ -2441,10 +2875,10 @@
                 abrirModal('modalConsumiveisAutorizacao');
             }
 
-            function salvarConsumiveisAutorizacao(e) {
+            async function salvarConsumiveisAutorizacao(e) {
                 e.preventDefault();
                 const id = document.getElementById('consumiveisAutorizacaoReqId').value;
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 const decisao = document.getElementById('consumiveisDecisao').value;
                 const comentario = document.getElementById('consumiveisComentario').value.trim();
@@ -2465,7 +2899,8 @@
                     adicionarHistorico(req, `Stephany Silva autorizou transferência. Manutenção pode executar.`);
                     notificar('✅ Autorização concedida! Manutenção pode executar o serviço.', 'success');
                 }
-                salvar();
+                salvarLocal();
+                await sincronizarSharePoint();
                 fecharModal('modalConsumiveisAutorizacao');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
@@ -2514,12 +2949,12 @@
             }
 
             function abrirConsumiveisDespesas(id) {
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 document.getElementById('consumiveisDespesasReqId').value = id;
                 consumiveisItens = [];
                 document.getElementById('consumiveisItensList').innerHTML = '';
-                document.getElementById('consumiveisFornecedor').value = '';
+                document.getElementById('consumiveisFornecedor').value = req.fornecedor || '';
                 document.getElementById('consumiveisData').value = new Date().toISOString().slice(0, 10);
                 document.getElementById('consumiveisTipoPagamento').value = 'proforma';
                 document.getElementById('consumiveisMotivo').value = '';
@@ -2530,17 +2965,17 @@
                 document.getElementById('consumiveisDespesasInfo').innerHTML = `
                     <strong>Requisição:</strong> ${req.codigo}<br>
                     <strong>Equipamento:</strong> ${req.equipamento}<br>
-                    <strong>Descrição da Compra:</strong> ${req.descricaoCompra}<br>
-                    <strong>Valor Estimado:</strong> ${formatarMoeda(req.valorCompra)}
+                    <strong>Descrição da Compra:</strong> ${req.descricaoCompra || 'N/A'}<br>
+                    <strong>Valor Estimado:</strong> ${formatarMoeda(req.valorTotal)}
                 `;
                 adicionarItemConsumiveis();
                 abrirModal('modalConsumiveisDespesas');
             }
 
-            function salvarConsumiveisDespesas(e) {
+            async function salvarConsumiveisDespesas(e) {
                 e.preventDefault();
                 const id = document.getElementById('consumiveisDespesasReqId').value;
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 
                 const fornecedor = document.getElementById('consumiveisFornecedor').value.trim();
@@ -2581,7 +3016,8 @@
                 req.status = 'aguardando_cg';
                 adicionarHistorico(req, `Stephany Silva registou despesas: Fornecedor ${req.fornecedor}, Valor ${formatarMoeda(req.valorTotal)}`);
                 notificar('✅ Despesas registadas. Enviado para Erikson Madureira (erikson.madureira@accordgrouplda.com).', 'success');
-                salvar();
+                salvarLocal();
+                await sincronizarSharePoint();
                 fecharModal('modalConsumiveisDespesas');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
@@ -2590,11 +3026,11 @@
 
             // ========== CG ==========
             function abrirCG(id) {
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 document.getElementById('cgReqId').value = id;
                 let itensHtml = '<ul style="margin-top:5px;">';
-                if (req.itens) req.itens.forEach(i => {
+                if (req.notaDespesa?.itens) req.notaDespesa.itens.forEach(i => {
                     itensHtml += `<li>${i.desc} - ${i.qtd}x ${formatarMoeda(i.preco)} = ${formatarMoeda(i.total)}</li>`;
                 });
                 itensHtml += '</ul>';
@@ -2611,10 +3047,10 @@
                 abrirModal('modalCG');
             }
 
-            function salvarCG(e) {
+            async function salvarCG(e) {
                 e.preventDefault();
                 const id = document.getElementById('cgReqId').value;
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 const decisao = document.getElementById('cgDecisao').value;
                 const parecer = document.getElementById('cgParecer').value.trim();
@@ -2639,7 +3075,8 @@
                     adicionarHistorico(req, 'Erikson Madureira aprovou. Enviado para Paulo Silva (paulo.silva@accordgrouplda.com).');
                     notificar('✅ Erikson Madureira aprovou. Enviado para o Director Geral.', 'success');
                 }
-                salvar();
+                salvarLocal();
+                await sincronizarSharePoint();
                 fecharModal('modalCG');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
@@ -2648,7 +3085,7 @@
 
             // ========== DIRECTOR GERAL ==========
             function abrirDiretor(id) {
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 document.getElementById('diretorReqId').value = id;
                 document.getElementById('diretorInfo').innerHTML = `
@@ -2663,10 +3100,10 @@
                 abrirModal('modalDiretor');
             }
 
-            function salvarDiretor(e) {
+            async function salvarDiretor(e) {
                 e.preventDefault();
                 const id = document.getElementById('diretorReqId').value;
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 const decisao = document.getElementById('diretorDecisao').value;
                 const parecer = document.getElementById('diretorParecer').value.trim();
@@ -2691,7 +3128,8 @@
                     adicionarHistorico(req, 'Paulo Silva aprovou. Enviado para Liliana Borges.');
                     notificar('✅ Paulo Silva aprovou. Aguardando pagamento.', 'success');
                 }
-                salvar();
+                salvarLocal();
+                await sincronizarSharePoint();
                 fecharModal('modalDiretor');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
@@ -2700,7 +3138,7 @@
 
             // ========== FINANÇAS ==========
             function abrirFinancas(id) {
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 document.getElementById('financasReqId').value = id;
                 document.getElementById('financasInfo').innerHTML = `
@@ -2720,10 +3158,10 @@
                 abrirModal('modalFinancas');
             }
 
-            function salvarFinancas(e) {
+            async function salvarFinancas(e) {
                 e.preventDefault();
                 const id = document.getElementById('financasReqId').value;
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 const status = document.getElementById('financasStatus').value;
                 const tipoPagamento = document.getElementById('financasTipoPagamento').value;
@@ -2759,7 +3197,8 @@
                     fecharModal('modalFinancas');
                     return;
                 }
-                salvar();
+                salvarLocal();
+                await sincronizarSharePoint();
                 fecharModal('modalFinancas');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
@@ -2768,7 +3207,7 @@
 
             // ========== EXECUÇÃO ==========
             function abrirExecucao(id) {
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 document.getElementById('execucaoReqId').value = id;
                 document.getElementById('relatorioExecucao').value = '';
@@ -2778,10 +3217,10 @@
                 abrirModal('modalExecucao');
             }
 
-            function salvarExecucao(e) {
+            async function salvarExecucao(e) {
                 e.preventDefault();
                 const id = document.getElementById('execucaoReqId').value;
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 
                 const relatorio = document.getElementById('relatorioExecucao').value.trim();
@@ -2797,7 +3236,8 @@
                 req.status = 'aguardando_execucao';
                 adicionarHistorico(req, `${usuario.nome} executou o serviço. Aguardando confirmação final de Teodoro Tavares.`);
                 notificar('✅ Serviço executado! Aguardando confirmação final de Teodoro Tavares.', 'success');
-                salvar();
+                salvarLocal();
+                await sincronizarSharePoint();
                 fecharModal('modalExecucao');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
@@ -2806,7 +3246,7 @@
 
             // ========== CONFIRMAÇÃO ÚNICA ==========
             function abrirConfirmacao(id) {
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req) return;
                 confirmacaoId = id;
                 let info = `<strong>Requisição:</strong> ${req.codigo}<br><strong>Equipamento:</strong> ${req.equipamento}<br>`;
@@ -2821,7 +3261,7 @@
                 abrirModal('modalConfirmacao');
             }
 
-            function enviarConfirmacao() {
+            async function enviarConfirmacao() {
                 const confirmMaterial = document.getElementById('confirmMaterial').value;
                 const confirmExecucao = document.getElementById('confirmExecucao').value;
                 const comentario = document.getElementById('confirmComentario').value;
@@ -2836,14 +3276,13 @@
                     return;
                 }
                 
-                const req = requisicoes.find(r => r.id === confirmacaoId);
+                const req = requisicoes.find(r => r.id === confirmacaoId || r._sharepointId === confirmacaoId);
                 if (!req) return;
 
                 if (confirmMaterial === 'nao' || confirmExecucao === 'nao') {
                     req.status = 'reprovada';
                     notificar('❌ Requisição reprovada por Teodoro Tavares.', 'error');
                 } else {
-                    // Confirmação única - finaliza diretamente a requisição
                     req.status = 'concluida';
                     req.dataConclusao = new Date().toISOString();
                     if (req.notaDespesa) req.notaDespesa.pagamentoStatus = 'Concluído';
@@ -2852,7 +3291,8 @@
                 req.comentarioFinal = comentario;
                 req.assinaturaSolicitante = assinatura;
                 adicionarHistorico(req, `Teodoro Tavares confirmou: Material=${confirmMaterial}, Execução=${confirmExecucao} - REQUISIÇÃO CONCLUÍDA`);
-                salvar();
+                salvarLocal();
+                await sincronizarSharePoint();
                 fecharModal('modalConfirmacao');
                 renderizarRequisicoes();
                 renderizarAprovacoes();
@@ -2887,10 +3327,10 @@
                 renderizarRequisicoes();
             }
 
-            // ========== NOTA DE DESPESA / COMPRA ==========
+            // ========== NOTA DE DESPESA ==========
             function imprimirNotaDespesa() {
                 const id = document.getElementById('financasReqId').value;
-                const req = requisicoes.find(r => r.id === id);
+                const req = requisicoes.find(r => r.id === id || r._sharepointId === id);
                 if (!req || !req.notaDespesa) {
                     notificar('Nenhuma nota de despesa encontrada!', 'warning');
                     return;
@@ -2924,8 +3364,6 @@
                         <p><strong>Parecer CG:</strong> ${req.parecerCG || 'N/A'}</p>
                         <p><strong>Parecer Director Geral:</strong> ${req.parecerDiretor || 'N/A'}</p>
                         <p><strong>Status Pagamento:</strong> ${nd.pagamentoStatus || 'Pendente'}</p>
-                        ${nd.comprovativo ? `<p><strong>Comprovativo:</strong> ${nd.comprovativo}</p>` : ''}
-                        ${nd.dataPagamento ? `<p><strong>Data Pagamento:</strong> ${formatarData(nd.dataPagamento)}</p>` : ''}
                     </div>
                 `;
                 notaDiv.innerHTML = html;
@@ -2937,7 +3375,7 @@
                 const data = {
                     requisicoes,
                     exportedAt: new Date().toISOString(),
-                    version: '8.0'
+                    version: '9.0-sharepoint'
                 };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -2957,35 +3395,15 @@
                 notificar('📊 Relatório Excel gerado com sucesso!', 'success'); 
             }
 
-            // ========== LOGIN / LOGOUT ==========
-            function login(tipo) {
-                usuario = perfis[tipo];
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainSystem').style.display = 'block';
-                
-                document.getElementById('headerUserName').innerText = usuario.nome;
-                document.getElementById('headerUserEmail').innerText = usuario.email;
-                const avatar = usuario.nome.split(' ').map(n => n[0]).join('').toUpperCase();
-                document.getElementById('headerUserAvatar').innerText = avatar;
-
-                // Carregar dados
-                carregar();
-                
-                // Renderizar a seção ativa (Dashboard por padrão)
-                carregarDashboard();
-                renderizarRequisicoes();
-                renderizarAprovacoes();
-                atualizarRelatorios();
-                atualizarBadges();
-
-                document.getElementById('currentDate').textContent =
-                    new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-
-                notificar(`👋 Bem-vindo(a), ${usuario.nome}!`, 'success');
-            }
-
+            // ========== LOGOUT ==========
             function logout() {
                 if (confirm('Tem certeza que deseja sair?')) {
+                    if (msalInstance) {
+                        const accounts = msalInstance.getAllAccounts();
+                        accounts.forEach(account => {
+                            msalInstance.logoutPopup({ account });
+                        });
+                    }
                     usuario = null;
                     document.getElementById('mainSystem').style.display = 'none';
                     document.getElementById('loginScreen').style.display = 'flex';
@@ -3280,12 +3698,16 @@
                 exportarDados,
                 imprimirNotaDespesa,
                 excluirRequisicao,
-                configurarEventos
+                sincronizarSharePoint,
+                configurarEventos,
+                initMsal
             };
         })();
 
+        // ========== INICIALIZAÇÃO ==========
         document.addEventListener('DOMContentLoaded', () => {
             app.configurarEventos();
+            app.initMsal();
         });
     </script>
 </body>
